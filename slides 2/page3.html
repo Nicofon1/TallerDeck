@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Reviews — Editorial Micro-Interactions Carousel</title>
+  
+  <!-- Modern Clean Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="page3.css">
+  <!-- La paleta y las letras del taller, despues de la hoja propia -->
+  <link rel="stylesheet" href="../taller.css">
+  <script src="../enlace.js"></script>
+  <!-- Antes de pintar nada: dentro del deck esta lámina nace a oscuras -->
+  <script>try{if(window.parent!==window&&!/[?&]previa=1/.test(location.search))document.documentElement.className+=" con-telon";}catch(e){}</script>
+
+  <style>
+    /* ── Costura con el deck ──────────────────────────────────
+       Esta lámina es clara y llega justo después de una oscura.
+       El telón evita el fogonazo: entra puesto y se levanta
+       mientras el contenido sube por debajo, escalonado. */
+    #telon{
+      position:fixed;inset:0;z-index:999;background:var(--papel);
+      pointer-events:none;opacity:0;
+      transition:opacity .62s cubic-bezier(.16,1,.3,1);
+    }
+    html.con-telon #telon{opacity:1}
+    html.con-telon body{overflow:hidden}
+
+    html.entrando .global-nav,
+    html.entrando .col-left,
+    html.entrando .col-center,
+    html.entrando .col-right{
+      animation:subirEntrada .82s cubic-bezier(.16,1,.3,1) both;
+    }
+    html.entrando .global-nav{animation-delay:.10s}
+    html.entrando .col-left  {animation-delay:.20s}
+    html.entrando .col-center{animation-delay:.16s}
+    html.entrando .col-right {animation-delay:.28s}
+    @keyframes subirEntrada{
+      from{opacity:0;transform:translateY(38px)}
+      to{opacity:1;transform:none}
+    }
+
+    /* Salida: todo baja y se apaga hacia el negro del deck */
+    html.saliendo #telon{opacity:1;transition-duration:.5s}
+    html.saliendo .global-nav,
+    html.saliendo .col-left,
+    html.saliendo .col-center,
+    html.saliendo .col-right{
+      opacity:0;transform:translateY(-26px);
+      transition:opacity .42s ease,transform .52s cubic-bezier(.6,0,.9,.4);
+    }
+
+    /* ── El índice de secciones ───────────────────────────── */
+    .nav-chip[data-seccion]{cursor:pointer}
+    .nav-chip .punto{
+      width:6px;height:6px;border-radius:50%;
+      background:currentColor;opacity:.55;flex-shrink:0;
+    }
+
+    /* ── Previsualizaciones ───────────────────────────────────
+       El marco y las fichas ya no llevan fotos: llevan las páginas,
+       cargadas y corriendo. La maqueta no cambia —el mismo retrato
+       estirado de 240×580, las mismas fichas de 76— porque la página
+       de dentro se recorta para cubrir su caja, igual que se recortaba
+       la foto que había aquí antes.
+
+       Ficha y marco son EL MISMO iframe: cambiarlo de sitio en el DOM
+       lo recargaría, así que ninguno se mueve de esta capa suelta y
+       todo el vuelo se hace sobre ella, con la Web Animations API. */
+    .capa-previas{position:absolute;inset:0;z-index:6;pointer-events:none}
+    .previa{
+      position:absolute;left:0;top:0;
+      transform-origin:0 0;overflow:hidden;
+      background:var(--niebla);border-radius:2px;
+      will-change:transform,width,height,opacity;
+    }
+    .previa iframe{border:0;display:block;transform-origin:0 0;pointer-events:none}
+    /* De ficha van apagadas, para que el marco mande */
+    .previa::after{
+      content:'';position:absolute;inset:0;
+      background:hsla(250,45%,21%,.32);
+      transition:opacity .5s ease;
+    }
+    .previa.grande::after{opacity:0}
+    .previa.grande{box-shadow:0 12px 35px var(--sombra)}
+    .previa.cargando{opacity:0}
+
+    /* Botón de ingresar, junto a la flecha ya existente */
+    .ingresar{
+      display:inline-flex;align-items:center;gap:10px;
+      padding:14px 26px;border-radius:999px;
+      background:var(--indigo);color:var(--papel);border:0;cursor:pointer;
+      font-family:inherit;font-size:.72rem;font-weight:700;
+      letter-spacing:.16em;text-transform:uppercase;
+      transition:transform .26s var(--ease-expo),background-color .26s ease;
+    }
+    .ingresar:hover{transform:translateY(-2px);background:var(--tinta)}
+    .ingresar:active{transform:translateY(0) scale(.98)}
+    .ingresar svg{display:block}
+    .acciones{display:flex;align-items:center;gap:18px;margin-top:6px}
+
+    /* El marco entero también entra */
+    .entrar-marco{
+      position:absolute;inset:0;z-index:7;border:0;cursor:pointer;
+      background:linear-gradient(180deg,hsla(250,45%,21%,.05),hsla(250,45%,21%,.62));
+      display:grid;place-content:center;padding:0 10px;
+      opacity:0;transition:opacity .3s ease;
+    }
+    .entrar-marco span{
+      padding:10px 14px;border-radius:999px;
+      background:var(--papel);color:var(--indigo);text-align:center;
+      font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+    }
+    .hero-banner-container:hover .entrar-marco{opacity:1}
+
+    /* Dirección del stagger: hacia atrás, todo se invierte */
+    .quote-content{--sg:1}
+    .quote-content.atras{--sg:-1}
+    .quote-content.stagger-out .reviewer-meta {transform:translateY(calc(var(--sg) * -16px))}
+    .quote-content.stagger-out .reviewer-quote{transform:translateY(calc(var(--sg) * -24px))}
+
+    @media (prefers-reduced-motion:reduce){
+      html.entrando .global-nav,html.entrando .col-left,
+      html.entrando .col-center,html.entrando .col-right{animation:none}
+    }
+  </style>
+</head>
+<body>
+
+<div id="telon" aria-hidden="true"></div>
+
+  <!-- Top Global Project Navigation -->
+  <nav class="global-nav">
+    <!-- Las secciones viven en el carrusel: aquí solo la vuelta atrás -->
+    <div class="nav-left">
+      <a href="../Slides/soma-hero.html" class="nav-chip" data-seccion="soma">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span>Corazón</span>
+      </a>
+      <span class="nav-chip active">Índice del taller</span>
+    </div>
+
+    <div class="nav-right">
+      <button id="autoPlayToggle" class="pill-badge active" title="Pausar / Reanudar Auto-Play">
+        <span class="pulse-dot"></span>
+        <span id="autoPlayLabel">Auto-Play</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Editorial Layout Stage -->
+  <main class="reviews-stage" id="reviewsStage">
+    
+    <!-- LEFT COLUMN: Counter, Vertical 'Reviews' Title, and Thumbnails Strip -->
+    <div class="col-left">
+      
+      <!-- Top Counter Wheel (01 / 05) -->
+      <div class="counter-box">
+        <div class="digit-wheel-container">
+          <!-- Digits are generated from reviewsData so the wheel can never
+               disagree with the number of reviews. -->
+          <div class="digit-wheel" id="digitWheel"></div>
+        </div>
+        <span class="divider">/</span>
+        <span class="total-num" id="totalNum">04</span>
+      </div>
+
+      <!-- Vertical Rotated Label -->
+      <div class="vertical-title-wrap">
+        <span class="vertical-title">Secciones</span>
+      </div>
+
+      <!-- Bottom Thumbnails Strip -->
+      <div class="thumbnails-container">
+        <div class="thumbnails-track" id="thumbnailsTrack">
+          <!-- Populated dynamically via JS for continuous seamless sliding -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CENTER COLUMN: el marco donde vive la página en grande -->
+    <div class="col-center">
+      <div class="hero-banner-container" id="heroBannerContainer">
+        <!-- Marco vacío a propósito: lo que se ve dentro lo pone
+             la capa de previsualizaciones, que está fuera del flujo. -->
+        <div class="hero-banner-card" id="heroBannerCard"></div>
+        <button class="entrar-marco" id="entrarMarco" tabindex="-1">
+          <span id="entrarMarcoTexto">Ingresar</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Reviewer Info, Big Quote, and Next Arrow Button -->
+    <div class="col-right">
+      
+      <div class="quote-content" id="quoteContent">
+        <div class="reviewer-meta" id="reviewerMeta">
+          <h2 class="reviewer-name" id="reviewerName">—</h2>
+          <span class="reviewer-company" id="reviewerCompany">—</span>
+        </div>
+
+        <blockquote class="reviewer-quote" id="reviewerQuote">—</blockquote>
+      </div>
+
+      <div class="acciones">
+        <button class="ingresar" id="ingresar">
+          <span>Ingresar</span>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 8h10M9 4l4 4-4 4"/>
+          </svg>
+        </button>
+
+        <!-- Botón circular con su anillo de progreso -->
+        <div class="next-btn-container" id="nextBtnContainer">
+          <div class="magnetic-ring" id="magneticRing">
+            <svg viewBox="0 0 54 54" class="ring-svg">
+              <circle cx="27" cy="27" r="23" class="ring-track"></circle>
+              <circle cx="27" cy="27" r="23" class="ring-progress" id="ringProgress"></circle>
+            </svg>
+          </div>
+
+          <button class="circular-next-btn" id="nextBtn" aria-label="Siguiente sección">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Capa suelta con las páginas vivas -->
+    <div class="capa-previas" id="capaPrevias"></div>
+
+  </main>
+
+  <script src="page3.js"></script>
+
+  <script>
+  /* ── Costura con el deck ────────────────────────────────────
+     Los enlaces siguen siendo enlaces: abierta suelta, la lámina
+     navega como siempre. Dentro del deck se interceptan y pasan
+     a ser saltos coreografiados, sin recargar nada. */
+  (function(){
+    var raiz = document.documentElement;   // el telón ya se puso en el <head>
+
+    document.querySelectorAll(".nav-chip[data-seccion]").forEach(function(a){
+      a.addEventListener("click", function(e){
+        if (!(window.Taller && Taller.dentroDelDeck)) return;
+        e.preventDefault();
+        Taller.ir(a.dataset.seccion);
+      });
+    });
+
+    if (!window.Taller) return;
+
+    Taller.alEntrar(function(){
+      raiz.classList.remove("saliendo");
+      raiz.classList.add("entrando");
+      /* El marco pudo cambiar de tamaño mientras la lámina no se veía, y
+         ademas la entrada empuja las columnas: hay que seguir mirando hasta
+         que termine, o las previas se quedan donde estaban de paso. */
+      if (window.indiceTaller) window.indiceTaller.vigilarUnRato(1800);
+      // un cuadro de margen para que la animación arranque con el telón puesto
+      Taller.trasPintar(function(){ raiz.classList.remove("con-telon"); });
+      setTimeout(function(){ raiz.classList.remove("entrando"); }, 1300);
+    });
+
+    Taller.alSalir(function(){
+      raiz.classList.remove("entrando");
+      raiz.classList.add("saliendo", "con-telon");
+      return new Promise(function(listo){ setTimeout(listo, 560); });
+    });
+  })();
+  </script>
+</body>
+</html>

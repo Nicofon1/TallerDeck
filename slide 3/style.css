@@ -1,0 +1,981 @@
+/* ==========================================================================
+   ORGANIC NOTCHED GLASSMORPHISM DESIGN SYSTEM
+   Exact recreation of the reference with mathematically smooth concave fillets
+   ========================================================================== */
+
+:root {
+  --bg-sand-pink: #f5edf1;
+  --bg-soft-lavender: #f1ecf7;
+  --bg-mint-cyan: #e4f3f2;
+  
+  --card-glass-fill: rgba(255, 255, 255, 0.72);
+  --card-glass-stroke: rgba(255, 255, 255, 0.95);
+  --card-shadow: 0 24px 50px -15px rgba(110, 95, 130, 0.16),
+                 0 8px 20px -6px rgba(110, 95, 130, 0.08);
+  
+  --text-dark: #1f2433;
+  --text-body: #4a5165;
+  --text-label: #8d8ba2;
+  --text-purple-accent: #785391;
+  --text-purple-light: #9d7bb3;
+  
+  --color-danger: #dc2626;
+  --color-warning: #b45309;
+  --color-success: #0d9488;
+
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --radius-card: 32px;
+}
+
+/* Base Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: #ebedf2;
+  color: var(--text-dark);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Outer Presentation Canvas (16:9 Slide Form Factor) */
+.screen-canvas {
+  position: relative;
+  width: 100%;
+  max-width: 1420px;
+  min-height: 800px;
+  background: linear-gradient(115deg, #f7eef2 0%, #f9f1f4 24%, #f1edf7 62%, #e5f3f3 100%);
+  border-radius: 40px;
+  box-shadow: 0 35px 90px -20px rgba(70, 60, 95, 0.2),
+              0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Fluted Ribbed Glass on Left Background (Exact match with reference) */
+.bg-fluted-glass {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 38%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.5) 0px,
+    rgba(255, 255, 255, 0.5) 14px,
+    rgba(225, 218, 230, 0.25) 14px,
+    rgba(225, 218, 230, 0.25) 28px
+  );
+  mask-image: linear-gradient(to right, rgba(0, 0, 0, 0.95) 60%, rgba(0, 0, 0, 0) 100%);
+  -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 0.95) 60%, rgba(0, 0, 0, 0) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.bg-gradient-glow-cyan {
+  position: absolute;
+  top: -8%;
+  right: -5%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(175, 235, 230, 0.55) 0%, rgba(215, 200, 245, 0.25) 50%, transparent 72%);
+  filter: blur(55px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.bg-gradient-glow-pink {
+  position: absolute;
+  bottom: -10%;
+  left: 22%;
+  width: 550px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(255, 215, 230, 0.45) 0%, transparent 68%);
+  filter: blur(65px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Stage Layout */
+.clinical-stage {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 390px 1fr;
+  min-height: 800px;
+  width: 100%;
+  padding: 38px 48px;
+  gap: 36px;
+}
+
+/* ==========================================================================
+   LEFT HERO: 3D ORGAN VISUALIZATION
+   ========================================================================== */
+
+.organ-hero-column {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+.organ-aura-glow {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(240, 120, 160, 0.3) 0%, rgba(160, 90, 200, 0.18) 50%, transparent 75%);
+  filter: blur(40px);
+  z-index: 1;
+}
+
+.organ-container {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.organ-floating-box {
+  position: relative;
+  width: 330px;
+  height: 330px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: organBreath 6s ease-in-out infinite;
+}
+
+.organ-3d-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 44px;
+  filter: drop-shadow(0 20px 35px rgba(180, 80, 130, 0.28));
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.organ-3d-img:hover {
+  transform: scale(1.04);
+}
+
+@keyframes organBreath {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    filter: drop-shadow(0 20px 35px rgba(180, 80, 130, 0.25));
+  }
+  50% {
+    transform: translateY(-8px) scale(1.02);
+    filter: drop-shadow(0 28px 45px rgba(180, 80, 130, 0.35));
+  }
+}
+
+/* Vitals Badge */
+.organ-vitals-badge {
+  margin-top: 22px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  border-radius: 40px;
+  box-shadow: 0 12px 28px -6px rgba(100, 80, 120, 0.14);
+}
+
+.vital-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dot-amber {
+  background-color: #f59e0b;
+  box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+  animation: pulseIndicator 1.8s infinite;
+}
+
+.dot-red {
+  background-color: #ef4444;
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  animation: pulseIndicator 1.2s infinite;
+}
+
+@keyframes pulseIndicator {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 7px rgba(239, 68, 68, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.v-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-label);
+  text-transform: uppercase;
+}
+
+.v-value {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.v-value small {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-label);
+}
+
+.vital-separator {
+  width: 1px;
+  height: 16px;
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.pals-status-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #dc2626;
+  background: rgba(239, 68, 68, 0.12);
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+
+.organ-floor-shadow {
+  width: 240px;
+  height: 16px;
+  margin-top: 10px;
+  background: radial-gradient(ellipse at center, rgba(120, 100, 130, 0.22) 0%, transparent 70%);
+}
+
+/* ==========================================================================
+   RIGHT CONTENT: TITLE & THE TWO-COLUMN COMPOSITION
+   ========================================================================== */
+
+.data-composition-column {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* Main Top Title (Tracking matching 'КАРТОЧКА ЗДОРОВЬЯ МОЗГА') */
+.top-title-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 8px;
+}
+
+.slide-main-title {
+  font-family: var(--font-heading);
+  font-size: 27px;
+  font-weight: 500;
+  letter-spacing: 4.5px;
+  text-transform: uppercase;
+  color: #1e2434;
+}
+
+/* Composition Grid */
+.composition-grid {
+  display: grid;
+  grid-template-columns: 1.28fr 0.88fr;
+  gap: 30px;
+  align-items: start;
+}
+
+/* ==========================================================================
+   SEAMLESS ORGANIC SCOOPED PATIENT CARD (Exact match to reference Image 2)
+   ========================================================================== */
+
+.scooped-card-container {
+  position: relative;
+  width: 100%;
+  filter: drop-shadow(0 20px 35px rgba(110, 95, 130, 0.15));
+}
+
+/* SVG Vector Background matching the organic fillet cutout curve */
+.notch-svg-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+}
+
+.notch-svg-fill {
+  fill: var(--card-glass-fill);
+}
+
+.notch-svg-stroke {
+  fill: none;
+  stroke: var(--card-glass-stroke);
+  stroke-width: 1.5px;
+}
+
+/* Floating Circular Button positioned inside the scooped notch */
+.notch-circle-pod {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 20;
+}
+
+.alcove-circle-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  color: var(--text-purple-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(120, 90, 130, 0.12), inset 0 1px 2px rgba(255, 255, 255, 0.9);
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.alcove-circle-btn:hover {
+  background: rgba(255, 255, 255, 0.95);
+  color: #582b75;
+  transform: scale(1.06) rotate(45deg);
+  box-shadow: 0 10px 22px rgba(120, 90, 130, 0.2);
+}
+
+/* Card Content positioned inside the SVG notch wrapper */
+.scooped-card-inner {
+  position: relative;
+  z-index: 5;
+  padding: 34px 34px 30px 34px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Patient Profile Header */
+.patient-profile-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-right: 64px; /* Space for the top right scooped button */
+}
+
+.patient-avatar-frame {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  padding: 3px;
+  background: linear-gradient(135deg, #f59e0b, #ec4899, #8b5cf6);
+  box-shadow: 0 8px 20px rgba(236, 72, 153, 0.22);
+  flex-shrink: 0;
+}
+
+.patient-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+}
+
+.patient-details {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.patient-fullname {
+  font-family: var(--font-heading);
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.22;
+  color: var(--text-dark);
+}
+
+.patient-age-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.age-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.status-dot {
+  font-size: 10px;
+  color: #cbd5e1;
+}
+
+.priority-text {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-danger);
+  background: rgba(220, 38, 38, 0.1);
+  padding: 1px 7px;
+  border-radius: 6px;
+}
+
+/* Parameters List / Table */
+.stats-table {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.85);
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.85);
+  padding: 16px 0;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.stat-label {
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  color: var(--text-label);
+}
+
+.stat-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dark);
+  text-align: right;
+}
+
+.stat-value.highlight {
+  color: var(--text-purple-accent);
+  font-weight: 700;
+}
+
+.stat-value.val-warning {
+  color: var(--color-warning);
+}
+
+.stat-value.val-danger {
+  color: var(--color-danger);
+}
+
+.stat-value.val-accent {
+  color: var(--color-success);
+}
+
+/* Evolution Notes Section */
+.evolution-note-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.note-heading {
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-purple-accent);
+}
+
+.note-paragraph {
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--text-body);
+  text-align: justify;
+  background: rgba(255, 255, 255, 0.45);
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+/* Card Bottom Actions */
+.card-bottom-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.pill-chip {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(120, 83, 145, 0.2);
+  background: rgba(255, 255, 255, 0.65);
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pill-chip:hover {
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--text-purple-accent);
+}
+
+.pill-chip.active {
+  background: var(--text-purple-accent);
+  color: #ffffff;
+  border-color: var(--text-purple-accent);
+  box-shadow: 0 4px 12px rgba(120, 83, 145, 0.25);
+}
+
+/* ==========================================================================
+   RIGHT: TALL X-RAY CARD + SCOOPED DOCTOR BADGE
+   ========================================================================== */
+
+.right-radiology-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Tall Dark Rounded X-Ray Container */
+.tall-xray-card {
+  position: relative;
+  background: #11141c;
+  border-radius: 28px;
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 24px 50px -10px rgba(15, 20, 35, 0.38);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+.xray-top-floating-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 18px;
+  background: rgba(26, 32, 45, 0.92);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.xray-dicom-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.live-pulse-green {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #10b981;
+}
+
+.xray-tool-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.xray-tool-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.xray-tool-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+.xray-media-box {
+  position: relative;
+  width: 100%;
+  height: 330px;
+  overflow: hidden;
+  background-color: #0b0d13;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.xray-actual-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: contrast(1.1) brightness(0.95);
+  transition: filter 0.3s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.xray-actual-img.inverted {
+  filter: invert(1) contrast(1.15) brightness(1.05);
+}
+
+.xray-actual-img.zoomed {
+  transform: scale(1.35);
+}
+
+/* X-Ray Interactive Annotations */
+.xray-pointer {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  z-index: 5;
+}
+
+.xray-pointer:hover {
+  transform: scale(1.08);
+  border-color: #38bdf8;
+}
+
+.marker-ett {
+  top: 26%;
+  left: 35%;
+}
+
+.marker-edema {
+  bottom: 22%;
+  right: 12%;
+}
+
+.pointer-radar {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
+}
+
+.pointer-badge {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.xray-tag-footer {
+  position: absolute;
+  bottom: 10px;
+  left: 14px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 1.2px;
+}
+
+/* ==========================================================================
+   DOCTOR BADGE WITH MATCHING ORGANIC SCOOP (Exact match to reference)
+   ========================================================================== */
+
+.doctor-scooped-container {
+  position: relative;
+  width: 100%;
+  filter: drop-shadow(0 14px 28px rgba(110, 95, 130, 0.14));
+}
+
+.notch-doc-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.doc-notch-circle-pod {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 20;
+}
+
+.doc-alcove-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  color: var(--text-purple-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(120, 90, 130, 0.12), inset 0 1px 2px rgba(255, 255, 255, 0.9);
+  transition: transform 0.25s ease;
+}
+
+.doctor-scooped-container:hover .doc-alcove-circle {
+  transform: rotate(90deg) scale(1.08);
+  background: #ffffff;
+}
+
+.doctor-badge-content {
+  position: relative;
+  z-index: 5;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.doctor-photo-ring {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  padding: 2px;
+  background: linear-gradient(135deg, #ffffff, #e0d7ea);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.doctor-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.doctor-check-dot {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: #10b981;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ffffff;
+}
+
+.doctor-text-info {
+  flex-grow: 1;
+  padding-right: 42px; /* Space for the scooped corner diamond */
+}
+
+.doctor-title-name {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.doctor-specialty {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #64748b;
+  line-height: 1.3;
+}
+
+.doctor-subtag {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-purple-accent);
+  display: inline-block;
+  margin-top: 2px;
+}
+
+/* ==========================================================================
+   MODAL WINDOW
+   ========================================================================== */
+
+.clinical-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(20, 15, 30, 0.45);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.clinical-modal-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.clinical-modal-card {
+  width: 90%;
+  max-width: 650px;
+  background: #ffffff;
+  border-radius: 28px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.25);
+  padding: 32px;
+  transform: translateY(20px) scale(0.97);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.clinical-modal-backdrop.open .clinical-modal-card {
+  transform: translateY(0) scale(1);
+}
+
+.c-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f0f0f5;
+}
+
+.c-modal-tag {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--color-danger);
+  background: rgba(220, 38, 38, 0.1);
+  padding: 3px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+
+.c-modal-title {
+  font-family: var(--font-heading);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.c-modal-close {
+  background: #f1f3f8;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 22px;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.c-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.c-modal-block h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 6px;
+}
+
+.c-modal-block p {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #475569;
+}
+
+.c-modal-steps {
+  padding-left: 20px;
+  font-size: 13px;
+  line-height: 1.68;
+  color: #475569;
+}
+
+.c-modal-steps li {
+  margin-bottom: 6px;
+}
+
+/* ==========================================================================
+   RESPONSIVENESS
+   ========================================================================== */
+
+@media (max-width: 1200px) {
+  .clinical-stage {
+    grid-template-columns: 340px 1fr;
+    padding: 28px 32px;
+    gap: 26px;
+  }
+  .composition-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 860px) {
+  body {
+    padding: 12px;
+  }
+  .screen-canvas {
+    border-radius: 24px;
+  }
+  .clinical-stage {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+  .slide-main-title {
+    font-size: 20px;
+    letter-spacing: 2px;
+  }
+}

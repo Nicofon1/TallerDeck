@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARTSPACE — Chapter 4: Upcoming Releases</title>
+  <meta name="description" content="ARTSPACE Chapter 4 Upcoming Releases editorial bookshelf.">
+  
+  <!-- Google Fonts for authentic editorial typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css">
+  <!-- La paleta y las letras del taller, despues de la hoja propia -->
+  <link rel="stylesheet" href="../taller.css">
+  <script src="../enlace.js"></script>
+  <script>try{if(window.parent!==window&&!/[?&]previa=1/.test(location.search))document.documentElement.className+=" con-telon";}catch(e){}</script>
+
+  <style>
+    /* ── Costura con el deck ────────────────────────────────── */
+    #telon{
+      position:fixed;inset:0;z-index:999;background:var(--papel);
+      pointer-events:none;opacity:0;
+      transition:opacity .6s cubic-bezier(.16,1,.3,1);
+    }
+    html.con-telon #telon{opacity:1}
+
+    html.entrando .editorial-header,
+    html.entrando .editorial-footer{animation:asomarBloque .8s cubic-bezier(.16,1,.3,1) both}
+    html.entrando .editorial-header{animation-delay:.12s}
+    html.entrando .editorial-footer{animation-delay:.26s}
+    html.entrando .shelf-viewport{animation:asomarEstante .95s cubic-bezier(.16,1,.3,1) .06s both}
+    @keyframes asomarBloque{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+    @keyframes asomarEstante{from{opacity:0;transform:translateY(46px) scale(.97)}to{opacity:1;transform:none}}
+
+    /* Salida hacia el caso: el estante se retira y en su sitio queda el
+       expediente abriéndose. Sin telón: la carpeta abierta se funde
+       directamente con el caso, que ya viene por debajo. */
+    html.abriendo .editorial-header,
+    html.abriendo .editorial-footer,
+    html.abriendo .shelf-ground-line{
+      opacity:0;transform:translateY(18px);
+      transition:opacity .34s ease,transform .44s ease;
+    }
+    html.abriendo .book-slot{
+      opacity:0;
+      transition:opacity .38s ease;
+    }
+    /* El que se abre desaparece en el acto: el expediente ya esta montado
+       justo encima y si se desvaneciera se verian los dos a la vez. */
+    html.abriendo .book-slot.se-abre{transition:none}
+
+    /* -- El expediente que se abre --------------------------------
+       Una carpeta a tamaño real montada encima del estante, justo sobre
+       el libro que se ha tocado: crece hasta la pantalla mientras la tapa
+       gira sobre su lomo y deja ver la hoja de dentro. */
+    .expediente{
+      position:fixed;inset:0;z-index:900;
+      pointer-events:none;opacity:0;perspective:1900px;
+    }
+    .expediente.abierto{opacity:1}
+
+    .exp-caja{
+      position:absolute;left:0;top:0;
+      transform-origin:0 0;transform-style:preserve-3d;
+      will-change:transform,width,height;
+    }
+    .exp-hoja,.exp-tapa{position:absolute;inset:0;overflow:hidden;border-radius:1px 3px 3px 1px}
+    .exp-hoja{
+      background:var(--papel);
+      box-shadow:0 40px 90px hsla(250,45%,12%,.34),0 1px 0 var(--linea);
+    }
+    /* La tapa gira sobre el lomo, como una carpeta de verdad. Pasados los
+       90 grados la cara de atrás no existe: por eso desaparece en vez de
+       enseñar el texto del revés. */
+    .exp-tapa{
+      transform-origin:left center;
+      backface-visibility:hidden;
+      box-shadow:14px 0 44px hsla(250,45%,12%,.28);
+    }
+
+    /* El texto no se estira con la caja: vive en un bloque de medidas fijas,
+       centrado, y solo se escala. El papel de detrás es el que cambia de
+       forma, y el papel no tiene forma. */
+    .tapa-texto{
+      position:absolute;left:50%;top:50%;
+      width:300px;height:420px;transform-origin:center center;
+    }
+    .tapa-texto .cover-folder{width:100%;height:100%;padding:34px 26px 26px}
+
+    /* El texto arriba y no centrado: asi la hoja se lee como la primera
+       pagina del expediente, que es justo lo que aparece despues. Centrado
+       parecia un cartel, y el corte contra el caso se notaba. */
+    .hoja-texto{
+      position:absolute;left:50%;top:50%;
+      width:900px;height:560px;transform-origin:center center;
+      display:flex;flex-direction:column;justify-content:flex-start;gap:14px;
+      padding:52px 70px 0;color:var(--tinta);
+      font-family:var(--texto);
+    }
+    .hoja-fila{display:flex;align-items:baseline;justify-content:space-between;
+      font-size:.78rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase}
+    .hoja-id{color:var(--apagado);font-weight:600}
+    .hoja-regla{height:2px;background:var(--indigo);opacity:.85}
+    .hoja-titulo{
+      font-family:var(--titulo);
+      font-size:2.9rem;line-height:1.04;font-weight:500;margin:4px 0 0;
+    }
+    .hoja-sub{font-size:.92rem;color:var(--apagado);letter-spacing:.02em}
+    .hoja-reglas{display:flex;flex-direction:column;gap:11px;margin-top:14px}
+    .hoja-reglas span{height:7px;background:var(--niebla);border-radius:2px}
+    .hoja-reglas span:nth-child(2){width:88%}
+    .hoja-reglas span:nth-child(3){width:94%}
+    .hoja-reglas span:nth-child(4){width:72%}
+    .hoja-reglas span:nth-child(5){width:90%}
+    .hoja-reglas span:nth-child(6){width:56%}
+    .hoja-pie{
+      margin-top:18px;font-size:.7rem;font-weight:700;
+      letter-spacing:.22em;text-transform:uppercase;color:var(--apagado);
+    }
+
+    /* Salida lateral, hacia cualquier otra sección */
+    html.saliendo #telon{opacity:1;transition-duration:.46s}
+    html.saliendo .editorial-stage{
+      opacity:0;transform:translateY(-22px);
+      transition:opacity .4s ease,transform .5s cubic-bezier(.6,0,.9,.4);
+    }
+
+    /* Cualquier expediente se ofrece a abrirse */
+    .book-slot{cursor:pointer}
+
+    @media (prefers-reduced-motion:reduce){
+      html.entrando .editorial-header,html.entrando .editorial-footer,
+      html.entrando .shelf-viewport{animation:none}
+      .exp-caja,.exp-tapa{transition:none}
+    }
+  </style>
+</head>
+<body>
+
+<div id="telon" aria-hidden="true"></div>
+
+  <div class="editorial-stage">
+    
+    <!-- Top Header matching the authentic screenshot -->
+    <header class="editorial-header">
+      <div class="header-col col-left" style="display:flex;align-items:center;gap:8px;">
+        <span class="brand-tag">ARCHIVO</span>
+        <a href="page3.html" data-seccion="indice" style="font-size:0.75rem;font-weight:700;letter-spacing:0.04em;color:#426DC2;text-decoration:none;padding:4px 10px;border-radius:999px;background:hsla(220,51%,51%,.10);border:1px solid hsla(220,51%,51%,.24);display:inline-flex;align-items:center;gap:5px;">
+          <span>←</span><span>Índice</span>
+        </a>
+      </div>
+      
+      <div class="header-col col-center">
+        <span class="chapter-label">CHAPTER<sup>4</sup></span>
+        <h1 class="releases-title">
+          <span>UPCOMING</span>
+          <span>RELEASES</span>
+        </h1>
+      </div>
+      
+      <div class="header-col col-right">
+        <div class="chapter-nav">
+          <span class="page-num" data-idx="0">1</span>
+          <span class="page-num" data-idx="2">2</span>
+          <span class="page-num" data-idx="4">3</span>
+          <span class="page-num active" data-idx="7">4</span>
+          <span class="page-num" data-idx="10">5</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Bookshelf Stage -->
+    <main class="carousel-stage" id="carouselStage">
+      
+      <div class="shelf-viewport" id="shelfViewport">
+        <div class="shelf-track" id="shelfTrack">
+          <!-- Dynamic books with organic variations & smooth cover expansion -->
+        </div>
+      </div>
+
+      <!-- Shelf Base Line -->
+      <div class="shelf-ground-line"></div>
+      
+    </main>
+
+    <!-- Subtle Navigation Controls -->
+    <footer class="editorial-footer">
+      <div class="nav-controls">
+        <button id="prevBtn" class="shelf-nav-btn" aria-label="Anterior">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+
+        <button id="nextBtn" class="shelf-nav-btn" aria-label="Siguiente">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+
+      <div class="interaction-hint">
+        <span>Arrastra o usa la rueda para recorrer el estante · haz clic en cualquier expediente para abrirlo</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- El expediente que se abre: vacío hasta que se toca un libro -->
+  <div class="expediente" id="expediente" aria-hidden="true">
+    <div class="exp-caja" id="expCaja">
+      <div class="exp-hoja" id="expHoja">
+        <div class="hoja-texto">
+          <div class="hoja-fila">
+            <span class="hoja-dep" id="hojaDep">&mdash;</span>
+            <span class="hoja-id" id="hojaId">&mdash;</span>
+          </div>
+          <div class="hoja-regla"></div>
+          <h2 class="hoja-titulo">Historia clínica</h2>
+          <div class="hoja-sub" id="hojaSub">&mdash;</div>
+          <div class="hoja-reglas">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <div class="hoja-pie">Abriendo expediente</div>
+        </div>
+      </div>
+      <div class="exp-tapa" id="expTapa">
+        <div class="tapa-texto"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+
+  <script>
+  /* ── Costura con el deck ────────────────────────────────── */
+  (function(){
+    var raiz = document.documentElement;
+
+    document.querySelectorAll("a[data-seccion]").forEach(function(a){
+      a.addEventListener("click", function(e){
+        if (!(window.Taller && Taller.dentroDelDeck)) return;
+        e.preventDefault();
+        Taller.ir(a.dataset.seccion);
+      });
+    });
+
+    if (!window.Taller) return;
+
+    Taller.alEntrar(function(){
+      raiz.classList.remove("saliendo", "abriendo");
+      // el estante vuelve a estar entero al regresar de un caso
+      if (window.estante) window.estante.cerrarExpediente();
+      raiz.classList.add("entrando");
+      Taller.trasPintar(function(){ raiz.classList.remove("con-telon"); });
+      setTimeout(function(){ raiz.classList.remove("entrando"); }, 1300);
+    });
+
+    Taller.alSalir(function(hacia){
+      raiz.classList.remove("entrando");
+      /* Hacia el caso no hay salida que coreografiar: la apertura ya viene
+         corriendo desde el clic. El deck solo espera a que termine. */
+      if (hacia === "caso" && window.estante && window.estante.aperturaLista) {
+        raiz.classList.add("abriendo");
+        return window.estante.aperturaLista;
+      }
+      raiz.classList.add("saliendo", "con-telon");
+      return new Promise(function(listo){ setTimeout(listo, 480); });
+    });
+  })();
+  </script>
+</body>
+</html>

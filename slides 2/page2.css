@@ -1,0 +1,265 @@
+/* ==========================================================================
+   Kinetic 3D Typography Carousel — Page 2 Styles
+   Faithful recreation of reference GIF animation
+   ========================================================================== */
+
+:root {
+  --bg-color: #f7f7f8;
+  --text-blue: var(--azul);
+  --text-dark: #121316;
+  --text-muted: #8e9099;
+  --border-color: rgba(0, 0, 0, 0.08);
+  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Inter', sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-color);
+  font-family: var(--font-main);
+  color: var(--text-dark);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+
+/* ==========================================================================
+   Header Navigation
+   ========================================================================== */
+.top-nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 32px;
+  z-index: 100;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.nav-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--text-dark);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border-color);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-back-link:hover {
+  background: rgba(0, 0, 0, 0.08);
+  transform: translateX(-2px);
+}
+
+.nav-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: var(--papel);
+  color: var(--text-dark);
+  font-family: var(--font-main);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+}
+
+.pill-btn:hover {
+  background: #f0f0f2;
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.pill-btn.active {
+  background: var(--azul);
+  color: var(--papel);
+  border-color: var(--azul);
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--aqua);
+  box-shadow: 0 0 8px var(--aqua);
+}
+
+.pill-btn.active .status-dot {
+  background: var(--papel);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+/* ==========================================================================
+   Main 3D Kinetic Stage
+   ========================================================================== */
+.kinetic-container {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  cursor: grab;
+  perspective: 1200px;
+  perspective-origin: 50% 50%;
+  overflow: hidden;
+}
+
+.kinetic-container:active {
+  cursor: grabbing;
+}
+
+.orbit-scene {
+  position: relative;
+  width: 100%;
+  height: 360px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+.orbit-track {
+  position: relative;
+  width: 0;
+  height: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform-style: preserve-3d;
+}
+
+/* 3D Orbiting Word */
+.orbit-word {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display);
+  /* A este tamano la letra de titulo pide ojo grande y algo de cuerpo, o las
+     astas finas desaparecen en cuanto la palabra se pone a girar. */
+  font-weight: 800;
+  font-variation-settings: 'opsz' 144, 'SOFT' 0, 'WONK' 1;
+  font-size: clamp(3.5rem, 8vw, 6.4rem);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--text-blue);
+  white-space: nowrap;
+  pointer-events: auto;
+  cursor: pointer;
+  will-change: transform, opacity, filter;
+  transform-origin: center center;
+  transition: color 0.2s ease;
+}
+
+.orbit-word:hover {
+  filter: brightness(1.1);
+}
+
+/* ==========================================================================
+   Bottom Controls & Indicators
+   ========================================================================== */
+.bottom-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 28px;
+  z-index: 100;
+}
+
+.word-indicators {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 5px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+}
+
+.word-tab {
+  border: none;
+  background: transparent;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-family: var(--font-main);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.word-tab:hover {
+  color: var(--text-dark);
+}
+
+.word-tab.active {
+  background: var(--text-blue);
+  color: var(--papel);
+  box-shadow: 0 2px 8px hsla(220,51%,51%,.3);
+}
+
+.drag-hint {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+  opacity: 0.75;
+}

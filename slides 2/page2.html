@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kinetic 3D Typography Carousel — Global / Fast / Easy / Local</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="page2.css">
+  <!-- La paleta y las letras del taller, despues de la hoja propia -->
+  <link rel="stylesheet" href="../taller.css">
+  <script src="../enlace.js"></script>
+  <script>try{if(window.parent!==window&&!/[?&]previa=1/.test(location.search))document.documentElement.className+=" con-telon";}catch(e){}</script>
+
+  <style>
+    /* ── Costura con el deck ──────────────────────────────── */
+    #telon{
+      position:fixed;inset:0;z-index:999;background:var(--papel);
+      pointer-events:none;opacity:0;
+      transition:opacity .6s cubic-bezier(.16,1,.3,1);
+    }
+    html.con-telon #telon{opacity:1}
+
+    html.entrando .top-nav,
+    html.entrando .bottom-bar{animation:asomarBarra .8s cubic-bezier(.16,1,.3,1) both}
+    html.entrando .top-nav{animation-delay:.12s}
+    html.entrando .bottom-bar{animation-delay:.26s}
+    html.entrando .orbit-scene{animation:llegarOrbita 1s cubic-bezier(.16,1,.3,1) .04s both}
+    @keyframes asomarBarra{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+    @keyframes llegarOrbita{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:none}}
+
+    html.saliendo #telon{opacity:1;transition-duration:.46s}
+    html.saliendo .top-nav,
+    html.saliendo .bottom-bar,
+    html.saliendo .orbit-scene{
+      opacity:0;transform:scale(1.08);
+      transition:opacity .4s ease,transform .5s cubic-bezier(.6,0,.9,.4);
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      html.entrando .top-nav,html.entrando .bottom-bar,html.entrando .orbit-scene{animation:none}
+    }
+  </style>
+</head>
+<body>
+
+<div id="telon" aria-hidden="true"></div>
+  <!-- Header / Navigation Bar -->
+  <header class="top-nav">
+    <div class="nav-left">
+      <a href="page3.html" class="nav-back-link" data-seccion="indice">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Índice</span>
+      </a>
+      <span class="nav-badge">Tipografía cinética</span>
+      <a href="index.html" class="nav-back-link" data-seccion="biblioteca" style="color:var(--azul);">
+        <span>Biblioteca de casos</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+      </a>
+    </div>
+
+    <div class="nav-right">
+      <button id="toggleAutoplayBtn" class="pill-btn active" title="Pausar / Reanudar Rotación">
+        <span class="status-dot"></span>
+        <span id="autoplayText">Auto-Loop</span>
+      </button>
+      <button id="speedBtn" class="pill-btn secondary" title="Cambiar Velocidad">1.0x</button>
+    </div>
+  </header>
+
+  <!-- Main 3D Stage -->
+  <main class="kinetic-container" id="stageContainer">
+    <div class="orbit-scene" id="orbitScene">
+      <!-- 3D Words are populated and dynamically positioned via JS -->
+      <div class="orbit-track" id="orbitTrack">
+        <div class="orbit-word" data-index="0">Global</div>
+        <div class="orbit-word" data-index="1">Fast</div>
+        <div class="orbit-word" data-index="2">Easy</div>
+        <div class="orbit-word" data-index="3">Local</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Interactive Footer Hints & Controls -->
+  <footer class="bottom-bar">
+    <div class="word-indicators" id="wordIndicators">
+      <button class="word-tab active" data-index="0">Global</button>
+      <button class="word-tab" data-index="1">Fast</button>
+      <button class="word-tab" data-index="2">Easy</button>
+      <button class="word-tab" data-index="3">Local</button>
+    </div>
+    <div class="drag-hint">
+      <span>Arrastra o haz clic en cualquier palabra para rotar</span>
+    </div>
+  </footer>
+
+  <script src="page2.js"></script>
+
+  <script>
+  /* ── Costura con el deck ────────────────────────────────── */
+  (function(){
+    var raiz = document.documentElement;
+
+    document.querySelectorAll("a[data-seccion]").forEach(function(a){
+      a.addEventListener("click", function(e){
+        if (!(window.Taller && Taller.dentroDelDeck)) return;
+        e.preventDefault();
+        Taller.ir(a.dataset.seccion);
+      });
+    });
+
+    if (!window.Taller) return;
+
+    Taller.alEntrar(function(){
+      raiz.classList.remove("saliendo");
+      raiz.classList.add("entrando");
+      Taller.trasPintar(function(){ raiz.classList.remove("con-telon"); });
+      setTimeout(function(){ raiz.classList.remove("entrando"); }, 1300);
+    });
+
+    Taller.alSalir(function(){
+      raiz.classList.remove("entrando");
+      raiz.classList.add("saliendo", "con-telon");
+      return new Promise(function(listo){ setTimeout(listo, 480); });
+    });
+  })();
+  </script>
+</body>
+</html>

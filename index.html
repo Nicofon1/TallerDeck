@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Taller</title>
+<meta name="description" content="Taller — pieza interactiva continua.">
+<link rel="stylesheet" href="taller.css">
+<style>
+/* ═══════════════════════════════════════════════════════════
+   EL DECK — deliberadamente invisible.
+
+   No hay barra, ni flechas, ni contador. La navegación vive
+   DENTRO de las láminas: el corazón invita a entrar, el índice
+   lleva a las secciones, cada libro abre su caso. Lo único que
+   hace este archivo es sostener las láminas y coserlas: le pide
+   a una que se vaya, espera a que termine su propia salida, y
+   descubre la siguiente por debajo. Si el corte no se nota,
+   está haciendo bien su trabajo.
+   ═══════════════════════════════════════════════════════════ */
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:var(--papel);
+  color:var(--tinta);
+  font-family:var(--texto);
+  overflow:hidden;
+}
+
+#escenario{position:fixed;inset:0;overflow:hidden;background:var(--papel)}
+
+.lamina{
+  position:absolute;inset:0;
+  opacity:0;pointer-events:none;
+  transition:opacity .5s ease;
+}
+.lamina.activa{opacity:1;pointer-events:auto;z-index:2}
+.lamina iframe{
+  position:absolute;inset:0;width:100%;height:100%;
+  border:0;display:block;background:transparent;
+}
+
+/* El velo cubre el hueco entre que una lámina termina de irse y la
+   otra está lista. Todas las láminas son claras, así que el velo es
+   del mismo papel: en la práctica no se ve. */
+#velo{
+  position:fixed;inset:0;z-index:10;pointer-events:none;
+  background:var(--papel);
+  opacity:0;transition:opacity .34s ease;
+}
+#velo.puesto{opacity:1;pointer-events:auto}
+
+#pulso{
+  position:fixed;left:50%;top:50%;z-index:11;
+  transform:translate(-50%,-50%);
+  width:38px;height:38px;border-radius:50%;
+  border:1.5px solid transparent;border-top-color:var(--aqua);
+  opacity:0;transition:opacity .3s ease;
+  animation:girar 1s linear infinite;
+}
+#velo.puesto.tarda ~ #pulso{opacity:1}
+@keyframes girar{to{transform:translate(-50%,-50%) rotate(360deg)}}
+
+@media (prefers-reduced-motion:reduce){
+  .lamina,#velo{transition-duration:.001ms}
+  #pulso{animation:none}
+}
+</style>
+</head>
+<body>
+
+<div id="escenario"></div>
+<div id="velo"></div>
+<div id="pulso" aria-hidden="true"></div>
+
+<script>
+(() => {
+"use strict";
+
+/* ═══════════════════════════════════════════════════════════
+   1 · EL MAPA
+   No es una lista ordenada: es un grafo. `cerca` son las láminas
+   que se precargan al llegar a esta, para que el salto siguiente
+   no tenga que esperar a que nazca un iframe.
+   ═══════════════════════════════════════════════════════════ */
+const MAPA = {
+  soma:       { src:"Slides/soma-hero.html",         cerca:["indice"] },
+  // El índice ya carga sus secciones para previsualizarlas: precargarlas
+  // otra vez aquí sería arrancar cada motor por duplicado.
+  indice:     { src:"slides 2/page3.html",           cerca:[] },
+  cinetica:   { src:"slides 2/page2.html",           cerca:["indice"] },
+  biblioteca: { src:"slides 2/index.html",           cerca:["caso"] },
+  caso:       { src:"slide 3/index.html",            cerca:["biblioteca"] },
+  burbujas:   { src:"Slides/corazon-burbujas.html",  cerca:["indice"] }
+};
+const INICIO = "soma";
+
+/* Cuánto se le concede a una lámina para irse antes de seguir sin ella. */
+const PACIENCIA = 2000;
+
+/* ═══════════════════════════════════════════════════════════
+   2 · MONTAJE
+   ═══════════════════════════════════════════════════════════ */
+const escenario = document.getElementById("escenario");
+const velo = document.getElementById("velo");
+
+const vivas = new Map();   // id -> { lam, marco, listo, esperandoCarga }
+
+function montar(id){
+  if (vivas.has(id)) return vivas.get(id);
+  const def = MAPA[id];
+  if (!def) return null;
+
+  const lam = document.createElement("div");
+  lam.className = "lamina";
+
+  const marco = document.createElement("iframe");
+  marco.title = id;
+  marco.setAttribute("allow", "fullscreen; xr-spatial-tracking; accelerometer; gyroscope");
+  marco.setAttribute("allowfullscreen", "");
+  marco.src = encodeURI(def.src);
+  lam.appendChild(marco);
+  escenario.appendChild(lam);
+
+  const ficha = { id, lam, marco, listo:false, avisos:[] };
+  marco.addEventListener("load", () => {
+    ficha.listo = true;
+    ficha.avisos.splice(0).forEach(f => f());
+  });
+
+  vivas.set(id, ficha);
+  return ficha;
+}
+
+function cuandoCargue(ficha){
+  if (ficha.listo) return Promise.resolve();
+  return new Promise(res => {
+    ficha.avisos.push(res);
+    setTimeout(res, 6000);        // una lámina rota no bloquea el deck
+  });
+}
+
+function precargar(id){
+  const def = MAPA[id];
+  if (!def || !def.cerca) return;
+  const lanzar = () => def.cerca.forEach(montar);
+  if ("requestIdleCallback" in window) requestIdleCallback(lanzar, { timeout:2500 });
+  else setTimeout(lanzar, 1200);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   3 · MENSAJES
+   El único canal con las láminas. postMessage funciona igual
+   servido por http:// que abierto a doble clic, que es
+   justamente lo que no conseguía el acceso directo al iframe.
+   ═══════════════════════════════════════════════════════════ */
+let vale = 0;
+const salidasPendientes = new Map();
+
+function quienEs(origen){
+  for (const ficha of vivas.values()){
+    if (ficha.marco.contentWindow === origen) return ficha;
+  }
+  return null;
+}
+
+function ordenar(ficha, orden, datos){
+  if (!ficha) return;
+  try { ficha.marco.contentWindow.postMessage(Object.assign({ taller:"orden", orden }, datos), "*"); }
+  catch (_) {}
+}
+
+window.addEventListener("message", e => {
+  const d = e.data;
+  if (!d || typeof d !== "object" || !d.taller) return;
+  const de = quienEs(e.source);
+
+  if (d.taller === "ir"){
+    ir(d.destino, { extra:d.extra, desde:de && de.id });
+
+  } else if (d.taller === "volver"){
+    volver();
+
+  } else if (d.taller === "salida-lista"){
+    const res = salidasPendientes.get(d.vale);
+    if (res){ salidasPendientes.delete(d.vale); res(); }
+  }
+});
+
+function pedirSalida(ficha, hacia){
+  if (!ficha || !ficha.listo) return Promise.resolve();
+  const v = ++vale;
+  return new Promise(res => {
+    let hecho = false;
+    const fin = () => { if (!hecho){ hecho = true; res(); } };
+    salidasPendientes.set(v, fin);
+    ordenar(ficha, "salir", { hacia, vale:v });
+    setTimeout(() => { salidasPendientes.delete(v); fin(); }, PACIENCIA);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   4 · NAVEGACIÓN
+   ═══════════════════════════════════════════════════════════ */
+let actual = null;
+let ocupado = false;
+const pila = [];
+
+async function ir(destino, opciones){
+  opciones = opciones || {};
+  if (ocupado || !MAPA[destino] || destino === actual) return;
+  ocupado = true;
+
+  const siguiente = montar(destino);
+  const previa = actual ? vivas.get(actual) : null;
+
+  // La lámina que se va y el iframe que nace corren a la vez: para
+  // cuando termina la coreografía, la siguiente suele estar lista.
+  const [ , ] = await Promise.all([
+    pedirSalida(previa, destino),
+    cuandoCargue(siguiente)
+  ]);
+
+  if (!siguiente.listo){
+    velo.classList.add("puesto", "tarda");
+    await cuandoCargue(siguiente);
+  }
+
+  siguiente.lam.classList.add("activa");
+  if (previa) previa.lam.classList.remove("activa");
+  velo.classList.remove("puesto", "tarda");
+
+  const antes = actual;
+  actual = destino;
+  if (!opciones.retroceso && antes) pila.push(antes);
+  if (location.hash.slice(1) !== destino) location.hash = destino;
+
+  ordenar(siguiente, "entrar", {
+    id: destino,
+    desde: opciones.desde || antes || null,
+    extra: opciones.extra || null
+  });
+
+  precargar(destino);
+  ocupado = false;
+}
+
+function volver(){
+  const previo = pila.pop();
+  if (previo) ir(previo, { retroceso:true });
+}
+
+window.addEventListener("keydown", e => {
+  if (e.key === "Escape" || e.key === "Backspace"){ volver(); e.preventDefault(); }
+});
+
+window.addEventListener("hashchange", () => {
+  const id = location.hash.slice(1);
+  if (MAPA[id] && id !== actual) ir(id);
+});
+
+/* ═══════════════════════════════════════════════════════════
+   5 · ARRANQUE
+   ═══════════════════════════════════════════════════════════ */
+const pedido = location.hash.slice(1);
+ir(MAPA[pedido] ? pedido : INICIO);
+})();
+</script>
+</body>
+</html>

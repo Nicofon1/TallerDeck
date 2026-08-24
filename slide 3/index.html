@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full overflow-hidden">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historia Clínica Pediátrica — Urgencias & PICU</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../taller.css">
+  <script>
+    /* Esta pagina pinta con utilidades de Tailwind, asi que la paleta no se
+       impone regla a regla: se cambia el significado de cada familia de color.
+       No hay rojo ni ambar en los siete del taller, y el codigo clinico los
+       usaba para avisar. Se conserva la distincion, no el tono: el indigo
+       marca lo urgente, el azul lo informativo y el agua lo estable. */
+    tailwind.config = {
+      theme: { extend: {
+        fontFamily: {
+          sans:  ['Montserrat', 'system-ui', 'sans-serif'],
+          serif: ['Fraunces', 'Georgia', 'serif'],
+          /* Las etiquetas de constantes usaban una mono; con Montserrat y algo
+             de tracking se leen igual de instrumentales. */
+          mono:  ['Montserrat', 'ui-monospace', 'monospace']
+        },
+        colors: {
+          slate: { 50:'#F9FAFB', 100:'#EBEBEB', 200:'#E2E2E6', 300:'#CFCFD6',
+                   400:'#6B6880', 500:'#6B6880', 600:'#4A4560', 700:'#251D4E',
+                   800:'#1F1A3A', 900:'#1A1A1A' },
+          gray:  { 50:'#F9FAFB', 100:'#EBEBEB', 200:'#E2E2E6', 300:'#CFCFD6',
+                   400:'#6B6880', 500:'#6B6880', 600:'#4A4560', 700:'#251D4E',
+                   800:'#1F1A3A', 900:'#1A1A1A' },
+          purple:  { 100:'#C8DEFE', 200:'#C8DEFE', 300:'#8AA8E0', 400:'#426DC2',
+                     500:'#426DC2', 600:'#251D4E', 700:'#251D4E', 800:'#1A1A1A', 900:'#1A1A1A' },
+          violet:  { 100:'#C8DEFE', 200:'#C8DEFE', 300:'#8AA8E0', 400:'#426DC2',
+                     500:'#426DC2', 600:'#251D4E', 700:'#251D4E', 800:'#1A1A1A', 900:'#1A1A1A' },
+          indigo:  { 100:'#C8DEFE', 200:'#C8DEFE', 300:'#8AA8E0', 400:'#426DC2',
+                     500:'#426DC2', 600:'#251D4E', 700:'#251D4E', 800:'#1A1A1A', 900:'#1A1A1A' },
+          fuchsia: { 100:'#C8DEFE', 200:'#C8DEFE', 400:'#426DC2', 500:'#426DC2',
+                     600:'#251D4E', 700:'#251D4E' },
+          rose: { 100:'#DCE7FA', 200:'#C8DEFE', 300:'#8AA8E0', 400:'#426DC2',
+                  500:'#251D4E', 600:'#251D4E', 700:'#1A1A1A' },
+          red:  { 100:'#DCE7FA', 200:'#C8DEFE', 300:'#8AA8E0', 400:'#426DC2',
+                  500:'#251D4E', 600:'#251D4E', 700:'#1A1A1A' },
+          pink: { 100:'#DCE7FA', 200:'#C8DEFE', 400:'#426DC2', 500:'#251D4E',
+                  600:'#251D4E', 700:'#1A1A1A' },
+          amber:  { 100:'#DCE7FA', 200:'#C8DEFE', 400:'#426DC2', 500:'#426DC2',
+                    600:'#251D4E', 700:'#251D4E' },
+          orange: { 100:'#DCE7FA', 200:'#C8DEFE', 400:'#426DC2', 500:'#426DC2',
+                    600:'#251D4E', 700:'#251D4E' },
+          yellow: { 100:'#DCE7FA', 200:'#C8DEFE', 400:'#426DC2', 500:'#426DC2',
+                    600:'#251D4E', 700:'#251D4E' },
+          teal:    { 100:'#DCF2F2', 200:'#B7E4E4', 300:'#82CACA', 400:'#82CACA',
+                     500:'#63AEB8', 600:'#4C8FAE', 700:'#426DC2' },
+          emerald: { 100:'#DCF2F2', 200:'#B7E4E4', 300:'#82CACA', 400:'#82CACA',
+                     500:'#63AEB8', 600:'#4C8FAE', 700:'#426DC2' },
+          green:   { 100:'#DCF2F2', 200:'#B7E4E4', 300:'#82CACA', 400:'#82CACA',
+                     500:'#63AEB8', 600:'#4C8FAE', 700:'#426DC2' },
+          cyan:    { 100:'#DCF2F2', 200:'#B7E4E4', 300:'#82CACA', 400:'#82CACA',
+                     500:'#63AEB8', 600:'#4C8FAE', 700:'#426DC2' },
+          sky:     { 100:'#DCF2F2', 200:'#B7E4E4', 300:'#82CACA', 400:'#82CACA',
+                     500:'#63AEB8', 600:'#4C8FAE', 700:'#426DC2' },
+          blue:    { 100:'#DCE7FA', 200:'#C8DEFE', 300:'#8AA8E0', 400:'#426DC2',
+                     500:'#426DC2', 600:'#251D4E', 700:'#251D4E' }
+        }
+      } }
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="../enlace.js"></script>
+  <script>try{if(window.parent!==window&&!/[?&]previa=1/.test(location.search))document.documentElement.className+=" con-telon";}catch(e){}</script>
+
+  <style>
+    /* ── Costura con el deck ──────────────────────────────────
+       El caso llega desde un expediente que se abrió: entra como
+       si la ficha se desplegara, no como una pantalla nueva. */
+    #telon{
+      position:fixed;inset:0;z-index:999;background:var(--papel);
+      pointer-events:none;opacity:0;
+      transition:opacity .62s cubic-bezier(.16,1,.3,1);
+    }
+    html.con-telon #telon{opacity:1}
+
+    html.entrando header,
+    html.entrando main > div,
+    html.entrando footer{animation:desplegar .8s cubic-bezier(.16,1,.3,1) both}
+    html.entrando header       {animation-delay:.10s}
+    html.entrando main > div:nth-child(1){animation-delay:.20s}
+    html.entrando main > div:nth-child(2){animation-delay:.28s}
+    html.entrando footer       {animation-delay:.36s}
+    @keyframes desplegar{
+      from{opacity:0;transform:translateY(30px) scale(.985)}
+      to{opacity:1;transform:none}
+    }
+
+    html.saliendo #telon{opacity:1;transition-duration:.44s}
+    html.saliendo header,
+    html.saliendo main,
+    html.saliendo footer{
+      opacity:0;transform:translateY(20px) scale(.99);
+      transition:opacity .38s ease,transform .48s cubic-bezier(.6,0,.9,.4);
+    }
+
+    /* Vuelta a la estantería */
+    #volver-archivo{
+      position:fixed;left:14px;top:14px;z-index:60;
+      display:none;align-items:center;gap:7px;
+      padding:7px 13px 7px 10px;border-radius:999px;
+      background:rgba(255,255,255,.78);
+      border:1.5px solid rgba(255,255,255,.95);
+      backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+      box-shadow:0 6px 16px rgba(110,115,145,.14);
+      font-family:var(--texto);
+      font-size:11px;font-weight:700;color:#251D4E;
+      cursor:pointer;transition:transform .24s ease,background-color .24s ease;
+    }
+    html.en-deck #volver-archivo{display:inline-flex}
+    #volver-archivo:hover{transform:translateX(-2px);background:rgba(255,255,255,.95)}
+    #volver-archivo .exp{color:#426DC2;font-weight:800}
+
+    /* El encabezado deja sitio al botón cuando el caso vive en el deck */
+    html.en-deck header{padding-left:150px}
+
+    @media (prefers-reduced-motion:reduce){
+      html.entrando header,html.entrando main > div,html.entrando footer{animation:none}
+    }
+  </style>
+
+  <style>
+    :root {
+      --bg-opacity: 0.72;
+      --blur-val: 24px;
+      --card-radius: 24px;
+    }
+
+    body {
+      font-family: var(--texto);
+      background: linear-gradient(130deg, #F9FAFB 0%, #EFF3FB 28%, #E7EFFB 65%, #DFF0F0 100%);
+      height: 100vh;
+      max-height: 100vh;
+      color: #1A1A1A;
+      overflow: hidden;
+    }
+
+    /* La clase sigue llamandose asi en el marcado; la letra ya es la del taller */
+    .font-syne {
+      font-family: var(--titulo);
+      font-variation-settings: 'opsz' 120;
+    }
+
+    /* Fluted Ribbed Glass Texture on Left */
+    .bg-fluted-glass {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 42%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.45) 0px,
+        rgba(255, 255, 255, 0.45) 12px,
+        rgba(225, 218, 230, 0.22) 12px,
+        rgba(225, 218, 230, 0.22) 24px
+      );
+      mask-image: linear-gradient(to right, rgba(0, 0, 0, 0.95) 60%, rgba(0, 0, 0, 0) 100%);
+      -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 0.95) 60%, rgba(0, 0, 0, 0) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Notch SVG Card Background */
+    .notch-card-wrapper {
+      position: relative;
+      filter: drop-shadow(0 14px 28px rgba(110, 115, 145, 0.12));
+    }
+
+    .notch-vector-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+      backdrop-filter: blur(var(--blur-val));
+      -webkit-backdrop-filter: blur(var(--blur-val));
+    }
+
+    .notch-fill {
+      fill: rgba(255, 255, 255, var(--bg-opacity));
+    }
+
+    .notch-stroke {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.95);
+      stroke-width: 1.5px;
+    }
+
+    /* Floating Circle Badges with generous clearance */
+    .notch-circle-badge-lg {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, var(--bg-opacity));
+      backdrop-filter: blur(var(--blur-val));
+      -webkit-backdrop-filter: blur(var(--blur-val));
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05), inset 0 1px 2px rgba(255, 255, 255, 0.95);
+      border: 1.5px solid rgba(255, 255, 255, 0.95);
+      z-index: 20;
+      transition: transform 0.25s ease, background-color 0.25s ease;
+    }
+
+    .notch-circle-badge-lg:hover {
+      transform: scale(1.08);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    .notch-circle-badge-sm {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, var(--bg-opacity));
+      backdrop-filter: blur(var(--blur-val));
+      -webkit-backdrop-filter: blur(var(--blur-val));
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05), inset 0 1px 2px rgba(255, 255, 255, 0.95);
+      border: 1.5px solid rgba(255, 255, 255, 0.95);
+      z-index: 20;
+      transition: transform 0.25s ease, background-color 0.25s ease;
+    }
+
+    .notch-circle-badge-sm:hover {
+      transform: scale(1.08);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    /* Diagnostics Cards (Left Column) */
+    .diagnostic-panel {
+      background: #1A1A1A;
+      border-radius: var(--card-radius);
+      box-shadow: 0 16px 32px rgba(15, 23, 42, 0.2);
+      position: relative;
+      overflow: hidden;
+      border: 1.5px solid rgba(255, 255, 255, 0.85);
+    }
+
+    .xray-img, .ekg-img {
+      transition: filter 0.3s ease, transform 0.4s ease;
+    }
+
+    /* La tira del ECG es un mapa de bits con la cuadricula rosa de siempre.
+       No se puede repintar regla a regla, asi que se le gira el tono hasta
+       el azul del taller y se le baja la saturacion. */
+    .ekg-img {
+      filter: hue-rotate(212deg) saturate(.62) brightness(1.03);
+    }
+
+    .xray-img.inverted {
+      filter: invert(1) contrast(1.15) brightness(1.05);
+    }
+
+    .xray-img.zoomed {
+      transform: scale(1.35);
+    }
+
+    .ekg-img.zoomed {
+      transform: scale(1.4);
+    }
+
+    /* ── El caso, en el lenguaje del taller ────────────────────
+       Esta ficha llegó de otro sitio y lo traía puesto: vidrio
+       esmerilado de fondo, tarjetas redondas, insignias flotantes
+       y sombras de color. El expediente que la abre es una carpeta
+       de papel, y el salto entre una cosa y la otra era justo lo
+       que se veía mal — no la transición, sino el aterrizaje.
+
+       Aquí se la pasa a papel: filete en vez de sombra, canto vivo
+       en vez de esquina redonda, y nada de desenfoque. No se toca
+       el contenido: ni un dato, ni una etiqueta, ni una imagen. */
+
+    /* Las tres perillas que ya gobernaban el vidrio */
+    :root{
+      --bg-opacity:1;
+      --blur-val:0px;
+      --card-radius:3px;
+    }
+
+    body{ background:var(--papel) !important; }
+
+    /* El vidrio estriado y los tres halos de color del fondo: sobran en una
+       hoja. Las demas laminas claras del taller son papel liso. */
+    .bg-fluted-glass,
+    .ambiente{ display:none }
+
+    /* Las tarjetas con muesca pasan a ser papel con filete. La muesca se
+       queda: es lo que le da carácter a la ficha y no depende del vidrio. */
+    .notch-card-wrapper{ filter:none }
+    .notch-vector-bg{ backdrop-filter:none; -webkit-backdrop-filter:none }
+    .notch-fill{ fill:var(--papel) }
+    .notch-stroke{ stroke:var(--linea); stroke-width:1px }
+
+    /* Las insignias circulares dejan de flotar y se posan */
+    .notch-circle-badge-lg,
+    .notch-circle-badge-sm{
+      background:transparent;
+      border:1px solid var(--linea);
+      box-shadow:none;
+      backdrop-filter:none; -webkit-backdrop-filter:none;
+    }
+    .notch-circle-badge-lg:hover,
+    .notch-circle-badge-sm:hover{ background:var(--niebla); transform:none }
+
+    /* Las placas de diagnóstico: la imagen manda y el marco calla */
+    .diagnostic-panel{
+      background:var(--tinta);
+      border:0;
+      border-radius:3px;
+      box-shadow:none;
+    }
+
+    /* Las superficies grandes pierden la esquina redonda; los controles
+       pequeños la conservan, que en el resto del taller son pastillas. */
+    [class*="rounded-xl"],
+    [class*="rounded-2xl"],
+    [class*="rounded-3xl"]{ border-radius:3px !important }
+    [class*="shadow"]{ box-shadow:none !important }
+
+    /* Un filete bajo la cabecera: la hoja necesita una línea que la ordene */
+    body > header{
+      border-bottom:1px solid var(--linea);
+      padding-bottom:10px;
+    }
+  </style>
+</head>
+<body class="p-3 sm:p-4 md:p-5 flex flex-col justify-between items-center h-screen max-h-screen overflow-hidden relative">
+
+  <div id="telon" aria-hidden="true"></div>
+
+  <button id="volver-archivo" type="button">
+    <i class="fa-solid fa-arrow-left"></i>
+    <span>Archivo<span class="exp" id="volver-exp"></span></span>
+  </button>
+
+  <!-- Fluted glass & background ambient glow -->
+  <div class="bg-fluted-glass"></div>
+  <div class="ambiente fixed inset-0 pointer-events-none overflow-hidden -z-10">
+    <div class="absolute -top-32 -left-32 w-[450px] h-[450px] bg-pink-200/40 rounded-full blur-3xl"></div>
+    <div class="absolute top-1/4 -right-20 w-[450px] h-[450px] bg-teal-200/50 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-20 left-1/3 w-[480px] h-[480px] bg-purple-200/40 rounded-full blur-3xl"></div>
+  </div>
+
+  <!-- Header Section (Compact Single Row) -->
+  <header class="w-full max-w-7xl flex items-center justify-between gap-4 z-10 flex-shrink-0 mb-2">
+    <div>
+      <h1 class="font-syne text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 uppercase leading-none">
+        HISTORIA CLÍNICA DE URGENCIA
+      </h1>
+      <p class="text-[11px] sm:text-xs text-slate-600 font-medium mt-1 flex items-center gap-1.5">
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        Caso Pediátrico: Sumersión Accidental & Hipoxemia Post-Intubación • UCIP
+      </p>
+    </div>
+
+    <div class="flex items-center gap-2 bg-white/70 backdrop-blur-md p-1 rounded-xl border border-white/80 shadow-sm">
+      <button id="lang-es" onclick="setLanguage('es')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-900 text-white transition-all">ES</button>
+      <button id="lang-en" onclick="setLanguage('en')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-600 hover:text-slate-900 transition-all">EN</button>
+      <button onclick="togglePalsModal()" class="ml-1 px-3 py-1 rounded-lg text-[11px] font-bold bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-1.5 shadow-sm transition-all">
+        <i class="fa-solid fa-heart-pulse"></i>
+        <span>Algoritmo PALS</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN 2-COLUMN GRID (100% fits within screen) -->
+  <main class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-4 z-10 flex-1 min-h-0 items-stretch">
+    
+    <!-- LEFT COLUMN: DIAGNOSTICS (CHEST X-RAY + 12-LEAD EKG) (Cols 1-5) -->
+    <div class="lg:col-span-5 flex flex-col gap-3.5 h-full min-h-0">
+      
+      <!-- TOP LEFT: PEDIATRIC CHEST X-RAY -->
+      <div class="diagnostic-panel p-3 flex flex-col justify-between flex-1 min-h-0">
+        <!-- HUD Header -->
+        <div class="w-full flex justify-between items-center text-[11px] text-slate-400 pb-1.5 border-b border-slate-800 flex-shrink-0">
+          <span class="flex items-center gap-1.5 text-emerald-400 font-mono">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            Rx Tórax AP • Portátil
+          </span>
+          <span class="font-mono text-[10px] text-slate-400">POST-INTUBACIÓN</span>
+        </div>
+
+        <!-- Chest X-Ray Viewport -->
+        <div class="relative my-1.5 w-full flex-1 min-h-0 flex items-center justify-center overflow-hidden rounded-xl bg-black">
+          <img src="assets/chest_xray.png" alt="Radiografía de Tórax Pediátrico" id="chest-xray-img" class="xray-img w-full h-full object-cover">
+          
+          <!-- Finding Marker 1: Tubo ET -->
+          <div class="absolute top-[26%] left-[34%] bg-slate-900/85 backdrop-blur-md px-2 py-0.5 rounded-full border border-sky-400/60 shadow flex items-center gap-1 cursor-pointer">
+            <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
+            <span class="text-[9px] font-mono font-bold text-slate-100">Tubo ET</span>
+          </div>
+
+          <!-- Finding Marker 2: Infiltrado Alveolar -->
+          <div class="absolute bottom-[20%] right-[14%] bg-slate-900/85 backdrop-blur-md px-2 py-0.5 rounded-full border border-sky-400/60 shadow flex items-center gap-1 cursor-pointer">
+            <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
+            <span class="text-[9px] font-mono font-bold text-slate-100">Infiltrado Alveolar</span>
+          </div>
+        </div>
+
+        <!-- Controls Toolbar -->
+        <div class="w-full flex justify-between items-center pt-1 text-[11px] text-slate-400 flex-shrink-0">
+          <div class="flex items-center gap-3">
+            <button onclick="toggleScanInvert()" class="hover:text-cyan-400 transition-colors flex items-center gap-1 font-medium">
+              <i class="fa-solid fa-circle-half-stroke text-[10px]"></i> Invertir
+            </button>
+            <button onclick="toggleScanZoom()" class="hover:text-cyan-400 transition-colors flex items-center gap-1 font-medium">
+              <i class="fa-solid fa-magnifying-glass text-[10px]"></i> Zoom
+            </button>
+          </div>
+          <span class="font-mono text-[10px] text-slate-400">PEDIATRIC ICU</span>
+        </div>
+      </div>
+
+      <!-- BOTTOM LEFT: 12-LEAD EKG STRIP -->
+      <div class="diagnostic-panel p-3 flex flex-col justify-between h-[180px] flex-shrink-0">
+        <!-- HUD Header -->
+        <div class="w-full flex justify-between items-center text-[11px] text-slate-400 pb-1 border-b border-slate-800 flex-shrink-0">
+          <span class="flex items-center gap-1.5 text-rose-400 font-mono">
+            <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+            Electrocardiograma (ECG 12D)
+          </span>
+          <span class="font-mono text-[10px] text-rose-400 font-bold">BRADICARDIA (<60 lpm)</span>
+        </div>
+
+        <!-- EKG Viewport -->
+        <div class="relative my-1 w-full h-[95px] flex items-center justify-center overflow-hidden rounded-xl bg-[#EFF3FB] border border-slate-200">
+          <img src="assets/ekg.png" alt="Electrocardiograma Pediátrico" id="ekg-strip-img" class="ekg-img w-full h-full object-cover">
+          <div class="absolute bottom-1 right-1.5 bg-slate-900/80 px-1.5 py-0.5 rounded text-[8px] font-mono text-slate-200">
+            25 mm/s • 10 mm/mV
+          </div>
+        </div>
+
+        <!-- Live Vitals Pill below EKG -->
+        <div class="w-full flex justify-between items-center pt-0.5 text-xs flex-shrink-0">
+          <div class="flex items-center gap-3">
+            <span class="flex items-center gap-1.5 text-amber-400 font-bold text-[11px]">
+              <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+              SpO₂: <strong id="vital-spo2" class="font-mono text-white">82%</strong>
+            </span>
+            <span class="flex items-center gap-1.5 text-rose-400 font-bold text-[11px]">
+              <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+              FC: <strong id="vital-hr" class="font-mono text-white">54 lpm</strong>
+            </span>
+          </div>
+          <button onclick="toggleEkgZoom()" class="text-slate-400 hover:text-cyan-400 transition-colors text-[10px] font-medium flex items-center gap-1">
+            <i class="fa-solid fa-expand"></i> Ampliar ECG
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN: PATIENT NOTCHED CARD + DOCTOR BADGE (Cols 6-12) -->
+    <div class="lg:col-span-7 flex flex-col gap-3.5 h-full min-h-0">
+      
+      <!-- MAIN PATIENT NOTCHED CARD -->
+      <div class="notch-card-wrapper flex-1 min-h-0">
+        
+        <!-- CIRCULAR BADGE FLOATING IN THE TOP-RIGHT CORNER NOTCH (Generous clearance) -->
+        <div class="notch-circle-badge-lg flex items-center justify-center cursor-pointer group" onclick="togglePalsModal()" title="Ver caso completo">
+          <i class="fa-solid fa-arrow-up-right-from-square text-purple-700 group-hover:rotate-45 transition-transform duration-300 text-sm"></i>
+        </div>
+
+        <!-- SVG Vector Background with Wide Smooth Fillet Curves -->
+        <svg id="patient-notch-svg" class="notch-vector-bg" aria-hidden="true">
+          <path id="patient-notch-fill" class="notch-fill" d="" />
+          <path id="patient-notch-stroke" class="notch-stroke" d="" />
+        </svg>
+
+        <!-- MAIN CARD BODY -->
+        <div id="patient-card" class="p-5 sm:p-6 flex flex-col justify-between h-full relative z-10">
+          
+          <div>
+            <!-- Patient Profile Header -->
+            <div class="flex items-center gap-4 pr-20">
+              <!-- Patient Avatar with Amber Circle Border -->
+              <div class="relative flex-shrink-0">
+                <div class="w-16 h-16 sm:w-18 sm:h-18 rounded-full p-1 bg-amber-400 shadow-sm">
+                  <img src="assets/patient.jpg" 
+                       alt="Patient Avatar" 
+                       class="w-full h-full object-cover rounded-full border-2 border-white">
+                </div>
+              </div>
+              <!-- Patient Name & Age -->
+              <div class="space-y-0.5">
+                <h2 id="patient-name" class="font-syne text-lg sm:text-xl font-bold text-slate-900 leading-snug">
+                  Lucas Mateo<br>Valenzuela<br>Rodríguez
+                </h2>
+                <p id="patient-age" class="text-xs font-bold text-slate-500 pt-0.5 flex items-center gap-2">
+                  <span>3 años</span>
+                  <span>•</span>
+                  <span class="text-red-600 bg-red-100 px-1.5 py-0.2 rounded text-[10px]">Código Rojo</span>
+                </p>
+              </div>
+            </div>
+
+            <!-- Solid Pure White Divider Line -->
+            <div class="my-3.5 border-b-2 border-white shadow-sm"></div>
+
+            <!-- Key Medical Metrics Table -->
+            <div class="space-y-2 text-xs sm:text-sm">
+              <div class="flex justify-between items-center">
+                <span id="lbl-organ" class="uppercase text-slate-500 font-semibold tracking-wider text-[11px]">ÓRGANO AFECTADO</span>
+                <span id="val-organ" class="font-bold text-purple-700 text-xs sm:text-sm">Pulmón / Vías Aéreas</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span id="lbl-diagnosis" class="uppercase text-slate-500 font-semibold tracking-wider text-[11px]">DIAGNÓSTICO INGRESO</span>
+                <span id="val-diagnosis" class="font-bold text-slate-900 text-xs sm:text-sm">Sumersión & Edema Pulmonar</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span id="lbl-resp" class="uppercase text-slate-500 font-semibold tracking-wider text-[11px]">ESTADO RESPIRATORIO</span>
+                <span id="val-resp" class="font-bold text-amber-700 text-xs sm:text-sm">Hipoxemia Post-Intubación (82%)</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span id="lbl-heart" class="uppercase text-slate-500 font-semibold tracking-wider text-[11px]">RITMO CARDÍACO</span>
+                <span id="val-heart" class="font-bold text-red-600 text-xs sm:text-sm">Bradicardia Pediátrica (&lt;60 lpm)</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span id="lbl-protocol" class="uppercase text-slate-500 font-semibold tracking-wider text-[11px]">PROTOCOLO APLICADO</span>
+                <span id="val-protocol" class="font-bold text-slate-900 text-xs sm:text-sm">PALS: RCP (1 Ciclo) + O₂ 100%</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span id="lbl-dest" class="uppercase text-slate-500 font-semibold tracking-wider text-[11px]">DESTINO / TRASLADO</span>
+                <span id="val-dest" class="font-bold text-teal-700 text-xs sm:text-sm">Ingreso Inmediato a UCIP</span>
+              </div>
+            </div>
+
+            <!-- Solid Pure White Divider Line -->
+            <div class="my-3.5 border-b-2 border-white shadow-sm"></div>
+
+            <!-- Doctor's Note Section -->
+            <div>
+              <h3 id="lbl-doctor-notes" class="uppercase text-purple-700 font-bold tracking-wider text-[11px] mb-1.5 flex items-center gap-1.5">
+                <i class="fa-solid fa-notes-medical text-purple-600"></i>
+                EVOLUCIÓN CLÍNICA & NOTA MÉDICA
+              </h3>
+              <p id="val-doctor-notes" class="text-[11.5px] sm:text-xs text-slate-800 leading-relaxed font-normal bg-white/40 p-2.5 rounded-xl border border-white/60">
+                Preescolar de 3 años rescatado tras inmersión accidental en piscina profunda. Ingresa inconsciente con fallo respiratorio y secreción espumosa. Tras intubación presenta hipoxemia y bradicardia severa; se ejecuta RCP PALS efectiva con soporte ventilatorio avanzado, logrando estabilización para entrega formal a UCIP.
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-2 pt-1 flex justify-between items-center text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+            <span>ID: #PEDS-302 • EHR VERIFICADO</span>
+            <button onclick="simulateRecovery()" class="text-purple-700 font-bold hover:underline">Simular Respuesta RCP</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- BOTTOM RIGHT: ATTENDING PHYSICIAN CARD (WITH NOTCH) -->
+      <div class="notch-card-wrapper h-[74px] flex-shrink-0">
+        
+        <!-- CIRCULAR BADGE FLOATING IN THE TOP-RIGHT NOTCH -->
+        <div class="notch-circle-badge-sm flex items-center justify-center cursor-pointer group" title="Médico Responsable">
+          <i class="fa-solid fa-diamond text-purple-600 group-hover:rotate-45 transition-transform duration-300 text-[10px]"></i>
+        </div>
+
+        <!-- SVG Vector Background for Doctor Badge -->
+        <svg id="doctor-notch-svg" class="notch-vector-bg" aria-hidden="true">
+          <path id="doctor-notch-fill" class="notch-fill" d="" />
+          <path id="doctor-notch-stroke" class="notch-stroke" d="" />
+        </svg>
+
+        <!-- Doctor Card Body -->
+        <div id="doctor-card" class="px-4 py-2.5 flex items-center justify-between relative z-10 h-full">
+          <div class="flex items-center gap-3 pr-14">
+            <!-- Doctor Avatar -->
+            <div class="w-11 h-11 rounded-full p-0.5 bg-gradient-to-tr from-purple-500 to-indigo-500 shadow-sm flex-shrink-0">
+              <img src="assets/doctor.jpg" 
+                   alt="Doctor Avatar" 
+                   class="w-full h-full object-cover rounded-full border border-white">
+            </div>
+            <!-- Doctor Info -->
+            <div>
+              <h4 id="doc-name" class="font-syne font-bold text-slate-900 text-xs sm:text-sm leading-tight">
+                Dra. Sarah J. Evans
+              </h4>
+              <p id="doc-role" class="text-[11px] text-slate-500 font-semibold mt-0.5">Especialista en Urgencias Pediátricas</p>
+              <p id="doc-status" class="text-[10px] text-purple-700 font-bold">Interconsulta UCIP Activa</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- PALS MODAL -->
+  <div id="pals-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-all">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4 pb-2.5 border-b border-slate-100">
+        <div>
+          <span class="text-[10px] font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded-full uppercase">PROTOCOLO PALS</span>
+          <h3 class="font-syne font-bold text-lg text-slate-900 mt-1">Algoritmo de Bradicardia & Hipoxemia</h3>
+        </div>
+        <button onclick="togglePalsModal()" class="w-7 h-7 rounded-full bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center text-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs sm:text-sm text-slate-700 leading-relaxed">
+        <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+          <h4 class="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
+            <i class="fa-solid fa-check-circle text-purple-600"></i> Manejo en Urgencias:
+          </h4>
+          <p>1. Vía aérea asegurada con tubo orotraqueal.<br>
+             2. Hipoxemia post-intubación tratada con ventilación a presión positiva y O₂ al 100%.<br>
+             3. Ante frecuencia cardíaca &lt;60 lpm con compromiso perfusorio, se inicia RCP inmediata.<br>
+             4. Recuperación de pulso y saturación tras 1 ciclo; pase monitorizado a UCIP.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="w-full max-w-7xl text-center text-[10px] text-slate-500 py-1 font-medium z-10 flex-shrink-0">
+    Ficha Clínica Pediátrica • Recreación de Muesca Cóncava & Panel Diagnóstico (Rx + ECG)
+  </footer>
+
+  <script src="app.js"></script>
+
+  <script>
+  /* ── Costura con el deck ────────────────────────────────────
+     El caso no sabe qué expediente lo abrió hasta que el deck se
+     lo dice: `extra` viaja desde el clic sobre el libro. */
+  (function(){
+    var raiz = document.documentElement;
+    var volver = document.getElementById("volver-archivo");
+    var exp = document.getElementById("volver-exp");
+
+    if (window.Taller && Taller.dentroDelDeck) raiz.classList.add("en-deck");
+
+    volver.addEventListener("click", function(){
+      if (window.Taller) Taller.ir("biblioteca");
+    });
+
+    if (!window.Taller) return;
+
+    Taller.alEntrar(function(desde, extra){
+      if (extra && extra.titulo){
+        exp.textContent = " · " + extra.titulo;
+        volver.style.borderColor = extra.color || "";
+      } else {
+        exp.textContent = "";
+      }
+      raiz.classList.remove("saliendo");
+      raiz.classList.add("entrando");
+      Taller.trasPintar(function(){ raiz.classList.remove("con-telon"); });
+      setTimeout(function(){ raiz.classList.remove("entrando"); }, 1300);
+    });
+
+    Taller.alSalir(function(){
+      raiz.classList.remove("entrando");
+      raiz.classList.add("saliendo", "con-telon");
+      return new Promise(function(listo){ setTimeout(listo, 470); });
+    });
+  })();
+  </script>
+</body>
+</html>
