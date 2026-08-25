@@ -77,30 +77,36 @@ class KineticTypographyOrbit {
 
   bindEvents() {
     // Autoplay toggle
-    this.toggleAutoplayBtn.addEventListener('click', () => {
-      this.isPlaying = !this.isPlaying;
-      this.toggleAutoplayBtn.classList.toggle('active', this.isPlaying);
-      this.autoplayText.textContent = this.isPlaying ? 'Auto-Loop' : 'Pausado';
-      if (this.isPlaying) {
-        this.scheduleNextStep();
-      } else {
-        clearTimeout(this.autoTimer);
-      }
-    });
+    if (this.toggleAutoplayBtn) {
+      this.toggleAutoplayBtn.addEventListener('click', () => {
+        this.isPlaying = !this.isPlaying;
+        this.toggleAutoplayBtn.classList.toggle('active', this.isPlaying);
+        if (this.autoplayText) this.autoplayText.textContent = this.isPlaying ? 'Auto-Loop' : 'Pausado';
+        if (this.isPlaying) {
+          this.scheduleNextStep();
+        } else {
+          clearTimeout(this.autoTimer);
+        }
+      });
+    }
 
     // Speed toggle
-    this.speedBtn.addEventListener('click', () => {
-      this.speedIndex = (this.speedIndex + 1) % this.speeds.length;
-      this.currentSpeed = this.speeds[this.speedIndex];
-      this.speedBtn.textContent = `${this.currentSpeed.toFixed(1)}x`;
-    });
+    if (this.speedBtn) {
+      this.speedBtn.addEventListener('click', () => {
+        this.speedIndex = (this.speedIndex + 1) % this.speeds.length;
+        this.currentSpeed = this.speeds[this.speedIndex];
+        this.speedBtn.textContent = `${this.currentSpeed.toFixed(1)}x`;
+      });
+    }
 
     // Click indicators
-    this.indicatorBtns.forEach((btn, idx) => {
-      btn.addEventListener('click', () => {
-        this.pauseAndGoTo(idx);
+    if (this.indicatorBtns) {
+      this.indicatorBtns.forEach((btn, idx) => {
+        btn.addEventListener('click', () => {
+          this.pauseAndGoTo(idx);
+        });
       });
-    });
+    }
 
     // Click on words directly to bring to front
     this.wordElements.forEach((el, idx) => {
@@ -298,9 +304,11 @@ class KineticTypographyOrbit {
     // Update bottom indicators
     if (activeWordIndex !== this.currentIndex) {
       this.currentIndex = activeWordIndex;
-      this.indicatorBtns.forEach((btn, idx) => {
-        btn.classList.toggle('active', idx === activeWordIndex);
-      });
+      if (this.indicatorBtns && this.indicatorBtns.length) {
+        this.indicatorBtns.forEach((btn, idx) => {
+          btn.classList.toggle('active', idx === activeWordIndex);
+        });
+      }
     }
   }
 }

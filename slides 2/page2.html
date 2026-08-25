@@ -46,30 +46,22 @@
 <body>
 
 <div id="telon" aria-hidden="true"></div>
-  <!-- Header / Navigation Bar -->
+  <!-- Header / Navigation Bar with only back button -->
   <header class="top-nav">
     <div class="nav-left">
       <a href="page3.html" class="nav-back-link icon-only" data-seccion="indice" aria-label="Volver al índice">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="19" y1="12" x2="5" y2="12"></line>
-          <polyline points="12 19 5 12 12 5"></polyline>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>
       </a>
-      <span class="nav-badge">Tipografía cinética</span>
-      <a href="index.html" class="nav-back-link" data-seccion="biblioteca" style="color:var(--azul);">
-        <span>Biblioteca de casos</span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-      </a>
-    </div>
-
-    <div class="nav-right">
-      <button id="toggleAutoplayBtn" class="pill-btn active" title="Pausar / Reanudar Rotación">
-        <span class="status-dot"></span>
-        <span id="autoplayText">Auto-Loop</span>
-      </button>
-      <button id="speedBtn" class="pill-btn secondary" title="Cambiar Velocidad">1.0x</button>
     </div>
   </header>
+
+  <!-- Central Editorial Heading: Osler Hub / Es -->
+  <div class="osler-hero-heading">
+    <h1 class="osler-hero-title">Osler Hub</h1>
+    <p class="osler-hero-sub">Es</p>
+  </div>
 
   <!-- Main 3D Stage -->
   <main class="kinetic-container" id="stageContainer">
@@ -83,19 +75,6 @@
       </div>
     </div>
   </main>
-
-  <!-- Interactive Footer Hints & Controls -->
-  <footer class="bottom-bar">
-    <div class="word-indicators" id="wordIndicators">
-      <button class="word-tab active" data-index="0">Global</button>
-      <button class="word-tab" data-index="1">Fast</button>
-      <button class="word-tab" data-index="2">Easy</button>
-      <button class="word-tab" data-index="3">Local</button>
-    </div>
-    <div class="drag-hint">
-      <span>Arrastra o haz clic en cualquier palabra para rotar</span>
-    </div>
-  </footer>
 
   <script src="page2.js"></script>
 
