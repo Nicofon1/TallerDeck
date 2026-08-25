@@ -69,24 +69,23 @@
   .nota-escena{transition:opacity .4s ease}
   html.cierre .nota-escena{opacity:0}
 
-  .remate{
+  /* La frase del momento, debajo de la esfera que manda. La coloca el guion:
+     va donde acaba esa esfera, y esa esfera siempre cae en el mismo sitio. */
+  .frase{
     position:absolute;left:50%;top:50%;z-index:3;
-    transform:translate(-50%,-50%) translateY(16px);
-    width:min(400px,46%);
-    display:flex;flex-direction:column;gap:15px;
-    text-align:center;
-    opacity:0;pointer-events:none;
-    transition:opacity .65s ease .4s,transform .9s cubic-bezier(.16,1,.3,1) .4s;
-  }
-  html.cierre .remate{opacity:1;transform:translate(-50%,-50%)}
-  .remate p{
-    margin:0;
+    transform:translateX(-50%);
+    width:min(430px,54%);
+    margin:0;text-align:center;
     font-family:var(--titulo);font-weight:400;
     font-variation-settings:'opsz' 120,'SOFT' 0,'WONK' 0;
-    font-size:clamp(15px,1.32vw,20px);
+    font-size:clamp(16px,1.42vw,22px);
     line-height:1.3;letter-spacing:-.008em;
     color:var(--tinta);
+    opacity:0;pointer-events:none;
+    transition:opacity .45s ease .2s;
   }
+  html.cierre .frase{opacity:1}
+  .frase.cambiando{opacity:0;transition:opacity .22s ease}
 
   .selector{display:flex;gap:6px;flex-wrap:wrap}
   .selector button{
@@ -132,11 +131,7 @@
     <div class="grafo" id="grafo">
       <canvas id="lienzo"></canvas>
       <div class="rotulos" id="rotulos"></div>
-      <div class="remate">
-        <p>El estudiante practica poco, entonces no internaliza el método.</p>
-        <p>No internaliza el método, entonces cada simulación le da más ansiedad.</p>
-        <p>Y el feedback que recibe no se registra para mejorar antes de la siguiente.</p>
-      </div>
+      <p class="frase" id="frase"></p>
     </div>
   </div>
 </main>
@@ -321,12 +316,28 @@
   /* El recorrido de la sección: los tres problemas y, al final, el cierre.
      `cierreT` es lo avanzada que está esa mudanza, de 0 a 1. */
   var raiz = document.documentElement;
-  var enCierre = false, cierreT = 0;
-  /* Dónde se planta cada uno en el cierre, en unidades del mundo: dos arriba,
-     en las esquinas, y el tercero abajo. El texto queda en medio. */
-  var CIERRE = [[-4.9, 2.4], [4.9, 2.4], [0, -2.62]];
+  var enCierre = false, cierreT = 0, pasoCierre = 0;
+  /* En el cierre los tres se reparten sobre una elipse: dos arriba en las
+     esquinas y el que manda abajo en medio, un poco por encima del suelo para
+     dejarle sitio a su frase. Cada paso adelante gira la elipse un tercio, así
+     que el de arriba a la izquierda baja a mandar y el que mandaba se va a la
+     derecha. */
+  var ELIPSE_A = 5.66, ELIPSE_B = 1.967, ELIPSE_C = 1.417;
+  var PRINCIPAL = -Math.PI/2;                  // el sitio de la que manda
+  var TERCIO = Math.PI*2/3;
+  /* Dónde arranca cada uno. El orden lo dictan las frases: la primera habla del
+     método, la segunda de la ansiedad y la tercera del feedback. */
+  var TH0 = [PRINCIPAL - TERCIO, PRINCIPAL, PRINCIPAL + TERCIO];
+  var giroCierre = 0, metaCierre = 0;
+
+  var FRASES = [
+    "El estudiante practica poco, entonces no internaliza el método.",
+    "No internaliza el método, entonces cada simulación le da más ansiedad.",
+    "Y el feedback que recibe no se registra para mejorar antes de la siguiente."
+  ];
   var centros = [[0,0,0],[0,0,0],[0,0,0]];
   var escalas = [1, 1, 1];
+  var manda   = [0, 0, 0];   // cuánto manda cada uno en el cierre
   var radios  = [1, 1, 1];
   var VAIVEN = [2400, 3150, 2780];   // ms de cada respiración
   var FASE   = [0, 2.1, 4.0];
@@ -345,7 +356,13 @@
       var a = giro + (i/3)*Math.PI*2 - Math.PI/2;
       // en el cierre no manda ninguno: los tres son la misma frase
       var mando = enCierre || (i === elegido);
-      var meta = enCierre ? 0.88 : (mando ? 1.32 : 0.84);
+      /* Cuánto le toca mandar a este: 1 cuando está en el sitio principal y 0
+         cuando está en cualquiera de los dos de arriba. */
+      var th = TH0[i] + giroCierre;
+      var prox = Math.max(0, (0.5 + 0.5*Math.cos(th - PRINCIPAL) - 0.25)/0.75);
+      manda[i] = prox;
+
+      var meta = enCierre ? (0.68 + 0.62*prox) : (mando ? 1.32 : 0.84);
       escalas[i] += (meta - escalas[i])*0.07;
       var e = escalas[i];
       /* Cada cuerpo respira a su aire: distinto periodo, distinta amplitud y
@@ -354,10 +371,12 @@
 
       aVista(Math.cos(a)*RADIO, flota, Math.sin(a)*RADIO, tmp);
       if (cierreT > 0){
-        // del anillo a su esquina, con la respiración intacta
+        // del anillo a su sitio en la elipse, con la respiración intacta
         var e2 = cierreT*cierreT*(3 - 2*cierreT);
-        tmp[0] += (CIERRE[i][0] - tmp[0])*e2;
-        tmp[1] += (CIERRE[i][1] + flota - tmp[1])*e2;
+        var cx = ELIPSE_A*Math.cos(th);
+        var cy = ELIPSE_C + ELIPSE_B*Math.sin(th) + flota;
+        tmp[0] += (cx - tmp[0])*e2;
+        tmp[1] += (cy - tmp[1])*e2;
         tmp[2] += (-DIST - tmp[2])*e2;
       }
       centros[i][0] = tmp[0]; centros[i][1] = tmp[1]; centros[i][2] = tmp[2];
@@ -365,7 +384,7 @@
       radios[i] = CUERPO*e;
       poner(tmp[0], tmp[1], tmp[2], radios[i],
             mando ? mezclar(AQUA, AZUL, 0.52) : mezclar(GRIS, GRIS2, 0.35),
-            enCierre ? -0.42 : (mando ? -0.62 : 0));   // en negativo: aura sí, lavado no
+            enCierre ? -(0.24 + 0.42*prox) : (mando ? -0.62 : 0));  // negativo: aura sí, lavado no
     }
 
     // los hilos, en el sentido del ciclo: 01 empuja a 02, 02 a 03, 03 a 01
@@ -415,6 +434,19 @@
   }
 
   /* ═══════════════ los rótulos, proyectados ═══════════════ */
+
+  var frase = document.getElementById("frase");
+  var relojFrase = null;
+
+  function decir(k, deGolpe){
+    if (deGolpe){ frase.textContent = FRASES[k]; return; }
+    frase.classList.add("cambiando");
+    clearTimeout(relojFrase);
+    relojFrase = setTimeout(function(){
+      frase.textContent = FRASES[k];
+      frase.classList.remove("cambiando");
+    }, 240);
+  }
 
   var rotulos = document.getElementById("rotulos");
   var chapas = NODOS.map(function(d){
@@ -470,9 +502,18 @@
 
       // lo que está lejos se lava, igual que las esferas
       var meta = libre(i, p.x, abajo + 8) ? 0.42 + 0.58*Math.min(1, 11/p.z) : 0;
+      // en el cierre, debajo de la que manda va su frase, no su rótulo
+      if (cierreT > 0.02) meta *= (1 - manda[i]*cierreT);
       visto[i] += (meta - visto[i])*0.18;
       chapas[i].style.opacity = visto[i].toFixed(3);
       chapas[i].classList.toggle("mando", i === elegido);
+    }
+
+    if (cierreT > 0.02){
+      // el sitio principal no se mueve: basta con proyectarlo una vez por cuadro
+      var yc = H/2 - ((ELIPSE_C - ELIPSE_B)*FOCO/DIST)*(H/2);
+      var rp = (CUERPO*1.30*FOCO/DIST)*(H/2);
+      frase.style.top = (yc + rp + 22).toFixed(0) + "px";
     }
   }
 
@@ -490,8 +531,11 @@
     cierreT += ((enCierre ? 1 : 0) - cierreT)*0.055;
     if (Math.abs((enCierre ? 1 : 0) - cierreT) < 0.002) cierreT = enCierre ? 1 : 0;
 
+    // el tercio de vuelta que da la elipse en cada paso del cierre
+    giroCierre += (metaCierre - giroCierre)*0.075;
+
     if (enCierre){
-      // el anillo se detiene: en el cierre las esferas ya no rondan
+      // el anillo se detiene: en el cierre manda la elipse
     } else if (destino !== null){
       // el anillo se vuelve para traer al elegido al frente, siempre hacia
       // adelante: aunque presente a alguien, el ciclo no gira al revés
@@ -562,23 +606,39 @@
      Uno a uno con las flechas. Pasados los tres, el siguiente abre el cierre;
      y desde el cierre, el siguiente devuelve al índice. */
   function avanzar(){
-    if (enCierre){
-      if (window.Taller && Taller.dentroDelDeck) Taller.ir("indice");
-      else location.href = "../slides 2/page3.html";
+    if (!enCierre){
+      if (elegido < NODOS.length - 1){ elegir(elegido + 1); return; }
+      enCierre = true;
+      pasoCierre = 0;
+      metaCierre = 0;
+      raiz.classList.add("cierre");
+      decir(0, true);
       return;
     }
-    if (elegido < NODOS.length - 1){ elegir(elegido + 1); return; }
-    enCierre = true;
-    raiz.classList.add("cierre");
+    if (pasoCierre < FRASES.length - 1){
+      // un tercio de vuelta: la de arriba a la izquierda baja a mandar
+      pasoCierre++;
+      metaCierre += TERCIO;
+      decir(pasoCierre);
+      return;
+    }
+    if (window.Taller && Taller.dentroDelDeck) Taller.ir("indice");
+    else location.href = "../slides 2/page3.html";
   }
 
   function retroceder(){
-    if (enCierre){
-      enCierre = false;
-      raiz.classList.remove("cierre");
+    if (!enCierre){
+      if (elegido > 0) elegir(elegido - 1);
       return;
     }
-    if (elegido > 0) elegir(elegido - 1);
+    if (pasoCierre > 0){
+      pasoCierre--;
+      metaCierre -= TERCIO;
+      decir(pasoCierre);
+      return;
+    }
+    enCierre = false;
+    raiz.classList.remove("cierre");
   }
 
   addEventListener("keydown", function(e){
@@ -602,7 +662,7 @@
      gana el más cercano al puntero dentro de su radio. Con tres bolas que se
      tapan entre sí, cualquier caja del DOM mentiría. */
   lienzo.addEventListener("click", function(ev){
-    if (enCierre) return;
+    if (enCierre){ avanzar(); return; }
     var caja = lienzo.getBoundingClientRect();
     var x = ev.clientX - caja.left, y = ev.clientY - caja.top;
     var gana = -1, mejor = Infinity;
