@@ -28,9 +28,9 @@ const seccionesData = [
   {
     deck: 'contexto',
     src: '../presentacion/contexto.html',
-    nombre: 'Contexto',
-    area: 'La clínica de simulación',
-    texto: 'El espacio donde equivocarse no cuesta vidas — y el límite que no es culpa de nadie: aforo, horarios y docentes finitos. Ocho por sesión, pocos participan.'
+    nombre: 'La clínica de simulación',
+    area: 'Contexto',
+    texto: 'Uno de los lugares más importantes en la formación de los estudiantes, porque es donde se pueden equivocar con los simuladores de alta fidelidad sin afectar una vida humana.'
   },
   {
     deck: 'problema',
@@ -244,6 +244,7 @@ class IndiceDeSecciones {
   wrap(n) { return (n + this.total * 2) % this.total; }
 
   buildWheel() {
+    if (!this.digitWheel) return;
     this.digitWheel.innerHTML = this.secciones
       .map((_, i) => '<span class="digit">' + this.pad(i + 1) + '</span>')
       .join('');
@@ -526,6 +527,7 @@ class IndiceDeSecciones {
   }
 
   updateWheel() {
+    if (!this.digitWheel) return;
     const digito = this.digitWheel.querySelector('.digit');
     const alto = digito ? digito.getBoundingClientRect().height : 22;
     this.digitWheel.style.transform = 'translateY(' + (-this.actual * alto) + 'px)';
@@ -549,15 +551,16 @@ class IndiceDeSecciones {
     b.classList.add('trigger-bounce');
   }
 
-  /* ---------- eventos ---------- */
   bindEvents() {
-    this.nextBtn.addEventListener('click', () => { this.pausar(); this.rebotar(); this.siguiente(); });
-    this.ingresarBtn.addEventListener('click', () => this.ingresar());
-    this.entrarMarco.addEventListener('click', () => this.ingresar());
+    if (this.nextBtn) this.nextBtn.addEventListener('click', () => { this.pausar(); this.rebotar(); this.siguiente(); });
+    if (this.ingresarBtn) this.ingresarBtn.addEventListener('click', () => this.ingresar());
+    if (this.entrarMarco) this.entrarMarco.addEventListener('click', () => this.ingresar());
 
-    this.autoPlayToggle.addEventListener('click', () => {
-      this.isPlaying ? this.pausar() : this.reanudar();
-    });
+    if (this.autoPlayToggle) {
+      this.autoPlayToggle.addEventListener('click', () => {
+        this.isPlaying ? this.pausar() : this.reanudar();
+      });
+    }
 
     window.addEventListener('resize', () => {
       if (!this.animando) this.asentar();
@@ -582,14 +585,14 @@ class IndiceDeSecciones {
   /* ---------- autoplay ---------- */
   pausar() {
     this.isPlaying = false;
-    this.autoPlayToggle.classList.remove('active');
+    if (this.autoPlayToggle) this.autoPlayToggle.classList.remove('active');
     if (this.autoPlayLabel) this.autoPlayLabel.textContent = 'Pausado';
     this.setRing(0);
   }
 
   reanudar() {
     this.isPlaying = true;
-    this.autoPlayToggle.classList.add('active');
+    if (this.autoPlayToggle) this.autoPlayToggle.classList.add('active');
     if (this.autoPlayLabel) this.autoPlayLabel.textContent = 'Auto-Play';
     this.resetProgress();
   }

@@ -136,45 +136,20 @@
 
   <!-- Top Global Project Navigation -->
   <nav class="global-nav">
-    <!-- Las secciones viven en el carrusel: aquí solo la vuelta atrás -->
     <div class="nav-left">
       <a href="../Slides/soma-hero.html" class="nav-chip" data-seccion="soma">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
         <span>Osler Hub</span>
       </a>
-      <span class="nav-chip active">Índice del taller</span>
-    </div>
-
-    <div class="nav-right">
-      <button id="autoPlayToggle" class="pill-badge active" title="Pausar / Reanudar Auto-Play">
-        <span class="pulse-dot"></span>
-        <span id="autoPlayLabel">Auto-Play</span>
-      </button>
     </div>
   </nav>
 
   <!-- Main Editorial Layout Stage -->
   <main class="reviews-stage" id="reviewsStage">
     
-    <!-- LEFT COLUMN: Counter, Vertical 'Reviews' Title, and Thumbnails Strip -->
+    <!-- LEFT COLUMN: Thumbnails Strip -->
     <div class="col-left">
       
-      <!-- Top Counter Wheel (01 / 05) -->
-      <div class="counter-box">
-        <div class="digit-wheel-container">
-          <!-- Digits are generated from reviewsData so the wheel can never
-               disagree with the number of reviews. -->
-          <div class="digit-wheel" id="digitWheel"></div>
-        </div>
-        <span class="divider">/</span>
-        <span class="total-num" id="totalNum">04</span>
-      </div>
-
-      <!-- Vertical Rotated Label -->
-      <div class="vertical-title-wrap">
-        <span class="vertical-title">Secciones</span>
-      </div>
-
       <!-- Bottom Thumbnails Strip -->
       <div class="thumbnails-container">
         <div class="thumbnails-track" id="thumbnailsTrack">

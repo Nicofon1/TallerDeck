@@ -142,10 +142,9 @@ body {
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-end;
   position: relative;
-  /* Left inset reserves the lane the rotated 'Reviews' title lives in. */
-  padding: 36px 0 24px 52px;
+  padding: 36px 0 24px 0;
 }
 
 /* 3. Number Counter Wheel (01 / 05) */
