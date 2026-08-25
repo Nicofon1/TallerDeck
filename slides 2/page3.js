@@ -29,9 +29,9 @@ const seccionesData = [
     id: 2,
     deck: 'investigacion',
     src: '../presentacion/investigacion.html',
-    nombre: 'La investigación',
-    area: 'Cinco frentes',
-    texto: 'Voz estudiantil, observación directa, referentes del mundo, literatura revisada por pares y marco normativo. La tira de evidencias se arrastra a lo ancho.',
+    nombre: 'Entendiendo el problema desde varios frentes',
+    area: 'Investigación',
+    texto: 'Escuchamos a los estudiantes, observación directa, referentes del mundo, literatura científica y marco normativo.',
     heroImg: 'assets/previews/investigacion.png',
     thumbImg: 'assets/previews/investigacion.png'
   },
