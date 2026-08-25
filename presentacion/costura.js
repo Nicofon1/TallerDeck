@@ -1,47 +1,13 @@
 /* ═══════════════════════════════════════════════════════════════
    La costura de las láminas de la presentación.
 
-   Hace dos cosas. Primero pinta la barra de rumbo —el mismo orden en
-   las cinco, sin repetir el markup cinco veces—. Y segundo engancha la
-   lámina al deck: el telón que tapa la carga, la llegada y la salida.
-
-   Cada página se identifica con <body data-seccion="...">.
+   Engancha la lámina al deck: el telón que tapa la carga, la llegada y
+   la salida, y los enlaces que en vez de navegar se lo piden al padre.
    ═══════════════════════════════════════════════════════════════ */
 (function(){
   "use strict";
 
   var raiz = document.documentElement;
-  var actual = document.body.getAttribute("data-seccion") || "";
-
-  /* El orden del guion. `deck` es el nombre con el que la lámina figura en
-     el mapa de index.html; `href` es para cuando alguien la abre suelta. */
-  var RUMBO = [
-    { deck:"soma",         nombre:"Punch",         href:"../Slides/soma-hero.html" },
-    { deck:"contexto",     nombre:"Contexto",      href:"contexto.html" },
-    { deck:"problema",     nombre:"Problema",      href:"problema.html" },
-    { deck:"investigacion",nombre:"Investigación", href:"investigacion.html" },
-    { deck:"journey",      nombre:"Journey",       href:"journey.html" },
-    { deck:"timeline",     nombre:"Timeline",      href:"timeline.html" }
-  ];
-
-  var caja = document.querySelector(".rumbo");
-  if (caja){
-    var vuelta = document.createElement("a");
-    vuelta.className = "vuelta";
-    vuelta.href = "../slides 2/page3.html";
-    vuelta.textContent = "Índice";
-    vuelta.setAttribute("data-seccion", "indice");
-    caja.appendChild(vuelta);
-
-    RUMBO.forEach(function(s){
-      var a = document.createElement("a");
-      a.href = s.href;
-      a.textContent = s.nombre;
-      a.setAttribute("data-seccion", s.deck);
-      if (s.deck === actual) a.setAttribute("aria-current", "page");
-      caja.appendChild(a);
-    });
-  }
 
   /* Dentro del deck los enlaces no navegan: se lo piden al padre, que es
      quien sabe hacer la transición. Fuera del deck siguen siendo enlaces. */

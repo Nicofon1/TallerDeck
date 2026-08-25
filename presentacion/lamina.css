@@ -1,8 +1,8 @@
 /* ═══════════════════════════════════════════════════════════════
    La hoja común de las láminas de la presentación.
 
-   Todas tienen la misma estructura: una barra arriba con el rumbo,
-   una columna de texto a la izquierda y una escena viva a la derecha.
+   Todas tienen la misma estructura: la vuelta al índice arriba a la
+   izquierda, una columna de texto y una escena viva al lado.
    Los colores y las letras salen de taller.css — aquí no se inventa
    ni un tono.
    ═══════════════════════════════════════════════════════════════ */
@@ -28,37 +28,20 @@ body{
 html.con-telon #telon{opacity:1}
 html.saliendo #telon{opacity:1;transition-duration:.46s}
 
-/* ── la barra de rumbo ──────────────────────────────────────── */
-.barra{
-  position:fixed;top:0;left:0;right:0;z-index:20;
-  display:flex;align-items:center;justify-content:space-between;
-  gap:24px;
-  padding:22px clamp(24px,3.4vw,54px);
-}
-.marca{
-  display:flex;align-items:center;gap:10px;
-  font-size:11px;letter-spacing:.26em;text-transform:uppercase;
-  color:var(--tinta);font-weight:600;
-}
-.marca i{
-  width:16px;height:16px;border-radius:50%;
-  background:linear-gradient(140deg,var(--aqua),var(--azul));
-}
-.rumbo{display:flex;align-items:center;gap:2px;flex-wrap:wrap}
-.rumbo a{
-  appearance:none;border:0;background:transparent;cursor:pointer;
-  font:inherit;color:var(--apagado);text-decoration:none;
+/* ── la vuelta al índice ────────────────────────────────────
+   Lo único que queda flotando sobre la lámina. Ni marca, ni rumbo,
+   ni pie: la lámina se lee sola y el guion lo lleva quien habla. */
+.volver{
+  position:fixed;top:22px;left:clamp(24px,3.4vw,54px);z-index:20;
+  display:inline-flex;align-items:center;gap:8px;
+  padding:9px 15px 9px 12px;border-radius:999px;
+  border:1px solid var(--linea);background:var(--papel);
+  color:var(--apagado);text-decoration:none;
   font-size:10px;letter-spacing:.2em;text-transform:uppercase;
-  padding:7px 11px;border-radius:999px;
-  transition:color .2s ease,background .2s ease;
+  transition:color .22s ease,border-color .22s ease,background .22s ease;
 }
-.rumbo a:hover{color:var(--tinta);background:var(--niebla)}
-.rumbo a[aria-current="page"]{
-  color:var(--tinta);font-weight:600;
-  box-shadow:inset 0 -1px 0 var(--azul);
-  border-radius:0;
-}
-.rumbo .vuelta{color:var(--azul);font-weight:600}
+.volver:hover{color:var(--tinta);border-color:var(--azul);background:var(--niebla)}
+.volver svg{flex:none}
 
 /* ── el reparto de la lámina ────────────────────────────────── */
 .lamina{
@@ -67,7 +50,7 @@ html.saliendo #telon{opacity:1;transition-duration:.46s}
   grid-template-columns:minmax(0,40%) minmax(0,60%);
   align-items:center;
   gap:clamp(24px,3vw,56px);
-  padding:96px clamp(24px,3.4vw,54px) 64px;
+  padding:78px clamp(24px,3.4vw,54px) 40px;
 }
 .lamina.entera{grid-template-columns:minmax(0,1fr)}
 
@@ -137,19 +120,8 @@ html.saliendo #telon{opacity:1;transition-duration:.46s}
   color:var(--apagado);
 }
 
-.pie-lamina{
-  position:fixed;left:0;right:0;bottom:0;z-index:15;
-  display:flex;align-items:baseline;justify-content:space-between;
-  gap:20px;
-  padding:0 clamp(24px,3.4vw,54px) 18px;
-  font-size:10px;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--apagado);
-  pointer-events:none;
-}
-.pie-lamina strong{color:var(--tinta);font-weight:600}
-
 /* ── la llegada y la salida ─────────────────────────────────── */
-html.entrando .barra{animation:asomarBarra .8s cubic-bezier(.16,1,.3,1) .1s both}
+html.entrando .volver{animation:asomarBarra .8s cubic-bezier(.16,1,.3,1) .1s both}
 html.entrando .columna > *{animation:asomarTexto .78s cubic-bezier(.16,1,.3,1) both}
 html.entrando .columna > *:nth-child(1){animation-delay:.06s}
 html.entrando .columna > *:nth-child(2){animation-delay:.13s}
@@ -157,16 +129,14 @@ html.entrando .columna > *:nth-child(3){animation-delay:.2s}
 html.entrando .columna > *:nth-child(4){animation-delay:.27s}
 html.entrando .columna > *:nth-child(5){animation-delay:.34s}
 html.entrando .escena{animation:asomarEscena .95s cubic-bezier(.16,1,.3,1) .1s both}
-html.entrando .pie-lamina{animation:asomarBarra .8s cubic-bezier(.16,1,.3,1) .3s both}
 
 @keyframes asomarBarra{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}
 @keyframes asomarTexto{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
 @keyframes asomarEscena{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
 
-html.saliendo .barra,
+html.saliendo .volver,
 html.saliendo .columna,
-html.saliendo .escena,
-html.saliendo .pie-lamina{
+html.saliendo .escena{
   opacity:0;
   transition:opacity .38s ease,transform .46s cubic-bezier(.6,0,.9,.4);
 }
@@ -174,10 +144,9 @@ html.saliendo .escena{transform:scale(1.05)}
 html.saliendo .columna{transform:translateY(-18px)}
 
 @media (prefers-reduced-motion:reduce){
-  html.entrando .barra,
+  html.entrando .volver,
   html.entrando .columna > *,
-  html.entrando .escena,
-  html.entrando .pie-lamina{animation:none}
+  html.entrando .escena{animation:none}
 }
 
 /* Por debajo de cierto ancho la lámina se apila. Pasa sobre todo en las
