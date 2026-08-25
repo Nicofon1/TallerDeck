@@ -13,198 +13,266 @@
 <script>try{if(window.parent!==window&&!/[?&]previa=1/.test(location.search))document.documentElement.className+=" con-telon";}catch(e){}</script>
 
 <style>
-  /* ── la sala ──────────────────────────────────────────────
-     El recinto es el límite del que habla la lámina: una caja que
-     no se puede estirar. Dentro caben diez, y solo dos participan. */
-  .sala{
-    position:relative;
-    width:100%;height:100%;
-    max-height:560px;
+  /* ── la planta ────────────────────────────────────────────
+     La sesión vista desde arriba: la sala con la camilla al centro y, al
+     otro lado del espejo, la cámara Gesell con la consola del docente
+     pegada al vidrio. Sin rótulos: el plano se lee solo. */
+  /* El gris de las figuras que esperan. Va aquí y no suelto en cada regla
+     porque el 8 de la cuenta tiene que ser exactamente el mismo. */
+  :root{ --gris-figura:hsl(230,13%,82%); }
+
+  .planta{width:100%;height:100%;max-height:520px}
+  .planta svg{width:100%;height:100%;overflow:visible}
+  /* Todo el trazo de un pelo: si no, al agrandarse el plano engorda
+     con él y deja de parecer un plano. */
+  .planta svg *{vector-effect:non-scaling-stroke}
+
+  .muro{fill:none;stroke:var(--linea);stroke-width:1}
+  .suelo{fill:hsla(210,17%,98%,.9)}
+  .suelo-gesell{fill:hsla(216,96%,89%,.28)}
+  .vano{fill:var(--papel);stroke:none}
+
+  /* El vidrio es un muro más grueso que los demás. Con eso basta: el
+     rayado que llevaba antes lo volvía un borrón duro en medio del plano. */
+  .espejo{stroke:var(--indigo);stroke-width:3;stroke-linecap:round;fill:none;opacity:.85}
+
+  .camilla{fill:var(--niebla);stroke:var(--linea);stroke-width:1}
+  .paciente{fill:var(--cielo)}
+  .manta{fill:hsl(214,78%,85%);stroke:none}
+  .embozo{fill:var(--papel);stroke:none}
+  /* Lo único que se mueve sin que nadie lo mueva. */
+  .respira{animation:respirar 5.4s ease-in-out infinite}
+  @keyframes respirar{0%,100%{opacity:.92}50%{opacity:.6}}
+
+  .mueble{fill:none;stroke:var(--linea);stroke-width:1}
+
+  /* ── la gente ─────────────────────────────────────────────
+     Todos la misma figura: cabeza y hombros. Cambia el relleno, no la
+     forma — los que participan van entintados y los que esperan huecos. */
+  .figura{
+    transform-box:view-box;transform-origin:0 0;
+    transition:transform 1.5s cubic-bezier(.42,0,.3,1);
   }
-  .recinto{
-    position:absolute;left:50%;top:6%;transform:translateX(-50%);
-    width:min(46%,260px);height:52%;
-    border:1px solid var(--linea);
-    background:linear-gradient(180deg,hsla(216,96%,89%,.34),hsla(210,17%,98%,.9));
-    border-radius:3px;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:8px;text-align:center;padding:18px;
-  }
-  .recinto b{
-    font-size:10px;letter-spacing:.24em;text-transform:uppercase;
-    color:var(--indigo);font-weight:600;
-  }
-  .recinto span{
-    font-size:11px;line-height:1.5;color:var(--apagado);max-width:22ch;
-  }
-  /* el aforo, escrito en el borde mismo del recinto */
-  .aforo{
-    position:absolute;left:50%;top:calc(6% + 52%);transform:translate(-50%,10px);
-    font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;
-    color:var(--apagado);white-space:nowrap;
+  .activo{fill:url(#tinta);stroke:none}
+  .espera{fill:var(--papel);stroke:var(--gris-figura);stroke-width:1.1}
+  .profe{fill:var(--indigo);stroke:none}
+
+  .rotulo-profe{
+    fill:var(--apagado);
+    font-family:var(--texto);
+    font-size:1.7px;letter-spacing:.24em;text-transform:uppercase;
   }
 
-  .alumno{
-    position:absolute;
-    width:54px;height:54px;margin:-27px 0 0 -27px;
-    border-radius:50%;
-    display:grid;place-items:center;
-    border:1px solid var(--linea);
-    background:var(--papel);
-    color:var(--apagado);
-    cursor:default;
-    animation:flotar 7s ease-in-out infinite;
-    transition:transform .42s cubic-bezier(.16,1,.3,1),
-               opacity .3s ease, box-shadow .3s ease, border-color .3s ease;
+  /* La cuenta hace de leyenda: cada cifra lleva encima la figura que le
+     corresponde, entintada sobre el 3 y hueca sobre el 8. */
+  /* Lo que la clínica sí tiene, en tabla y no en párrafo: la lámina apoya
+     lo que se está diciendo, no lo repite. Cuántos participan de los ocho no
+     se escribe aquí — lo dice la cuenta bajo el plano. */
+  .datos{margin:6px 0 0;border-top:1px solid var(--linea)}
+  .datos div{
+    display:flex;align-items:baseline;gap:16px;
+    padding:9px 0;border-bottom:1px solid var(--linea);
   }
-  .alumno.activo{
-    border-color:transparent;
-    background:linear-gradient(150deg,var(--aqua),var(--azul));
-    color:var(--papel);
-    box-shadow:0 10px 26px hsla(220,51%,51%,.28);
+  .datos dt{
+    margin:0;flex:none;min-width:9ch;
+    font-family:var(--titulo);font-size:17px;font-weight:400;
+    line-height:1.1;color:var(--indigo);
   }
-  /* El anillo que late: solo lo llevan los que están participando. */
-  .alumno.activo::after{
-    content:"";position:absolute;inset:-7px;border-radius:50%;
-    border:1px solid var(--azul);opacity:.5;
-    animation:latir 2.6s ease-out infinite;
-  }
-  @keyframes latir{
-    0%{transform:scale(.9);opacity:.55}
-    70%{transform:scale(1.22);opacity:0}
-    100%{opacity:0}
-  }
-  @keyframes flotar{
-    0%,100%{translate:0 0}
-    50%{translate:0 -9px}
-  }
-
-  /* Al posarse sobre uno, el resto se apaga: es exactamente lo que pasa
-     en la sala cuando la atención cae sobre un estudiante. */
-  .sala.enfocando .alumno{opacity:.22}
-  .sala.enfocando .alumno.foco{
-    opacity:1;transform:scale(1.16);
-    box-shadow:0 14px 30px var(--sombra);
-  }
-  .etiqueta{
-    position:absolute;left:50%;top:100%;transform:translate(-50%,8px);
-    padding:4px 9px;border-radius:999px;
-    background:var(--tinta);color:var(--papel);
-    font-size:9px;letter-spacing:.16em;text-transform:uppercase;
-    white-space:nowrap;opacity:0;pointer-events:none;
-    transition:opacity .22s ease;
-  }
-  .alumno.foco .etiqueta{opacity:1}
+  .datos dd{margin:0;font-size:12.5px;line-height:1.5;color:var(--apagado)}
 
   .marcador{
-    position:absolute;left:0;bottom:0;
-    display:flex;align-items:baseline;gap:10px;
+    position:absolute;left:50%;bottom:-10px;transform:translateX(-50%);
+    display:flex;flex-direction:column;align-items:center;gap:6px;
   }
   .marcador b{
+    display:flex;align-items:flex-end;gap:9px;
     font-family:var(--titulo);font-size:38px;font-weight:400;
-    line-height:1;color:var(--indigo);
+    line-height:1;color:var(--gris-figura);
   }
-  .marcador span{font-size:11px;line-height:1.5;color:var(--apagado);max-width:18ch}
+  .cifra{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .cifra.viva{color:var(--azul)}
+  .ico{display:block;width:17px;height:18px}
+  .ico svg{width:100%;height:100%;display:block;fill:var(--papel);stroke:var(--gris-figura);stroke-width:1.1}
+  .cifra.viva .ico svg{fill:var(--azul);stroke:none}
+  .raya{padding-bottom:1px}
+  .glosa{font-size:11px;line-height:1.5;color:var(--apagado);text-align:center}
 </style>
 </head>
 <body data-seccion="contexto">
 
 <div id="telon" aria-hidden="true"></div>
 
-<header class="barra">
-  <span class="marca"><i></i>Osler Hub</span>
-  <nav class="rumbo" aria-label="Secciones"></nav>
-</header>
+<a class="volver" href="../slides 2/page3.html" data-seccion="indice">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+  <span>Índice</span>
+</a>
 
 <main class="lamina">
   <div class="columna">
     <p class="rotulo">Contexto</p>
     <h1 class="punch">El espacio donde equivocarse no cuesta vidas.</h1>
     <p class="parrafo">
-      La Universidad Pontificia Bolivariana cuenta con una <strong>Clínica de Simulación
-      de Medicina</strong>: un espacio físico donde los estudiantes practican con
-      simuladores de alta fidelidad antes de tocar a un paciente real. Tiene equipos,
-      salas y docentes con experiencia que acompañan cada sesión.
+      En la Clínica de Simulación de la UPB los estudiantes practican con
+      simuladores de alta fidelidad antes de tocar a un paciente real.
     </p>
-    <p class="parrafo">
-      Pero tiene un límite que no es culpa de nadie: <strong>es un espacio físico</strong>.
-      Hay un número finito de salas, de horarios y de docentes. Cada simulación reúne
-      en promedio ocho estudiantes, de los cuales solo unos pocos participan activamente
-      mientras el resto observa.
-    </p>
+
+    <dl class="datos">
+      <div><dt>Equipos</dt><dd>simuladores de alta fidelidad</dd></div>
+      <div><dt>Salas</dt><dd>donde equivocarse no afecta una vida</dd></div>
+      <div><dt>Docentes</dt><dd>con experiencia, en cada sesión</dd></div>
+    </dl>
+
+
   </div>
 
   <div class="escena">
-    <p class="nota-escena">Una sesión, vista desde afuera</p>
-    <div class="sala" id="sala">
-      <div class="recinto">
-        <b>Clínica de simulación</b>
-        <span>Salas, simuladores de alta fidelidad, cámara Gesell y docente</span>
-      </div>
-      <p class="aforo">Aforo limitado · horarios finitos</p>
-      <div class="marcador">
-        <b id="cuenta">2 / 10</b>
-        <span>participan activamente por sesión</span>
-      </div>
+    <p class="nota-escena">Una sesión, en planta</p>
+
+    <div class="planta">
+      <svg viewBox="0 0 100 80" role="img"
+           aria-label="Planta de la sala de simulación: la camilla al centro con tres estudiantes alrededor, cinco esperando y el docente detrás del espejo unidireccional">
+        <defs>
+          <linearGradient id="tinta" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%"   stop-color="var(--aqua)"/>
+            <stop offset="100%" stop-color="var(--azul)"/>
+          </linearGradient>
+          <!-- cabeza y hombros: la misma figura para los ocho y el docente -->
+          <g id="fig">
+            <circle cx="0" cy="-2.9" r="2.2"/>
+            <path d="M-4 3.9 A4 4 0 0 1 4 3.9 Z"/>
+          </g>
+        </defs>
+
+        <!-- la sala y, detrás del vidrio, la Gesell -->
+        <rect class="suelo"        x="2"  y="2" width="70" height="76" rx="1.5"/>
+        <rect class="suelo-gesell" x="76" y="2" width="22" height="76" rx="1.5"/>
+        <rect class="muro" x="2"  y="2" width="70" height="76" rx="1.5"/>
+        <rect class="muro" x="76" y="2" width="22" height="76" rx="1.5"/>
+
+        <!-- el espejo: un trazo más grueso en el muro compartido, y ya -->
+        <line class="espejo" x1="72" y1="12" x2="72" y2="68"/>
+
+        <!-- la puerta: el vano y su barrido -->
+        <rect class="vano" x="1.2" y="52" width="1.6" height="12"/>
+        <path class="muro" d="M2 52 A12 12 0 0 1 14 64" opacity=".45"/>
+
+        <!-- la camilla y el paciente -->
+        <rect class="camilla" x="39" y="20" width="14" height="36" rx="2"/>
+        <g class="respira">
+          <circle class="paciente" cx="46" cy="26" r="3.4"/>
+          <rect class="paciente" x="42" y="30.2" width="8" height="21.6" rx="4"/>
+        </g>
+        <!-- la manta: cubre la camilla entera del pecho a los pies, con el
+             embozo de sábana asomando por arriba -->
+        <rect class="embozo" x="39" y="35.4" width="14" height="1.8"/>
+        <path class="manta" d="M39 37.2 H53 V54 A2 2 0 0 1 51 56 H41 A2 2 0 0 1 39 54 Z"/>
+
+        <!-- la consola del docente: pegada al vidrio y paralela a él -->
+        <rect class="mueble" x="78" y="22" width="4.6" height="36" rx="1"/>
+        <line class="mueble" x1="80.3" y1="27" x2="80.3" y2="53"/>
+
+        <!-- la gente la coloca el guion de abajo -->
+        <g id="gente"></g>
+        <text class="rotulo-profe" x="89" y="47.5" text-anchor="middle">Profe</text>
+      </svg>
+    </div>
+
+    <div class="marcador">
+      <b>
+        <span class="cifra viva"><i class="ico"><svg viewBox="-4.8 -5.9 9.6 10.4" aria-hidden="true"><circle cx="0" cy="-2.9" r="2.2"/><path d="M-4 3.9 A4 4 0 0 1 4 3.9 Z"/></svg></i>3</span>
+        <span class="raya">/</span>
+        <span class="cifra"><i class="ico"><svg viewBox="-4.8 -5.9 9.6 10.4" aria-hidden="true"><circle cx="0" cy="-2.9" r="2.2"/><path d="M-4 3.9 A4 4 0 0 1 4 3.9 Z"/></svg></i>8</span>
+      </b>
+      <span class="glosa">participan activamente por sesión</span>
     </div>
   </div>
 </main>
-
-<footer class="pie-lamina">
-  <span><strong>Contexto</strong> · Lu · 45 s</span>
-  <span>Pasá el cursor por la sala</span>
-</footer>
 
 <script src="costura.js"></script>
 <script>
 (function(){
   "use strict";
 
-  /* Diez estudiantes colocados a mano alrededor del recinto: dos dentro de la
-     acción, ocho en la periferia. Las posiciones van en porcentaje para que la
-     escena se comporte igual en la miniatura del índice y a pantalla completa. */
-  var GENTE = [
-    { x:22, y:24, activo:false }, { x:78, y:20, activo:false },
-    { x:12, y:48, activo:false }, { x:88, y:46, activo:false },
-    { x:36, y:70, activo:true  }, { x:62, y:74, activo:true  },
-    { x:18, y:76, activo:false }, { x:82, y:72, activo:false },
-    { x:46, y:88, activo:false }, { x:72, y:92, activo:false }
+  /* Los seis puestos alrededor de la camilla, en orden de vuelta. Que estén
+     en anillo no es un detalle: nadie puede cruzar por encima del paciente,
+     así que solo se pasa al puesto de al lado y el camino bordea la camilla.
+     Tres están ocupados y tres libres — de ahí sale el sitio para moverse. */
+  var PUESTOS = [
+    { x:46, y:12 },   // 0 · cabecera
+    { x:62, y:26 },   // 1 · derecha arriba
+    { x:62, y:50 },   // 2 · derecha abajo
+    { x:46, y:64 },   // 3 · pies
+    { x:30, y:50 },   // 4 · izquierda abajo
+    { x:30, y:26 }    // 5 · izquierda arriba
   ];
 
-  var CARA_ACTIVA =
-    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">' +
-    '<circle cx="9" cy="10" r=".9" fill="currentColor" stroke="none"/>' +
-    '<circle cx="15" cy="10" r=".9" fill="currentColor" stroke="none"/>' +
-    '<path d="M8.4 14.4c1 1.1 2.2 1.7 3.6 1.7s2.6-.6 3.6-1.7"/></svg>';
-  var CARA_MIRA =
-    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">' +
-    '<circle cx="9" cy="10" r=".9" fill="currentColor" stroke="none"/>' +
-    '<circle cx="15" cy="10" r=".9" fill="currentColor" stroke="none"/>' +
-    '<path d="M8.6 15.6c1-1 2.1-1.5 3.4-1.5s2.4.5 3.4 1.5"/></svg>';
+  /* Los que esperan: repartidos por la sala, cada uno donde cabe. No hacen
+     fila; se quedan donde estaban cuando empezó la simulación. */
+  var ESPERA = [
+    { x:12, y:13 }, { x:10, y:40 }, { x:23, y:69 },
+    { x:60, y:71 }, { x:64, y:12 }
+  ];
 
-  var sala = document.getElementById("sala");
+  var NS = "http://www.w3.org/2000/svg";
+  var gente = document.getElementById("gente");
 
-  GENTE.forEach(function(g, i){
-    var n = document.createElement("span");
-    n.className = "alumno" + (g.activo ? " activo" : "");
-    n.style.left = g.x + "%";
-    n.style.top  = g.y + "%";
-    // Desfases distintos: si flotaran a la vez parecerían una sola pieza.
-    n.style.animationDelay = (-i * 0.63).toFixed(2) + "s";
-    n.style.animationDuration = (6.2 + (i % 4) * 0.7).toFixed(1) + "s";
-    n.innerHTML = (g.activo ? CARA_ACTIVA : CARA_MIRA) +
-                  '<span class="etiqueta">' + (g.activo ? "Participa" : "Observa") + '</span>';
+  function poner(clase, p, escala){
+    var u = document.createElementNS(NS, "use");
+    u.setAttribute("href", "#fig");
+    u.setAttribute("class", "figura " + clase);
+    u.style.transform = "translate(" + p.x + "px," + p.y + "px) scale(" + escala + ")";
+    gente.appendChild(u);
+    return u;
+  }
 
-    n.addEventListener("pointerenter", function(){
-      sala.classList.add("enfocando");
-      n.classList.add("foco");
+  ESPERA.forEach(function(p){ poner("espera", p, 0.78); });
+  poner("profe", { x:89, y:40 }, 0.82);
+
+  var ocupados = [0, 2, 4];
+  var activos = ocupados.map(function(i){ return poner("activo", PUESTOS[i], 0.86); });
+
+  /* Cada estudiante lleva su propio reloj y su propio ritmo. Antes se movían
+     por turnos —uno, pausa, otro— y se notaba el turnero; así a veces se mueven
+     dos casi a la vez y a veces ninguno en un buen rato, que es como pasa.
+
+     El puesto de destino se marca ocupado antes de arrancar el viaje: si no,
+     dos que salen al mismo tiempo podrían apuntar al mismo sitio. */
+  var relojes = [];
+
+  function mover(quien){
+    var desde = ocupados[quien];
+    // solo al puesto contiguo: así el camino bordea la camilla y nadie la cruza
+    var vecinos = [(desde + 1) % 6, (desde + 5) % 6].filter(function(v){
+      return ocupados.indexOf(v) === -1;
     });
-    n.addEventListener("pointerleave", function(){
-      sala.classList.remove("enfocando");
-      n.classList.remove("foco");
-    });
 
-    sala.appendChild(n);
+    if (vecinos.length){
+      var destino = vecinos[Math.floor(Math.random() * vecinos.length)];
+      ocupados[quien] = destino;
+      var p = PUESTOS[destino];
+      var fig = activos[quien];
+      // cada paso dura lo suyo: dos pasos iguales se leen como una coreografía
+      fig.style.transitionDuration = (1.15 + Math.random() * 0.85).toFixed(2) + "s";
+      fig.style.transform = "translate(" + p.x + "px," + p.y + "px) scale(0.86)";
+    }
+
+    relojes[quien] = setTimeout(function(){ mover(quien); },
+                                1100 + Math.random() * 2700);
+  }
+
+  function arrancar(){
+    activos.forEach(function(_, i){
+      clearTimeout(relojes[i]);
+      relojes[i] = setTimeout(function(){ mover(i); }, 300 + Math.random() * 1500);
+    });
+  }
+
+  arrancar();
+
+  /* En una pestaña de fondo no hay por qué seguir moviendo gente. */
+  document.addEventListener("visibilitychange", function(){
+    if (document.hidden) relojes.forEach(clearTimeout);
+    else arrancar();
   });
 })();
 </script>
