@@ -1,6 +1,7 @@
 /* ==========================================================================
    Índice del taller (page3.js)
    Motor FLIP / Shared-Layout cíclico de alta fidelidad
+   Previsualizaciones reales de cada lámina
    ========================================================================== */
 
 const seccionesData = [
@@ -11,8 +12,8 @@ const seccionesData = [
     nombre: 'La clínica de simulación',
     area: 'Contexto',
     texto: 'Uno de los lugares más importantes en la formación de los estudiantes, porque es donde se pueden equivocar con los simuladores de alta fidelidad sin afectar una vida humana.',
-    heroImg: 'assets/cover_curation.jpg',
-    thumbImg: 'assets/cover_curation.jpg'
+    heroImg: 'assets/previews/contexto.png',
+    thumbImg: 'assets/previews/contexto.png'
   },
   {
     id: 1,
@@ -21,8 +22,8 @@ const seccionesData = [
     nombre: 'El problema',
     area: 'Tres nodos en ciclo',
     texto: 'Inseguridad, método que no se internaliza y feedback que no deja rastro. Los tres se refuerzan uno al otro; el grafo lo muestra encendiendo sus hilos.',
-    heroImg: 'assets/candy_bar.jpg',
-    thumbImg: 'assets/candy_bar.jpg'
+    heroImg: 'assets/previews/problema.png',
+    thumbImg: 'assets/previews/problema.png'
   },
   {
     id: 2,
@@ -31,8 +32,8 @@ const seccionesData = [
     nombre: 'La investigación',
     area: 'Cinco frentes',
     texto: 'Voz estudiantil, observación directa, referentes del mundo, literatura revisada por pares y marco normativo. La tira de evidencias se arrastra a lo ancho.',
-    heroImg: 'assets/lost_in_you.jpg',
-    thumbImg: 'assets/lost_in_you.jpg'
+    heroImg: 'assets/previews/investigacion.png',
+    thumbImg: 'assets/previews/investigacion.png'
   },
   {
     id: 3,
@@ -41,8 +42,8 @@ const seccionesData = [
     nombre: 'Journey',
     area: 'Los cinco pasos',
     texto: 'La simulación de Camilo en órbita: inicio y modo, anamnesis libre, procedimientos, diagnóstico con justificación y el feedback que queda guardado.',
-    heroImg: 'assets/love_me.jpg',
-    thumbImg: 'assets/love_me.jpg'
+    heroImg: 'assets/previews/journey.png',
+    thumbImg: 'assets/previews/journey.png'
   },
   {
     id: 4,
@@ -51,8 +52,8 @@ const seccionesData = [
     nombre: 'Timeline',
     area: 'Hasta el 11 de noviembre',
     texto: 'Prototipo, pruebas de usuario, pre entrega y entrega. Cada tramo ocupa a lo ancho lo que dura, y al pie queda el cierre del guion.',
-    heroImg: 'assets/bubble_pop.jpg',
-    thumbImg: 'assets/bubble_pop.jpg'
+    heroImg: 'assets/previews/timeline.png',
+    thumbImg: 'assets/previews/timeline.png'
   },
   {
     id: 5,
@@ -61,8 +62,8 @@ const seccionesData = [
     nombre: 'Anatomía de burbujas',
     area: 'Modelo interactivo',
     texto: 'El corazón otra vez, pero en tus manos: densidad, tamaño, opacidad y paleta. Las esferas se apartan del puntero, empujan a las vecinas y vuelven a su sitio.',
-    heroImg: 'assets/anew.jpg',
-    thumbImg: 'assets/anew.jpg'
+    heroImg: 'assets/previews/burbujas.png',
+    thumbImg: 'assets/previews/burbujas.png'
   },
   {
     id: 6,
@@ -71,8 +72,8 @@ const seccionesData = [
     nombre: 'Tipografía cinética',
     area: 'Concepto',
     texto: 'Palabras en órbita sobre un eje tridimensional. Se arrastra para girarlas o se salta directo a cualquiera de ellas.',
-    heroImg: 'assets/preview.jpg',
-    thumbImg: 'assets/preview.jpg'
+    heroImg: 'assets/previews/cinetica.png',
+    thumbImg: 'assets/previews/cinetica.png'
   },
   {
     id: 7,
@@ -81,8 +82,8 @@ const seccionesData = [
     nombre: 'Archivo de casos',
     area: 'Estantería',
     texto: 'La estantería de expedientes. Cada carpeta se centra al primer clic y abre su historia clínica al segundo.',
-    heroImg: 'assets/cover_smlxl.jpg',
-    thumbImg: 'assets/cover_smlxl.jpg'
+    heroImg: 'assets/previews/biblioteca.png',
+    thumbImg: 'assets/previews/biblioteca.png'
   },
   {
     id: 8,
@@ -91,8 +92,8 @@ const seccionesData = [
     nombre: 'Historia clínica',
     area: 'Caso PEDS-302',
     texto: 'La ficha completa de urgencias: radiografía de tórax, electrocardiograma de doce derivaciones, constantes en vivo y el protocolo PALS aplicado.',
-    heroImg: 'assets/reviews/hero_jacob.png',
-    thumbImg: 'assets/reviews/hero_jacob.png'
+    heroImg: 'assets/previews/caso.png',
+    thumbImg: 'assets/previews/caso.png'
   }
 ];
 
@@ -102,7 +103,6 @@ const SLOT = THUMB_W + THUMB_GAP; // 92
 const MORPH_MS = 750;
 const MORPH_EASING = 'cubic-bezier(0.19, 1, 0.22, 1)';
 const TEXT_SWAP_MS = 280;
-const RING_CIRCUMFERENCE = 2 * Math.PI * 23;
 
 class IndiceDeSecciones {
   constructor() {
