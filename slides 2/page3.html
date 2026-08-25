@@ -104,20 +104,6 @@
     .ingresar svg{display:block}
     .acciones{display:flex;align-items:center;gap:18px;margin-top:6px}
 
-    /* El marco entero también entra */
-    .entrar-marco{
-      position:absolute;inset:0;z-index:7;border:0;cursor:pointer;
-      background:linear-gradient(180deg,hsla(250,45%,21%,.05),hsla(250,45%,21%,.62));
-      display:grid;place-content:center;padding:0 10px;
-      opacity:0;transition:opacity .3s ease;
-    }
-    .entrar-marco span{
-      padding:10px 14px;border-radius:999px;
-      background:var(--papel);color:var(--indigo);text-align:center;
-      font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
-    }
-    .hero-banner-container:hover .entrar-marco{opacity:1}
-
     /* Dirección del stagger: hacia atrás, todo se invierte */
     .quote-content{--sg:1}
     .quote-content.atras{--sg:-1}
@@ -164,9 +150,6 @@
         <div class="hero-banner-card" id="heroBannerCard">
           <img src="assets/previews/contexto.png" alt="Active Section" id="heroImage" class="hero-image">
         </div>
-        <button class="entrar-marco" id="entrarMarco" tabindex="-1">
-          <span id="entrarMarcoTexto">Ingresar</span>
-        </button>
       </div>
     </div>
 
