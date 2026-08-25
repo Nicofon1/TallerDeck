@@ -104,22 +104,20 @@
     /* Vuelta a la estantería */
     #volver-archivo{
       position:fixed;left:14px;top:14px;z-index:60;
-      display:none;align-items:center;gap:7px;
-      padding:7px 13px 7px 10px;border-radius:999px;
+      display:none;justify-content:center;align-items:center;
+      width:36px;height:36px;padding:0;border-radius:50%;
       background:rgba(255,255,255,.78);
       border:1.5px solid rgba(255,255,255,.95);
       backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
       box-shadow:0 6px 16px rgba(110,115,145,.14);
-      font-family:var(--texto);
-      font-size:11px;font-weight:700;color:#251D4E;
+      color:#251D4E;
       cursor:pointer;transition:transform .24s ease,background-color .24s ease;
     }
     html.en-deck #volver-archivo{display:inline-flex}
     #volver-archivo:hover{transform:translateX(-2px);background:rgba(255,255,255,.95)}
-    #volver-archivo .exp{color:#426DC2;font-weight:800}
 
     /* El encabezado deja sitio al botón cuando el caso vive en el deck */
-    html.en-deck header{padding-left:150px}
+    html.en-deck header{padding-left:60px}
 
     @media (prefers-reduced-motion:reduce){
       html.entrando header,html.entrando main > div,html.entrando footer{animation:none}
@@ -340,9 +338,8 @@
 
   <div id="telon" aria-hidden="true"></div>
 
-  <button id="volver-archivo" type="button">
+  <button id="volver-archivo" type="button" aria-label="Volver al archivo">
     <i class="fa-solid fa-arrow-left"></i>
-    <span>Archivo<span class="exp" id="volver-exp"></span></span>
   </button>
 
   <!-- Fluted glass & background ambient glow -->

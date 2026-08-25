@@ -33,14 +33,13 @@ html.saliendo #telon{opacity:1;transition-duration:.46s}
    ni pie: la lámina se lee sola y el guion lo lleva quien habla. */
 .volver{
   position:fixed;top:22px;left:clamp(24px,3.4vw,54px);z-index:20;
-  display:inline-flex;align-items:center;gap:8px;
-  padding:9px 15px 9px 12px;border-radius:999px;
+  display:inline-grid;place-items:center;
+  width:36px;height:36px;padding:0;border-radius:50%;
   border:1px solid var(--linea);background:var(--papel);
   color:var(--apagado);text-decoration:none;
-  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
-  transition:color .22s ease,border-color .22s ease,background .22s ease;
+  transition:color .22s ease,border-color .22s ease,background .22s ease,transform .22s ease;
 }
-.volver:hover{color:var(--tinta);border-color:var(--azul);background:var(--niebla)}
+.volver:hover{color:var(--tinta);border-color:var(--azul);background:var(--niebla);transform:translateX(-2px)}
 .volver svg{flex:none}
 
 /* ── el reparto de la lámina ────────────────────────────────── */
