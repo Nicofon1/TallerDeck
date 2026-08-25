@@ -158,12 +158,12 @@
 
     </div>
 
-    <!-- CENTER COLUMN: el marco donde vive la página en grande -->
+    <!-- CENTER COLUMN: el marco donde vive la portada en grande -->
     <div class="col-center">
       <div class="hero-banner-container" id="heroBannerContainer">
-        <!-- Marco vacío a propósito: lo que se ve dentro lo pone
-             la capa de previsualizaciones, que está fuera del flujo. -->
-        <div class="hero-banner-card" id="heroBannerCard"></div>
+        <div class="hero-banner-card" id="heroBannerCard">
+          <img src="assets/cover_curation.jpg" alt="Active Section" id="heroImage" class="hero-image">
+        </div>
         <button class="entrar-marco" id="entrarMarco" tabindex="-1">
           <span id="entrarMarcoTexto">Ingresar</span>
         </button>
@@ -210,10 +210,12 @@
 
     </div>
 
-    <!-- Capa suelta con las páginas vivas -->
-    <div class="capa-previas" id="capaPrevias"></div>
-
   </main>
+
+  <!-- Floating FLIP Ghost Element for Shared Layout morphing -->
+  <div class="flip-ghost-card" id="flipGhostCard">
+    <img src="" alt="" id="flipGhostImg">
+  </div>
 
   <script src="page3.js"></script>
 
