@@ -19,9 +19,9 @@ const seccionesData = [
     id: 1,
     deck: 'problema',
     src: '../presentacion/problema.html',
-    nombre: 'El problema',
-    area: 'Tres nodos en ciclo',
-    texto: 'Inseguridad, método que no se internaliza y feedback que no deja rastro. Los tres se refuerzan uno al otro; el grafo lo muestra encendiendo sus hilos.',
+    nombre: 'Los tres problemas que se refuerzan uno al otro.',
+    area: 'Problema',
+    texto: 'Inseguridad y la ansiedad.\n\nEl método clínico no se internaliza bien.\n\nfeedback docente ineficiente.',
     heroImg: 'assets/previews/problema.png',
     thumbImg: 'assets/previews/problema.png'
   },
