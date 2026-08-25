@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El problema — Osler Hub</title>
+<script>document.documentElement.setAttribute("data-theme","light");</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="../taller.css">
+<link rel="stylesheet" href="lamina.css">
+<script src="../enlace.js"></script>
+<script>try{if(window.parent!==window&&!/[?&]previa=1/.test(location.search))document.documentElement.className+=" con-telon";}catch(e){}</script>
+
+<style>
+  /* ── el grafo ─────────────────────────────────────────────
+     Tres nodos en triángulo. No son tres problemas en fila: son un
+     ciclo, y por eso las líneas van y vuelven entre los tres. */
+  .grafo{position:relative;width:100%;height:100%;max-height:520px}
+
+  .hilos{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+  .hilo{
+    stroke:var(--linea);stroke-width:1;fill:none;
+    vector-effect:non-scaling-stroke;
+    transition:stroke .4s ease,opacity .4s ease;
+  }
+  /* El hilo encendido lleva el pulso: la retroalimentación entre los tres
+     problemas, viajando. El guion dice que se refuerzan uno al otro. */
+  .hilo.vivo{
+    stroke:var(--azul);opacity:.9;
+    stroke-dasharray:3 5;
+    animation:correr 1.4s linear infinite;
+  }
+  @keyframes correr{to{stroke-dashoffset:-16}}
+
+  .nodo{
+    position:absolute;
+    display:grid;place-items:center;
+    border-radius:50%;
+    border:1px solid var(--linea);
+    background:var(--papel);
+    color:var(--apagado);
+    cursor:pointer;
+    padding:0;
+    font:inherit;
+    transition:width .55s cubic-bezier(.16,1,.3,1),
+               height .55s cubic-bezier(.16,1,.3,1),
+               margin .55s cubic-bezier(.16,1,.3,1),
+               background .4s ease,color .4s ease,
+               border-color .4s ease,box-shadow .4s ease;
+  }
+  .nodo b{
+    font-family:var(--titulo);font-weight:400;
+    font-size:22px;line-height:1;
+  }
+  .nodo em{
+    font-style:normal;
+    font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+    margin-top:5px;opacity:.72;
+  }
+  .nodo.activo{
+    border-color:transparent;
+    background:linear-gradient(150deg,var(--aqua),var(--azul));
+    color:var(--papel);
+    box-shadow:0 16px 38px hsla(220,51%,51%,.26);
+  }
+  .nodo:hover{border-color:var(--azul);color:var(--tinta)}
+  .nodo.activo:hover{color:var(--papel)}
+
+  .rotulo-nodo{
+    position:absolute;left:50%;top:100%;transform:translate(-50%,12px);
+    font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--apagado);white-space:nowrap;
+    transition:color .3s ease;
+  }
+  .nodo.activo .rotulo-nodo{color:var(--tinta)}
+
+  /* ── la ficha de la izquierda ──────────────────────────── */
+  .tarjeta{
+    border:1px solid var(--linea);
+    border-left:2px solid var(--azul);
+    background:var(--papel);
+    border-radius:3px;
+    padding:22px 24px;
+    display:flex;flex-direction:column;gap:14px;
+    min-height:232px;
+  }
+  .tarjeta.cambiando{opacity:0;transform:translateY(10px)}
+  .tarjeta{transition:opacity .32s ease,transform .32s cubic-bezier(.16,1,.3,1)}
+
+  .selector{display:flex;gap:6px;flex-wrap:wrap}
+  .selector button{
+    appearance:none;cursor:pointer;font:inherit;
+    border:1px solid var(--linea);background:transparent;
+    color:var(--apagado);
+    border-radius:999px;padding:7px 13px;
+    font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    transition:all .24s ease;
+  }
+  .selector button:hover{color:var(--tinta);border-color:var(--azul)}
+  .selector button[aria-pressed="true"]{
+    background:var(--tinta);border-color:var(--tinta);color:var(--papel);
+  }
+
+  .cierre-ciclo{
+    margin:0;font-size:12px;line-height:1.55;color:var(--apagado);
+    border-top:1px solid var(--linea);padding-top:12px;
+  }
+</style>
+</head>
+<body data-seccion="problema">
+
+<div id="telon" aria-hidden="true"></div>
+
+<header class="barra">
+  <span class="marca"><i></i>Osler Hub</span>
+  <nav class="rumbo" aria-label="Secciones"></nav>
+</header>
+
+<main class="lamina">
+  <div class="columna">
+    <p class="rotulo">El problema</p>
+    <h1 class="punch">Tres problemas que se agudizan entre sí.</h1>
+
+    <div class="selector" id="selector" role="group" aria-label="Los tres problemas"></div>
+
+    <div class="tarjeta" id="tarjeta">
+      <p class="cita" id="cita"></p>
+      <p class="cita-pie" id="citaPie"></p>
+      <p class="parrafo" id="detalle"></p>
+    </div>
+
+    <p class="cierre-ciclo">
+      Practica poco, entonces no internaliza el método. No internaliza el método,
+      entonces cada simulación le da más ansiedad. Y el feedback que recibe no deja
+      rastro para mejorar antes de la siguiente.
+    </p>
+  </div>
+
+  <div class="escena">
+    <p class="nota-escena">El ciclo</p>
+    <div class="grafo" id="grafo">
+      <svg class="hilos" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <line class="hilo" data-de="0" data-a="1" x1="28" y1="26" x2="66" y2="52"/>
+        <line class="hilo" data-de="1" data-a="2" x1="66" y1="52" x2="34" y2="80"/>
+        <line class="hilo" data-de="2" data-a="0" x1="34" y1="80" x2="28" y2="26"/>
+      </svg>
+    </div>
+  </div>
+</main>
+
+<footer class="pie-lamina">
+  <span><strong>El problema</strong> · Salo · 1 min 30 s</span>
+  <span>Clic en cualquiera de los tres nodos</span>
+</footer>
+
+<script src="costura.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var NODOS = [
+    {
+      n:"01", corto:"Ansiedad", titulo:"Inseguridad y ansiedad",
+      x:28, y:26,
+      cita:"Me da nervio que me estén viendo.",
+      pie:"Estudiante de Medicina · UPB",
+      detalle:"Entran a la clínica de simulación muy pocas veces por semestre y, " +
+              "cuando lo hacen, tienen un tiempo limitado, miedo a equivocarse y la " +
+              "presión de ser observados por el docente y sus compañeros. Practican poco " +
+              "porque hay pocas oportunidades; y cuando llega la oportunidad, la ansiedad " +
+              "les impide aprovecharla. Terminan el semestre sintiendo que nunca " +
+              "practicaron lo suficiente."
+    },
+    {
+      n:"02", corto:"Método", titulo:"El método no se internaliza",
+      x:66, y:52,
+      cita:"El proceso del razonamiento diagnóstico no se hace paso por paso, se hace de manera integral.",
+      pie:"Literatura en educación médica",
+      detalle:"Por esa naturaleza iterativa, los estudiantes aprenden por medio de la " +
+              "práctica y la repetición. Hace falta que se enfrenten a muchos casos " +
+              "distintos para que el método se vuelva un hábito."
+    },
+    {
+      n:"03", corto:"Feedback", titulo:"El feedback no deja rastro",
+      x:34, y:80,
+      cita:"Cinco minutos, verbales, que se desvanecen al salir de la sala.",
+      pie:"Retroalimentación docente",
+      detalle:"Al terminar la simulación el estudiante recibe una retroalimentación " +
+              "verbal de unos pocos minutos que no queda registrada para un análisis " +
+              "posterior. El feedback informa si acertaron o no, pero los estudiantes no " +
+              "tienen la estructura necesaria para analizar su proceso de manera " +
+              "retrospectiva y aprender de sus errores."
+    }
+  ];
+
+  /* Cuánto mide cada nodo según mande o acompañe. El seleccionado crece y los
+     otros dos se encogen: el wireframe lo pedía así y además ordena la lectura. */
+  var GRANDE = 132, CHICO = 74;
+
+  var grafo    = document.getElementById("grafo");
+  var selector = document.getElementById("selector");
+  var tarjeta  = document.getElementById("tarjeta");
+  var elCita   = document.getElementById("cita");
+  var elPie    = document.getElementById("citaPie");
+  var elDet    = document.getElementById("detalle");
+  var hilos    = grafo.querySelectorAll(".hilo");
+
+  var botones = [], circulos = [], elegido = -1, reloj = null;
+
+  NODOS.forEach(function(d, i){
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "nodo";
+    b.style.left = d.x + "%";
+    b.style.top  = d.y + "%";
+    b.innerHTML = '<span><b>' + d.n + '</b></span>' +
+                  '<span class="rotulo-nodo">' + d.corto + '</span>';
+    b.setAttribute("aria-label", d.titulo);
+    b.addEventListener("click", function(){ elegir(i); });
+    grafo.appendChild(b);
+    circulos.push(b);
+
+    var s = document.createElement("button");
+    s.type = "button";
+    s.textContent = d.n + " · " + d.corto;
+    s.addEventListener("click", function(){ elegir(i); });
+    selector.appendChild(s);
+    botones.push(s);
+  });
+
+  function medir(){
+    circulos.forEach(function(b, i){
+      var r = (i === elegido) ? GRANDE : CHICO;
+      b.style.width  = r + "px";
+      b.style.height = r + "px";
+      b.style.margin = (-r/2) + "px 0 0 " + (-r/2) + "px";
+    });
+  }
+
+  function elegir(i){
+    if (i === elegido) return;
+    var primero = elegido === -1;
+    elegido = i;
+    var d = NODOS[i];
+
+    circulos.forEach(function(b, j){ b.classList.toggle("activo", j === i); });
+    botones.forEach(function(b, j){ b.setAttribute("aria-pressed", String(j === i)); });
+    /* Se encienden los dos hilos que salen del nodo elegido: el problema no se
+       queda quieto, empuja a los otros dos. */
+    hilos.forEach(function(h){
+      var toca = +h.dataset.de === i || +h.dataset.a === i;
+      h.classList.toggle("vivo", toca);
+    });
+    medir();
+
+    var pintar = function(){
+      elCita.textContent = d.cita;
+      elPie.textContent  = d.pie;
+      elDet.textContent  = d.detalle;
+      tarjeta.classList.remove("cambiando");
+    };
+
+    if (primero){ pintar(); return; }
+    tarjeta.classList.add("cambiando");
+    clearTimeout(reloj);
+    reloj = setTimeout(pintar, 200);
+  }
+
+  elegir(0);
+})();
+</script>
+</body>
+</html>

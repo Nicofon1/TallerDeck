@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timeline — Osler Hub</title>
+<script>document.documentElement.setAttribute("data-theme","light");</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="../taller.css">
+<link rel="stylesheet" href="lamina.css">
+<script src="../enlace.js"></script>
+<script>try{if(window.parent!==window&&!/[?&]previa=1/.test(location.search))document.documentElement.className+=" con-telon";}catch(e){}</script>
+
+<style>
+  .lamina.entera{
+    grid-template-rows:auto 1fr auto;
+    align-content:center;
+    gap:clamp(20px,2.6vw,38px);
+    padding-bottom:78px;
+  }
+
+  /* ── el riel ──────────────────────────────────────────────
+     Las columnas no son iguales: cada hito ocupa a lo ancho lo que dura.
+     El prototipo son cinco semanas y la entrega es un día, y así se ve. */
+  .riel{
+    display:grid;
+    grid-template-columns:1.55fr 1fr .62fr .62fr;
+    gap:0;
+    align-items:stretch;
+  }
+
+  .hito{
+    position:relative;
+    display:flex;flex-direction:column;gap:14px;
+    padding:0 clamp(14px,1.6vw,26px) 0 0;
+  }
+  .hito .fecha{
+    font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--azul);font-weight:600;
+  }
+
+  /* La barra: un tramo lleno para lo que dura semanas, un punto para lo
+     que ocurre en un día. */
+  .barra-hito{
+    position:relative;height:3px;border-radius:2px;
+    background:var(--niebla);
+    margin-right:10px;
+  }
+  .barra-hito::before{
+    content:"";position:absolute;inset:0;border-radius:2px;
+    background:linear-gradient(90deg,var(--aqua),var(--azul));
+    transform-origin:left center;
+    transform:scaleX(var(--llena,1));
+    transition:transform .9s cubic-bezier(.16,1,.3,1);
+  }
+  .hito .punto{
+    position:absolute;left:0;top:50%;transform:translate(-1px,-50%);
+    width:11px;height:11px;border-radius:50%;
+    background:var(--papel);border:2px solid var(--azul);
+    z-index:2;
+  }
+  .hito.puntual .punto{background:var(--azul)}
+  .hito.puntual .barra-hito{background:transparent}
+  .hito.puntual .barra-hito::before{display:none}
+
+  .hito h2{
+    margin:0;
+    font-family:var(--titulo);font-weight:400;
+    font-size:clamp(17px,1.62vw,24px);line-height:1.1;letter-spacing:-.012em;
+    color:var(--tinta);
+  }
+  .hito p{
+    margin:0;font-size:12.5px;line-height:1.58;color:var(--apagado);
+    max-width:32ch;
+  }
+  .hito .duracion{
+    margin-top:auto;
+    font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--apagado);
+  }
+
+  /* Al mirar uno, los demás se apartan un poco de la atención. */
+  .riel:hover .hito{opacity:.5}
+  .riel .hito:hover{opacity:1}
+  .hito{transition:opacity .3s ease}
+
+  /* ── el cierre ────────────────────────────────────────────
+     La última frase del guion vive aquí, al pie de la línea de tiempo:
+     es lo que queda dicho cuando ya se vio todo el plan. */
+  .cierre{
+    border-top:1px solid var(--linea);
+    padding-top:clamp(14px,1.8vw,22px);
+    display:flex;align-items:flex-end;gap:clamp(20px,3vw,48px);
+    flex-wrap:wrap;
+  }
+  .cierre .marca-paso{
+    font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--apagado);white-space:nowrap;padding-bottom:6px;
+  }
+  .cierre p{
+    margin:0;flex:1 1 420px;
+    font-family:var(--titulo);font-weight:400;
+    font-variation-settings:'opsz' 120,'SOFT' 0,'WONK' 0;
+    font-size:clamp(19px,2.05vw,30px);
+    line-height:1.16;letter-spacing:-.012em;
+    color:var(--tinta);
+  }
+  .cierre em{font-style:italic;color:var(--indigo)}
+
+  @media (max-width:900px){
+    .riel{grid-template-columns:1fr 1fr;gap:26px 0}
+  }
+</style>
+</head>
+<body data-seccion="timeline">
+
+<div id="telon" aria-hidden="true"></div>
+
+<header class="barra">
+  <span class="marca"><i></i>Osler Hub</span>
+  <nav class="rumbo" aria-label="Secciones"></nav>
+</header>
+
+<main class="lamina entera">
+  <div class="cabeza columna" style="max-width:62ch">
+    <p class="rotulo">Timeline</p>
+    <h1 class="punch">De aquí a la entrega, en cuatro tramos.</h1>
+  </div>
+
+  <div class="riel" id="riel"></div>
+
+  <div class="cierre">
+    <span class="marca-paso">Cierre · Lu · 20 s</span>
+    <p>
+      Osler Hub no reemplaza la Clínica de Simulación: la <em>complementa</em>.
+      La clínica enseña a intervenir; Osler Hub acompaña el paso previo, que es
+      aprender a pensar antes de hacer.
+    </p>
+  </div>
+</main>
+
+<footer class="pie-lamina">
+  <span><strong>Timeline</strong> · Fon · 50 s</span>
+  <span>Entrega formal · 11 de noviembre</span>
+</footer>
+
+<script src="costura.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var HITOS = [
+    {
+      fecha:"26 ago — 30 sep", duracion:"Cinco semanas",
+      titulo:"Prototipo para prueba de usuario",
+      texto:"El equipo de desarrollo y diseño se enfoca en un producto mínimo " +
+            "funcional, suficiente para que un usuario pueda testear el core de la " +
+            "aplicación."
+    },
+    {
+      fecha:"1 — 20 oct", duracion:"Tres semanas",
+      titulo:"Pruebas de usuario",
+      texto:"Se recolectan múltiples testeos con usuarios de diferentes semestres " +
+            "para validar las historias de usuario principales."
+    },
+    {
+      fecha:"21 oct", duracion:"Un día", puntual:true,
+      titulo:"Pre entrega",
+      texto:"Entrega preliminar del producto, implementando las correcciones " +
+            "halladas durante los testeos."
+    },
+    {
+      fecha:"11 nov", duracion:"Un día", puntual:true,
+      titulo:"Entrega",
+      texto:"Entrega formal del producto funcional, en formato de link para web y " +
+            "el descargable APK para Android."
+    }
+  ];
+
+  var riel = document.getElementById("riel");
+
+  HITOS.forEach(function(h){
+    var d = document.createElement("article");
+    d.className = "hito" + (h.puntual ? " puntual" : "");
+    d.innerHTML =
+      '<span class="fecha">' + h.fecha + '</span>' +
+      '<div class="barra-hito"><span class="punto"></span></div>' +
+      '<h2>' + h.titulo + '</h2>' +
+      '<p>' + h.texto + '</p>' +
+      '<span class="duracion">' + h.duracion + '</span>';
+    riel.appendChild(d);
+  });
+
+  /* Las barras se llenan al llegar. Va por reloj y no por `animationend`
+     porque en una pestaña de fondo las animaciones no corren. */
+  function llenar(){
+    riel.querySelectorAll(".barra-hito").forEach(function(b, i){
+      b.style.setProperty("--llena", "0");
+      setTimeout(function(){ b.style.setProperty("--llena", "1"); }, 180 + i*130);
+    });
+  }
+  window.alLlegarLamina = llenar;   // el gancho que ofrece costura.js
+  llenar();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Journey — Osler Hub</title>
+<script>document.documentElement.setAttribute("data-theme","light");</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="../taller.css">
+<link rel="stylesheet" href="lamina.css">
+<script src="../enlace.js"></script>
+<script>try{if(window.parent!==window&&!/[?&]previa=1/.test(location.search))document.documentElement.className+=" con-telon";}catch(e){}</script>
+
+<style>
+  /* ── la órbita ────────────────────────────────────────────
+     Un núcleo en el centro y cinco satélites girando alrededor. El
+     anillo entero gira despacio; cada satélite gira al revés a la misma
+     velocidad, así los rótulos nunca se ponen de cabeza. */
+  .orbita{
+    position:relative;
+    height:min(100%,540px);
+    aspect-ratio:1;
+  }
+  .anillo{
+    position:absolute;inset:0;
+    animation:girar 72s linear infinite;
+  }
+  .orbita.quieta .anillo,
+  .orbita.quieta .satelite,
+  .orbita.quieta .nube{animation-play-state:paused}
+  @keyframes girar{to{rotate:360deg}}
+  @keyframes girar-inv{to{rotate:-360deg}}
+
+  .radios{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+  .radio{
+    stroke:var(--linea);stroke-width:1;fill:none;
+    vector-effect:non-scaling-stroke;
+    transition:stroke .4s ease,opacity .4s ease;
+  }
+  .radio.vivo{
+    stroke:var(--azul);
+    stroke-dasharray:2.5 4;
+    animation:pulsar 1.25s linear infinite;
+  }
+  @keyframes pulsar{to{stroke-dashoffset:-13}}
+
+  /* ── el núcleo ────────────────────────────────────────────
+     Las mismas esferas de la portada, reducidas a su idea: puntos en dos
+     anillos que giran en sentidos contrarios. */
+  .nucleo{
+    position:absolute;left:50%;top:50%;
+    width:31%;height:31%;margin:-15.5% 0 0 -15.5%;
+    border-radius:50%;
+    display:grid;place-items:center;
+    border:1px solid var(--linea);
+    background:radial-gradient(circle at 50% 42%, hsla(216,96%,89%,.55), hsla(210,17%,98%,.95) 70%);
+    transition:box-shadow .5s ease,border-color .5s ease;
+  }
+  .nucleo.encendido{
+    border-color:transparent;
+    box-shadow:0 0 0 1px var(--tono,var(--azul)) inset,
+               0 18px 50px hsla(220,51%,51%,.22);
+  }
+  .nucleo b{
+    font-family:var(--titulo);font-weight:400;
+    font-size:clamp(15px,1.5vw,21px);letter-spacing:-.01em;
+    color:var(--tinta);z-index:2;
+  }
+  .nube{position:absolute;inset:0;animation:girar 26s linear infinite}
+  .nube.lejos{animation:girar-inv 38s linear infinite}
+  .nube i{
+    position:absolute;
+    width:8px;height:8px;margin:-4px 0 0 -4px;
+    border-radius:50%;
+    background:linear-gradient(150deg,var(--aqua),var(--azul));
+    opacity:.62;
+  }
+  .nube.lejos i{opacity:.38;width:6px;height:6px;margin:-3px 0 0 -3px}
+
+  /* ── los satélites ────────────────────────────────────── */
+  .satelite{
+    position:absolute;
+    width:96px;height:96px;margin:-48px 0 0 -48px;
+    border-radius:50%;
+    display:grid;place-items:center;
+    border:1px solid var(--linea);
+    background:var(--papel);
+    color:var(--apagado);
+    font:inherit;cursor:pointer;padding:0;
+    animation:girar-inv 72s linear infinite;
+    transition:width .5s cubic-bezier(.16,1,.3,1),
+               height .5s cubic-bezier(.16,1,.3,1),
+               margin .5s cubic-bezier(.16,1,.3,1),
+               background .38s ease,color .38s ease,
+               border-color .38s ease,box-shadow .38s ease;
+  }
+  .satelite b{font-family:var(--titulo);font-weight:400;font-size:20px;line-height:1}
+  .satelite .nombre{
+    position:absolute;left:50%;top:100%;transform:translate(-50%,10px);
+    font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;
+    white-space:nowrap;color:var(--apagado);
+    transition:color .3s ease;
+  }
+  .satelite:hover{border-color:var(--azul);color:var(--tinta)}
+  .satelite.activo{
+    width:118px;height:118px;margin:-59px 0 0 -59px;
+    border-color:transparent;
+    background:linear-gradient(150deg,var(--tono-claro,var(--aqua)),var(--tono,var(--azul)));
+    color:var(--papel);
+    box-shadow:0 18px 44px hsla(220,51%,51%,.28);
+  }
+  .satelite.activo .nombre{color:var(--tinta);font-weight:600}
+
+  /* ── la ficha del paso ────────────────────────────────── */
+  .paso{
+    border:1px solid var(--linea);
+    border-left:2px solid var(--azul);
+    background:var(--papel);
+    border-radius:3px;
+    padding:22px 24px;
+    display:flex;flex-direction:column;gap:12px;
+    min-height:250px;
+    transition:opacity .32s ease,transform .32s cubic-bezier(.16,1,.3,1);
+  }
+  .paso.cambiando{opacity:0;transform:translateY(10px)}
+  .paso .momento{
+    font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--azul);
+  }
+  .paso h2{
+    margin:0;
+    font-family:var(--titulo);font-weight:400;
+    font-size:clamp(21px,2vw,29px);line-height:1.08;letter-spacing:-.012em;
+    color:var(--tinta);
+  }
+  .paso .extra{
+    margin:0;padding-top:11px;border-top:1px solid var(--linea);
+    font-size:12.5px;line-height:1.56;color:var(--apagado);
+  }
+  .paso .extra b{color:var(--tinta);font-weight:600}
+
+  .pasos-mini{display:flex;gap:6px;flex-wrap:wrap}
+  .pasos-mini button{
+    appearance:none;cursor:pointer;font:inherit;
+    border:1px solid var(--linea);background:transparent;color:var(--apagado);
+    border-radius:999px;padding:7px 12px;
+    font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+    transition:all .24s ease;
+  }
+  .pasos-mini button:hover{color:var(--tinta);border-color:var(--azul)}
+  .pasos-mini button[aria-pressed="true"]{
+    background:var(--tinta);border-color:var(--tinta);color:var(--papel);
+  }
+</style>
+</head>
+<body data-seccion="journey">
+
+<div id="telon" aria-hidden="true"></div>
+
+<header class="barra">
+  <span class="marca"><i></i>Osler Hub</span>
+  <nav class="rumbo" aria-label="Secciones"></nav>
+</header>
+
+<main class="lamina">
+  <div class="columna">
+    <p class="rotulo">Cómo lo resolvemos</p>
+    <h1 class="punch">Camilo, octavo semestre, un martes por la noche.</h1>
+
+    <div class="pasos-mini" id="mini" role="group" aria-label="Los cinco pasos"></div>
+
+    <div class="paso" id="ficha">
+      <span class="momento" id="momento"></span>
+      <h2 id="titulo"></h2>
+      <p class="parrafo" id="texto"></p>
+      <p class="extra" id="extra"></p>
+    </div>
+  </div>
+
+  <div class="escena">
+    <p class="nota-escena">La simulación, paso a paso</p>
+    <div class="orbita" id="orbita">
+      <div class="nucleo" id="nucleo"><b>Osler</b></div>
+      <div class="anillo" id="anillo">
+        <svg class="radios" viewBox="0 0 100 100" aria-hidden="true"></svg>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="pie-lamina">
+  <span><strong>Cómo lo resolvemos</strong> · Lu y Salo · 2 min 20 s</span>
+  <span>Camilo nunca intervino al paciente: solo practicó su razonamiento</span>
+</footer>
+
+<script src="costura.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var PASOS = [
+    {
+      n:"1", corto:"Inicio", titulo:"Inicio y modo",
+      momento:"Martes, 9:00 p.m.",
+      tono:"var(--azul)", tonoClaro:"var(--cielo)",
+      texto:"Camilo necesita estudiar para endocrinología, así que abre la web de " +
+            "Osler Hub desde su computador. Filtra los casos clínicos por especialidad " +
+            "médica y por su semestre, elige uno e inicia la simulación.",
+      extra:"<b>Elige cómo practicarlo:</b> práctica libre, sin presión de tiempo, o " +
+            "examen cronometrado de ocho minutos."
+    },
+    {
+      n:"2", corto:"Anamnesis", titulo:"Anamnesis libre",
+      momento:"La entrevista",
+      tono:"var(--aqua)", tonoClaro:"var(--cielo)",
+      texto:"Hace las preguntas de la entrevista por voz o por texto, en lenguaje " +
+            "natural, y el paciente responde en lenguaje cotidiano. Cuando está listo " +
+            "para terminar, cierra la entrevista y pasa a la siguiente etapa.",
+      extra:"<b>Sin menús delatores:</b> no hay opciones prediseñadas que le soplen la " +
+            "pregunta que faltaba."
+    },
+    {
+      n:"3", corto:"Procedimientos", titulo:"Procedimientos y ayudas",
+      momento:"Las pruebas",
+      tono:"var(--indigo)", tonoClaro:"var(--aqua)",
+      texto:"Decide qué exámenes diagnósticos quiere realizarle al paciente y los " +
+            "escribe en un campo de texto, sin una lista de opciones predeterminadas " +
+            "que lo obligue a reconocer en vez de recordar.",
+      extra:"<b>Antes de los resultados:</b> la interfaz le exige redactar la " +
+            "argumentación clínica de qué busca confirmar."
+    },
+    {
+      n:"4", corto:"Diagnóstico", titulo:"Diagnóstico y justificación",
+      momento:"El corazón de la app",
+      tono:"var(--indigo)", tonoClaro:"var(--azul)",
+      texto:"Registra su sospecha principal, la justifica y lista sus diagnósticos " +
+            "diferenciales. Si no acierta el principal pero razonó bien el camino y la " +
+            "respuesta correcta está entre sus diferenciales, eso se le reconoce en la " +
+            "retroalimentación.",
+      extra:"<b>Plan de manejo:</b> registra qué formularía a nivel general, sin dosis " +
+            "ni nombres específicos. El sistema revisa que el plan sea coherente con la " +
+            "causa que él mismo planteó."
+    },
+    {
+      n:"5", corto:"Feedback", titulo:"Feedback guardado",
+      momento:"El cierre",
+      tono:"var(--azul)", tonoClaro:"var(--aqua)",
+      texto:"El sistema le retroalimenta qué preguntas clave le faltaron, qué pidió que " +
+            "no necesitaba, qué hizo tarde y qué fue incoherente. Al cierre se adjuntan " +
+            "las guías académicas del caso, para que estudie justo aquello donde falló.",
+      extra:"<b>Queda registrado:</b> la semana siguiente Camilo puede volver a leerlo, " +
+            "compararlo y repetir el caso las veces que quiera."
+    }
+  ];
+
+  var RADIO = 37;          // en % del lado de la órbita
+  var ARRANQUE = -Math.PI/2;
+
+  var orbita = document.getElementById("orbita");
+  var anillo = document.getElementById("anillo");
+  var nucleo = document.getElementById("nucleo");
+  var svg    = anillo.querySelector(".radios");
+  var mini   = document.getElementById("mini");
+  var ficha  = document.getElementById("ficha");
+  var elMom  = document.getElementById("momento");
+  var elTit  = document.getElementById("titulo");
+  var elTxt  = document.getElementById("texto");
+  var elExt  = document.getElementById("extra");
+
+  var lunas = [], radios = [], chips = [], elegido = -1, reloj = null;
+
+  /* El núcleo: dos anillos de puntos girando en sentidos contrarios. Es la
+     misma idea de la portada —materia hecha de esferas— en pequeño. */
+  [[9, 29, false], [7, 42, true]].forEach(function(capa){
+    var cuantos = capa[0], r = capa[1], lejos = capa[2];
+    var nube = document.createElement("div");
+    nube.className = "nube" + (lejos ? " lejos" : "");
+    for (var k = 0; k < cuantos; k++){
+      var punto = document.createElement("i");
+      var a = (k / cuantos) * Math.PI * 2 + (lejos ? 0.31 : 0);
+      // En % del núcleo, igual que los satélites en % de la órbita.
+      punto.style.left = (50 + Math.cos(a) * r).toFixed(2) + "%";
+      punto.style.top  = (50 + Math.sin(a) * r).toFixed(2) + "%";
+      nube.appendChild(punto);
+    }
+    nucleo.appendChild(nube);
+  });
+
+  PASOS.forEach(function(d, i){
+    var a = ARRANQUE + (i / PASOS.length) * Math.PI * 2;
+    var x = 50 + Math.cos(a) * RADIO;
+    var y = 50 + Math.sin(a) * RADIO;
+
+    var linea = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    linea.setAttribute("class", "radio");
+    linea.setAttribute("x1", "50"); linea.setAttribute("y1", "50");
+    linea.setAttribute("x2", x.toFixed(2)); linea.setAttribute("y2", y.toFixed(2));
+    svg.appendChild(linea);
+    radios.push(linea);
+
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "satelite";
+    b.style.left = x.toFixed(2) + "%";
+    b.style.top  = y.toFixed(2) + "%";
+    b.style.setProperty("--tono", d.tono);
+    b.style.setProperty("--tono-claro", d.tonoClaro);
+    b.innerHTML = '<b>' + d.n + '</b><span class="nombre">' + d.corto + '</span>';
+    b.setAttribute("aria-label", "Paso " + d.n + ": " + d.titulo);
+    b.addEventListener("click", function(){ elegir(i); });
+    anillo.appendChild(b);
+    lunas.push(b);
+
+    var c = document.createElement("button");
+    c.type = "button";
+    c.textContent = d.n + " · " + d.corto;
+    c.addEventListener("click", function(){ elegir(i); });
+    mini.appendChild(c);
+    chips.push(c);
+  });
+
+  function elegir(i){
+    if (i === elegido) return;
+    var primero = elegido === -1;
+    elegido = i;
+    var d = PASOS[i];
+
+    lunas.forEach(function(b, j){ b.classList.toggle("activo", j === i); });
+    chips.forEach(function(b, j){ b.setAttribute("aria-pressed", String(j === i)); });
+    radios.forEach(function(l, j){ l.classList.toggle("vivo", j === i); });
+
+    /* El núcleo toma el color del paso: el wireframe pedía que la estructura
+       central respondiera a cada satélite. */
+    nucleo.classList.add("encendido");
+    nucleo.style.setProperty("--tono", d.tono);
+    ficha.style.borderLeftColor = d.tono;
+
+    var pintar = function(){
+      elMom.textContent = d.momento;
+      elTit.textContent = d.titulo;
+      elTxt.textContent = d.texto;
+      elExt.innerHTML   = d.extra;
+      ficha.classList.remove("cambiando");
+    };
+
+    if (primero){ pintar(); return; }
+    ficha.classList.add("cambiando");
+    clearTimeout(reloj);
+    reloj = setTimeout(pintar, 200);
+  }
+
+  /* Mientras alguien está mirando de cerca, la órbita se detiene: perseguir un
+     botón que se mueve no es una gracia, es un estorbo. */
+  orbita.addEventListener("pointerenter", function(){ orbita.classList.add("quieta"); });
+  orbita.addEventListener("pointerleave", function(){ orbita.classList.remove("quieta"); });
+
+  elegir(0);
+})();
+</script>
+</body>
+</html>

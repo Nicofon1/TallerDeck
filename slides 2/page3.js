@@ -26,6 +26,41 @@
 
 const seccionesData = [
   {
+    deck: 'contexto',
+    src: '../presentacion/contexto.html',
+    nombre: 'Contexto',
+    area: 'La clínica de simulación',
+    texto: 'El espacio donde equivocarse no cuesta vidas — y el límite que no es culpa de nadie: aforo, horarios y docentes finitos. Ocho por sesión, pocos participan.'
+  },
+  {
+    deck: 'problema',
+    src: '../presentacion/problema.html',
+    nombre: 'El problema',
+    area: 'Tres nodos en ciclo',
+    texto: 'Inseguridad, método que no se internaliza y feedback que no deja rastro. Los tres se refuerzan uno al otro; el grafo lo muestra encendiendo sus hilos.'
+  },
+  {
+    deck: 'investigacion',
+    src: '../presentacion/investigacion.html',
+    nombre: 'La investigación',
+    area: 'Cinco frentes',
+    texto: 'Voz estudiantil, observación directa, referentes del mundo, literatura revisada por pares y marco normativo. La tira de evidencias se arrastra a lo ancho.'
+  },
+  {
+    deck: 'journey',
+    src: '../presentacion/journey.html',
+    nombre: 'Journey',
+    area: 'Los cinco pasos',
+    texto: 'La simulación de Camilo en órbita: inicio y modo, anamnesis libre, procedimientos, diagnóstico con justificación y el feedback que queda guardado.'
+  },
+  {
+    deck: 'timeline',
+    src: '../presentacion/timeline.html',
+    nombre: 'Timeline',
+    area: 'Hasta el 11 de noviembre',
+    texto: 'Prototipo, pruebas de usuario, pre entrega y entrega. Cada tramo ocupa a lo ancho lo que dura, y al pie queda el cierre del guion.'
+  },
+  {
     deck: 'burbujas',
     src: '../Slides/corazon-burbujas.html',
     nombre: 'Anatomía de burbujas',

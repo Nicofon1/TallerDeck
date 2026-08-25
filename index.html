@@ -87,6 +87,14 @@ body{
    ═══════════════════════════════════════════════════════════ */
 const MAPA = {
   soma:       { src:"Slides/soma-hero.html",         cerca:["indice"] },
+  // El guion, en orden: contexto, problema, investigacion, journey, timeline.
+  // Cada una precarga la siguiente, que es el salto que de verdad se hace al
+  // presentar; el indice queda siempre a un paso.
+  contexto:     { src:"presentacion/contexto.html",     cerca:["problema"] },
+  problema:     { src:"presentacion/problema.html",     cerca:["investigacion"] },
+  investigacion:{ src:"presentacion/investigacion.html",cerca:["journey"] },
+  journey:      { src:"presentacion/journey.html",      cerca:["timeline"] },
+  timeline:     { src:"presentacion/timeline.html",     cerca:["indice"] },
   // El índice ya carga sus secciones para previsualizarlas: precargarlas
   // otra vez aquí sería arrancar cada motor por duplicado.
   indice:     { src:"slides 2/page3.html",           cerca:[] },

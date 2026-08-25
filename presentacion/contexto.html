@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contexto — Osler Hub</title>
+<script>document.documentElement.setAttribute("data-theme","light");</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="../taller.css">
+<link rel="stylesheet" href="lamina.css">
+<script src="../enlace.js"></script>
+<script>try{if(window.parent!==window&&!/[?&]previa=1/.test(location.search))document.documentElement.className+=" con-telon";}catch(e){}</script>
+
+<style>
+  /* ── la sala ──────────────────────────────────────────────
+     El recinto es el límite del que habla la lámina: una caja que
+     no se puede estirar. Dentro caben diez, y solo dos participan. */
+  .sala{
+    position:relative;
+    width:100%;height:100%;
+    max-height:560px;
+  }
+  .recinto{
+    position:absolute;left:50%;top:6%;transform:translateX(-50%);
+    width:min(46%,260px);height:52%;
+    border:1px solid var(--linea);
+    background:linear-gradient(180deg,hsla(216,96%,89%,.34),hsla(210,17%,98%,.9));
+    border-radius:3px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:8px;text-align:center;padding:18px;
+  }
+  .recinto b{
+    font-size:10px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--indigo);font-weight:600;
+  }
+  .recinto span{
+    font-size:11px;line-height:1.5;color:var(--apagado);max-width:22ch;
+  }
+  /* el aforo, escrito en el borde mismo del recinto */
+  .aforo{
+    position:absolute;left:50%;top:calc(6% + 52%);transform:translate(-50%,10px);
+    font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--apagado);white-space:nowrap;
+  }
+
+  .alumno{
+    position:absolute;
+    width:54px;height:54px;margin:-27px 0 0 -27px;
+    border-radius:50%;
+    display:grid;place-items:center;
+    border:1px solid var(--linea);
+    background:var(--papel);
+    color:var(--apagado);
+    cursor:default;
+    animation:flotar 7s ease-in-out infinite;
+    transition:transform .42s cubic-bezier(.16,1,.3,1),
+               opacity .3s ease, box-shadow .3s ease, border-color .3s ease;
+  }
+  .alumno.activo{
+    border-color:transparent;
+    background:linear-gradient(150deg,var(--aqua),var(--azul));
+    color:var(--papel);
+    box-shadow:0 10px 26px hsla(220,51%,51%,.28);
+  }
+  /* El anillo que late: solo lo llevan los que están participando. */
+  .alumno.activo::after{
+    content:"";position:absolute;inset:-7px;border-radius:50%;
+    border:1px solid var(--azul);opacity:.5;
+    animation:latir 2.6s ease-out infinite;
+  }
+  @keyframes latir{
+    0%{transform:scale(.9);opacity:.55}
+    70%{transform:scale(1.22);opacity:0}
+    100%{opacity:0}
+  }
+  @keyframes flotar{
+    0%,100%{translate:0 0}
+    50%{translate:0 -9px}
+  }
+
+  /* Al posarse sobre uno, el resto se apaga: es exactamente lo que pasa
+     en la sala cuando la atención cae sobre un estudiante. */
+  .sala.enfocando .alumno{opacity:.22}
+  .sala.enfocando .alumno.foco{
+    opacity:1;transform:scale(1.16);
+    box-shadow:0 14px 30px var(--sombra);
+  }
+  .etiqueta{
+    position:absolute;left:50%;top:100%;transform:translate(-50%,8px);
+    padding:4px 9px;border-radius:999px;
+    background:var(--tinta);color:var(--papel);
+    font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+    white-space:nowrap;opacity:0;pointer-events:none;
+    transition:opacity .22s ease;
+  }
+  .alumno.foco .etiqueta{opacity:1}
+
+  .marcador{
+    position:absolute;left:0;bottom:0;
+    display:flex;align-items:baseline;gap:10px;
+  }
+  .marcador b{
+    font-family:var(--titulo);font-size:38px;font-weight:400;
+    line-height:1;color:var(--indigo);
+  }
+  .marcador span{font-size:11px;line-height:1.5;color:var(--apagado);max-width:18ch}
+</style>
+</head>
+<body data-seccion="contexto">
+
+<div id="telon" aria-hidden="true"></div>
+
+<header class="barra">
+  <span class="marca"><i></i>Osler Hub</span>
+  <nav class="rumbo" aria-label="Secciones"></nav>
+</header>
+
+<main class="lamina">
+  <div class="columna">
+    <p class="rotulo">Contexto</p>
+    <h1 class="punch">El espacio donde equivocarse no cuesta vidas.</h1>
+    <p class="parrafo">
+      La Universidad Pontificia Bolivariana cuenta con una <strong>Clínica de Simulación
+      de Medicina</strong>: un espacio físico donde los estudiantes practican con
+      simuladores de alta fidelidad antes de tocar a un paciente real. Tiene equipos,
+      salas y docentes con experiencia que acompañan cada sesión.
+    </p>
+    <p class="parrafo">
+      Pero tiene un límite que no es culpa de nadie: <strong>es un espacio físico</strong>.
+      Hay un número finito de salas, de horarios y de docentes. Cada simulación reúne
+      en promedio ocho estudiantes, de los cuales solo unos pocos participan activamente
+      mientras el resto observa.
+    </p>
+  </div>
+
+  <div class="escena">
+    <p class="nota-escena">Una sesión, vista desde afuera</p>
+    <div class="sala" id="sala">
+      <div class="recinto">
+        <b>Clínica de simulación</b>
+        <span>Salas, simuladores de alta fidelidad, cámara Gesell y docente</span>
+      </div>
+      <p class="aforo">Aforo limitado · horarios finitos</p>
+      <div class="marcador">
+        <b id="cuenta">2 / 10</b>
+        <span>participan activamente por sesión</span>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="pie-lamina">
+  <span><strong>Contexto</strong> · Lu · 45 s</span>
+  <span>Pasá el cursor por la sala</span>
+</footer>
+
+<script src="costura.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  /* Diez estudiantes colocados a mano alrededor del recinto: dos dentro de la
+     acción, ocho en la periferia. Las posiciones van en porcentaje para que la
+     escena se comporte igual en la miniatura del índice y a pantalla completa. */
+  var GENTE = [
+    { x:22, y:24, activo:false }, { x:78, y:20, activo:false },
+    { x:12, y:48, activo:false }, { x:88, y:46, activo:false },
+    { x:36, y:70, activo:true  }, { x:62, y:74, activo:true  },
+    { x:18, y:76, activo:false }, { x:82, y:72, activo:false },
+    { x:46, y:88, activo:false }, { x:72, y:92, activo:false }
+  ];
+
+  var CARA_ACTIVA =
+    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">' +
+    '<circle cx="9" cy="10" r=".9" fill="currentColor" stroke="none"/>' +
+    '<circle cx="15" cy="10" r=".9" fill="currentColor" stroke="none"/>' +
+    '<path d="M8.4 14.4c1 1.1 2.2 1.7 3.6 1.7s2.6-.6 3.6-1.7"/></svg>';
+  var CARA_MIRA =
+    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">' +
+    '<circle cx="9" cy="10" r=".9" fill="currentColor" stroke="none"/>' +
+    '<circle cx="15" cy="10" r=".9" fill="currentColor" stroke="none"/>' +
+    '<path d="M8.6 15.6c1-1 2.1-1.5 3.4-1.5s2.4.5 3.4 1.5"/></svg>';
+
+  var sala = document.getElementById("sala");
+
+  GENTE.forEach(function(g, i){
+    var n = document.createElement("span");
+    n.className = "alumno" + (g.activo ? " activo" : "");
+    n.style.left = g.x + "%";
+    n.style.top  = g.y + "%";
+    // Desfases distintos: si flotaran a la vez parecerían una sola pieza.
+    n.style.animationDelay = (-i * 0.63).toFixed(2) + "s";
+    n.style.animationDuration = (6.2 + (i % 4) * 0.7).toFixed(1) + "s";
+    n.innerHTML = (g.activo ? CARA_ACTIVA : CARA_MIRA) +
+                  '<span class="etiqueta">' + (g.activo ? "Participa" : "Observa") + '</span>';
+
+    n.addEventListener("pointerenter", function(){
+      sala.classList.add("enfocando");
+      n.classList.add("foco");
+    });
+    n.addEventListener("pointerleave", function(){
+      sala.classList.remove("enfocando");
+      n.classList.remove("foco");
+    });
+
+    sala.appendChild(n);
+  });
+})();
+</script>
+</body>
+</html>

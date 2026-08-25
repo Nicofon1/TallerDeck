@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La investigación — Osler Hub</title>
+<script>document.documentElement.setAttribute("data-theme","light");</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="../taller.css">
+<link rel="stylesheet" href="lamina.css">
+<script src="../enlace.js"></script>
+<script>try{if(window.parent!==window&&!/[?&]previa=1/.test(location.search))document.documentElement.className+=" con-telon";}catch(e){}</script>
+
+<style>
+  /* Esta lámina no se parte en dos: las evidencias corren a lo ancho. */
+  .lamina.entera{
+    grid-template-rows:auto 1fr auto;
+    align-content:center;
+    gap:clamp(18px,2.4vw,34px);
+    padding-bottom:78px;
+  }
+  .cabeza{display:flex;flex-direction:column;gap:12px;max-width:62ch}
+
+  /* ── la tira de evidencias ────────────────────────────────
+     Las tarjetas sobresalen por la derecha a propósito: es la señal de
+     que la tira sigue y se puede arrastrar. */
+  .tira{
+    position:relative;
+    display:flex;gap:14px;
+    overflow-x:auto;overflow-y:hidden;
+    padding:6px 54px 18px 0;
+    margin-right:calc(-1 * clamp(24px,3.4vw,54px));
+    scrollbar-width:none;
+    cursor:grab;
+    scroll-snap-type:x proximity;
+  }
+  .tira::-webkit-scrollbar{display:none}
+  .tira.arrastrando{cursor:grabbing;scroll-snap-type:none}
+
+  .pilar{
+    flex:0 0 clamp(210px,19vw,268px);
+    scroll-snap-align:start;
+    display:flex;flex-direction:column;gap:12px;
+    padding:22px 22px 20px;
+    border:1px solid var(--linea);
+    border-radius:3px;
+    background:var(--papel);
+    transition:transform .34s cubic-bezier(.16,1,.3,1),
+               opacity .3s ease,border-color .3s ease,box-shadow .34s ease;
+  }
+  .pilar .num{
+    font-size:9.5px;letter-spacing:.24em;color:var(--azul);font-weight:600;
+  }
+  .pilar h2{
+    margin:0;
+    font-family:var(--titulo);font-weight:400;
+    font-size:19px;line-height:1.12;letter-spacing:-.01em;
+    color:var(--tinta);
+  }
+  .pilar p{
+    margin:0;font-size:12.5px;line-height:1.56;color:var(--apagado);
+  }
+  /* El aval aparece solo cuando la tarjeta se mira: es el detalle que
+     respalda la evidencia, no el titular. */
+  .pilar .aval{
+    margin-top:auto;
+    display:flex;align-items:center;gap:7px;
+    font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--indigo);
+    opacity:0;transform:translateY(6px);
+    transition:opacity .3s ease,transform .3s cubic-bezier(.16,1,.3,1);
+  }
+  .pilar .aval::before{
+    content:"";width:14px;height:1px;background:var(--indigo);flex:none;
+  }
+
+  .tira:hover .pilar{opacity:.55}
+  .tira .pilar:hover{
+    opacity:1;transform:translateY(-4px) scale(1.04);
+    border-color:var(--azul);
+    box-shadow:0 18px 40px var(--sombra);
+  }
+  .tira .pilar:hover .aval{opacity:1;transform:none}
+  .tira.arrastrando .pilar:hover{transform:none;box-shadow:none}
+
+  /* ── la conclusión ────────────────────────────────────────── */
+  .conclusion{
+    border-top:1px solid var(--linea);
+    padding-top:clamp(14px,1.8vw,22px);
+    display:flex;align-items:flex-end;gap:clamp(20px,3vw,48px);
+    flex-wrap:wrap;
+  }
+  .conclusion .marca-paso{
+    font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--apagado);white-space:nowrap;padding-bottom:6px;
+  }
+  .conclusion p{
+    margin:0;flex:1 1 420px;
+    font-family:var(--titulo);font-weight:400;
+    font-variation-settings:'opsz' 120,'SOFT' 0,'WONK' 0;
+    font-size:clamp(19px,2.05vw,30px);
+    line-height:1.16;letter-spacing:-.012em;
+    color:var(--tinta);
+  }
+  .conclusion em{font-style:italic;color:var(--indigo)}
+</style>
+</head>
+<body data-seccion="investigacion">
+
+<div id="telon" aria-hidden="true"></div>
+
+<header class="barra">
+  <span class="marca"><i></i>Osler Hub</span>
+  <nav class="rumbo" aria-label="Secciones"></nav>
+</header>
+
+<main class="lamina entera">
+  <div class="cabeza columna" style="max-width:62ch">
+    <p class="rotulo">La investigación</p>
+    <h1 class="punch">Entendimos el problema desde cinco frentes.</h1>
+  </div>
+
+  <div class="tira" id="tira"></div>
+
+  <div class="conclusion">
+    <span class="marca-paso">La conclusión</span>
+    <p>
+      El problema no es que a los estudiantes les falte conocimiento. Es que el proceso
+      por el cual llegan a una respuesta es <em>invisible y automático</em>, y por lo
+      tanto no se puede corregir.
+    </p>
+  </div>
+</main>
+
+<footer class="pie-lamina">
+  <span><strong>La investigación</strong> · Fon · 1 min 30 s</span>
+  <span>Arrastrá la tira de evidencias</span>
+</footer>
+
+<script src="costura.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var PILARES = [
+    {
+      titulo:"Voz estudiantil",
+      texto:"Encuestas amplias entre estudiantes de Medicina de la UPB de distintos " +
+            "semestres. En varias de esas sesiones fueron ellos mismos quienes nos " +
+            "describieron, paso a paso, cómo funciona su proceso mental cuando " +
+            "enfrentan un caso.",
+      aval:"Encuestas y entrevistas a profundidad"
+    },
+    {
+      titulo:"Observación directa",
+      texto:"Fuimos a ver cómo ocurre una simulación: cómo se comunican en la sala, " +
+            "cómo el docente maneja los signos vitales desde la cámara Gesell, cómo " +
+            "hace de paciente por el micrófono y cómo se resuelve el caso.",
+      aval:"Trabajo de campo en la clínica"
+    },
+    {
+      titulo:"Referentes del mundo",
+      texto:"Estudiamos los simuladores que hoy se usan alrededor del mundo, sus " +
+            "modelos de interacción y sus limitaciones.",
+      aval:"Análisis comparado de producto"
+    },
+    {
+      titulo:"Literatura científica",
+      texto:"Trabajamos sobre publicaciones revisadas por pares en educación médica y " +
+            "razonamiento diagnóstico. Cada decisión del producto se apoya en fuentes " +
+            "que podemos citar.",
+      aval:"Publicaciones revisadas por pares"
+    },
+    {
+      titulo:"Marco normativo",
+      texto:"Revisamos la normatividad colombiana que regula múltiples procesos " +
+            "clínicos, los estándares internacionales de buenas prácticas en simulación " +
+            "en salud y los formatos técnicos que hacen transferible un caso clínico " +
+            "entre plataformas.",
+      aval:"Norma colombiana y estándar internacional"
+    }
+  ];
+
+  var tira = document.getElementById("tira");
+
+  PILARES.forEach(function(p, i){
+    var c = document.createElement("article");
+    c.className = "pilar";
+    c.innerHTML =
+      '<span class="num">' + String(i+1).padStart(2,"0") + '</span>' +
+      '<h2>' + p.titulo + '</h2>' +
+      '<p>' + p.texto + '</p>' +
+      '<span class="aval">' + p.aval + '</span>';
+    tira.appendChild(c);
+  });
+
+  /* Arrastre con el puntero, además de la rueda. La tira ya scrollea sola con
+     trackpad; esto es para el que la agarra con el mouse. */
+  var agarrado = false, x0 = 0, s0 = 0, movido = 0;
+
+  tira.addEventListener("pointerdown", function(e){
+    agarrado = true; movido = 0;
+    x0 = e.clientX; s0 = tira.scrollLeft;
+    tira.setPointerCapture(e.pointerId);
+    tira.classList.add("arrastrando");
+  });
+  tira.addEventListener("pointermove", function(e){
+    if (!agarrado) return;
+    var d = e.clientX - x0;
+    movido = Math.max(movido, Math.abs(d));
+    tira.scrollLeft = s0 - d;
+  });
+  function soltar(e){
+    if (!agarrado) return;
+    agarrado = false;
+    try { tira.releasePointerCapture(e.pointerId); } catch(err){}
+    tira.classList.remove("arrastrando");
+  }
+  tira.addEventListener("pointerup", soltar);
+  tira.addEventListener("pointercancel", soltar);
+
+  /* La rueda vertical mueve la tira a lo ancho: es lo que espera cualquiera
+     que llegue con un mouse de rueda y no con un trackpad. */
+  tira.addEventListener("wheel", function(e){
+    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+    tira.scrollLeft += e.deltaY;
+    e.preventDefault();
+  }, { passive:false });
+})();
+</script>
+</body>
+</html>
