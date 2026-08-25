@@ -127,7 +127,6 @@ function montar(id){
   const marco = document.createElement("iframe");
   marco.title = id;
   marco.setAttribute("allow", "fullscreen; xr-spatial-tracking; accelerometer; gyroscope");
-  marco.setAttribute("allowfullscreen", "");
   marco.src = encodeURI(def.src);
   lam.appendChild(marco);
   escenario.appendChild(lam);

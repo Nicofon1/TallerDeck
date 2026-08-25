@@ -240,10 +240,6 @@
     Taller.alEntrar(function(){
       raiz.classList.remove("saliendo");
       raiz.classList.add("entrando");
-      /* El marco pudo cambiar de tamaño mientras la lámina no se veía, y
-         ademas la entrada empuja las columnas: hay que seguir mirando hasta
-         que termine, o las previas se quedan donde estaban de paso. */
-      if (window.indiceTaller) window.indiceTaller.vigilarUnRato(1800);
       // un cuadro de margen para que la animación arranque con el telón puesto
       Taller.trasPintar(function(){ raiz.classList.remove("con-telon"); });
       setTimeout(function(){ raiz.classList.remove("entrando"); }, 1300);
