@@ -459,7 +459,7 @@ class EstanteInvestigacion {
   }
 
   alIndice() {
-    if (window.Taller && window.Taller.dentroDelDeck) window.Taller.ir('indice');
+    if (window.Taller) window.Taller.terminar();
     else window.location.href = 'page3.html';
   }
 

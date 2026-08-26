@@ -357,7 +357,7 @@
 
   function avanzar(){
     if (actual < N - 1){ ir(actual + 1); return; }
-    if (window.Taller && Taller.dentroDelDeck) Taller.ir("indice");
+    if (window.Taller) Taller.terminar();
     else location.href = "../slides 2/page3.html";
   }
   function retroceder(){ ir(actual - 1); }

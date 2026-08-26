@@ -386,6 +386,31 @@ class IndiceDeSecciones {
     if (this.entrarMarcoTexto) this.entrarMarcoTexto.textContent = 'Ingresar a ' + s.nombre;
   }
 
+  /* Vuelta de una lámina terminada: el carrusel no se queda en la card que
+     se acaba de ver, se pone en la siguiente. Se hace en seco y no con el
+     vuelo: esto ocurre con el telón puesto, así que el vuelo no se vería y
+     sí se pisaría con la animación de entrada. Lo que se ve al levantarse el
+     telón es el índice ya adelantado, con el rebote de siempre. */
+  avanzarTras(deckId) {
+    const i = this.secciones.findIndex((s) => s.deck === deckId);
+    if (i === -1) return;          // el hero no es una card: de ahí no se avanza
+    this.saltarA(this.wrap(i + 1));
+  }
+
+  saltarA(idx) {
+    this.clearMorphTimers();
+    this.clearMorphAnims();
+    this.isAnimating = false;
+    this.aterrizar = null;
+
+    this.currentHeroIndex = idx;
+    const s = this.secciones[idx];
+    if (this.heroImage) this.heroImage.src = s.heroImg;
+    this.applySeccion(s);
+    this.renderStrip(idx);
+    this.playHeroSettle();
+  }
+
   ingresar() {
     const s = this.secciones[this.currentHeroIndex];
     if (window.Taller && window.Taller.dentroDelDeck) window.Taller.ir(s.deck);

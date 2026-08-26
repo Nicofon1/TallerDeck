@@ -102,6 +102,10 @@
     Taller.alEntrar(function(){
       raiz.classList.remove("saliendo");
       raiz.classList.add("entrando");
+      /* Cada llegada es una vuelta nueva: si no, volver a entrar heredaría
+         los pasos de la visita anterior y la lámina se daría por terminada
+         al primer flechazo. */
+      if (window.orbitaCinetica) window.orbitaCinetica.pasosDados = 0;
       Taller.trasPintar(function(){ raiz.classList.remove("con-telon"); });
       setTimeout(function(){ raiz.classList.remove("entrando"); }, 1300);
     });

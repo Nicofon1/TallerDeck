@@ -38,4 +38,20 @@
     raiz.classList.add("saliendo", "con-telon");
     return new Promise(function(listo){ setTimeout(listo, 460); });
   });
+
+  /* Hay láminas de una sola pantalla —el contexto, la línea de tiempo—: no
+     tienen pasos que recorrer, así que en ellas avanzar ya es terminar. Se
+     declaran con `data-sinpasos` en el body y no se detectan desde aquí,
+     porque desde aquí no hay forma de saber si la lámina escucha las flechas
+     por su cuenta, y dos oyentes de la misma tecla darían dos saltos. */
+  if (document.body.hasAttribute("data-sinpasos")) {
+    addEventListener("keydown", function(e){
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      var k = e.key;
+      if (k === "ArrowRight" || k === "ArrowDown" || k === " " || k === "PageDown"){
+        e.preventDefault();
+        Taller.terminar();
+      }
+    });
+  }
 })();

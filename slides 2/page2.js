@@ -28,6 +28,13 @@ class KineticTypographyOrbit {
     this.lastPointerTime = 0;
     this.pointerVelocity = 0;
 
+    /* La órbita gira sin fin, así que «terminar» no le llega solo: hay que
+       contarle las vueltas. Con tres palabras, el tercer paso adelante te
+       devuelve a la primera —has visto las tres— y ahí la lámina se da por
+       contada y el índice se adelanta a la card siguiente. Los pasos hacia
+       atrás descuentan: quien retrocede no ha terminado nada. */
+    this.pasosDados = 0;
+
     // Autoplay Loop
     this.isPlaying = true;
     this.holdDuration = 2800; // ms en cada palabra antes de avanzar
@@ -149,8 +156,13 @@ class KineticTypographyOrbit {
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
         this.pauseAndStep(1);
+        if (++this.pasosDados >= this.numWords) {
+          this.pasosDados = 0;
+          if (window.Taller) window.Taller.terminar();
+        }
       } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
         this.pauseAndStep(-1);
+        this.pasosDados = Math.max(0, this.pasosDados - 1);
       }
     });
   }
@@ -258,5 +270,5 @@ class KineticTypographyOrbit {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  new KineticTypographyOrbit();
+  window.orbitaCinetica = new KineticTypographyOrbit();
 });

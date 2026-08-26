@@ -221,9 +221,14 @@
 
     if (!window.Taller) return;
 
-    Taller.alEntrar(function(){
+    Taller.alEntrar(function(desde, extra){
       raiz.classList.remove("saliendo");
       raiz.classList.add("entrando");
+      /* Si la lámina de la que venimos se dio por terminada, el carrusel se
+         adelanta a la card siguiente antes de que el telón se levante. */
+      if (extra && extra.terminada && window.indiceTaller){
+        window.indiceTaller.avanzarTras(desde);
+      }
       // un cuadro de margen para que la animación arranque con el telón puesto
       Taller.trasPintar(function(){ raiz.classList.remove("con-telon"); });
       setTimeout(function(){ raiz.classList.remove("entrando"); }, 1300);

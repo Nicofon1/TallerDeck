@@ -52,6 +52,23 @@
     /* Volver a quien la contiene. */
     volver: function(){ avisar({ taller:"volver" }); },
 
+    /* Terminar no es volver. Volver es salirse a medias —el botón de la
+       esquina, el gesto hacia abajo— y el índice tiene que dejarte donde
+       estabas, porque vas a querer entrar otra vez. Terminar es haber
+       llegado al final de la lámina, y entonces el índice se adelanta a la
+       card siguiente: el guion continúa sin que nadie tenga que buscar en
+       el carrusel por dónde iba.
+       Suelta, sin deck alrededor, se resuelve con el enlace de volver, que
+       es a donde la lámina iría igualmente. */
+    terminar: function(){
+      if (dentroDelDeck){
+        avisar({ taller:"ir", destino:"indice", extra:{ terminada:true } });
+        return;
+      }
+      var salida = document.querySelector("a.volver, a[data-seccion='indice']");
+      if (salida) salida.click();
+    },
+
     /* Ejecuta `fn` una vez el navegador ya pintó el estado inicial, que
        es lo que hace falta para que una transición CSS arranque desde
        algún sitio en lugar de saltar. Dos cuadros bastan... salvo en una
