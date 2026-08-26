@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fondo Blur Osler Hub</title>
+<style>
+  :root {
+    --papel: #F9FAFB;
+    --brillo-aqua: rgba(130, 202, 202, 0.42);
+    --brillo-azul: rgba(66, 109, 194, 0.32);
+    --halo-central: rgba(66, 109, 194, 0.28);
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--papel);
+  }
+
+  .fondo-blur {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(64% 52% at 50% 46%, var(--halo-central) 0%, transparent 68%),
+      radial-gradient(58% 48% at 20% 22%, var(--brillo-aqua) 0%, transparent 66%),
+      radial-gradient(62% 54% at 82% 78%, var(--brillo-azul) 0%, transparent 64%),
+      var(--papel);
+  }
+</style>
+</head>
+<body>
+  <div class="fondo-blur"></div>
+</body>
+</html>

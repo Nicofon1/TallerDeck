@@ -81,6 +81,12 @@ class KineticTypographyOrbit {
       });
     });
 
+    /* La órbita se gira con el dedo, pero solo encima de ella: deslizar en
+       el resto de la lámina sigue siendo pasar de lámina. */
+    if (window.Gestos && this.stageContainer) {
+      window.Gestos.mio((e) => this.stageContainer.contains(e.target));
+    }
+
     // Arrastre con puntero (ratón o táctil)
     if (this.stageContainer) {
       this.stageContainer.addEventListener('pointerdown', (e) => {

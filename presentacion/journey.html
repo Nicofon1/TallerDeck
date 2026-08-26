@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="../taller.css">
 <link rel="stylesheet" href="lamina.css">
 <script src="../enlace.js"></script>
+<script src="../gestos.js"></script>
 <script>try{if(window.parent!==window&&!/[?&]previa=1/.test(location.search))document.documentElement.className+=" con-telon";}catch(e){}</script>
 
 <style>
@@ -105,15 +106,39 @@
   /* La primera es la única con fondo de verdad —un jardín— y de cuerpo
      entero. Se recorta a busto para que su cabeza mida lo que las otras, y
      en vez de enmarcarla se le pasa un velo elíptico: el jardín se disuelve
-     en el color del disco y deja de leerse como una foto pegada encima. */
-  .capa.busto{width:var(--w); overflow:visible}
+     en el color del disco y deja de leerse como una foto pegada encima.
+
+     El velo solo, sin embargo, no cerraba por arriba: la elipse desborda el
+     lienzo por la coronilla, así que el canto superior de la foto llegaba
+     al disco con un tercio de tinta todavía puesta y se leía como una raya
+     recta sobre el jardín. Va cruzado con un desvanecido de arriba que sí
+     toca cero justo donde acaba el lienzo, y la elipse sube un poco para
+     devolverle a la cabeza la opacidad que el cruce le quita.
+
+     Ese desvanecido no es una rampa recta. Una recta sale de cero con
+     pendiente entera, y ese quiebre se ve: no como un canto, pero sí como
+     el renglón donde empieza a aparecer el jardín. Los tramos de abajo
+     dibujan una ese —arranca plana, gana en el medio y se asienta— para que
+     no haya ningún punto en el que la foto «empiece». */
+  .capa.busto{
+    width:var(--w); overflow:visible;
+    --velo-arriba:
+      transparent 0,
+      rgba(0,0,0,.03)  1.2%, rgba(0,0,0,.11)  2.4%, rgba(0,0,0,.26) 3.6%,
+      rgba(0,0,0,.45)  4.8%, rgba(0,0,0,.64)  6.0%, rgba(0,0,0,.80) 7.2%,
+      rgba(0,0,0,.91)  8.4%, rgba(0,0,0,.97)  9.6%, #000 11%;
+  }
   .capa.busto img{
     position:absolute;
     height:var(--zoom); left:var(--ix); top:var(--iy);
-    -webkit-mask-image:radial-gradient(ellipse 50% 48% at 50% 40%, #000 46%, transparent 100%);
-            mask-image:radial-gradient(ellipse 50% 48% at 50% 40%, #000 46%, transparent 100%);
-    -webkit-mask-composite:source-over;
-            mask-composite:add;
+    -webkit-mask-image:
+      radial-gradient(ellipse 50% 50% at 50% 36%, #000 46%, transparent 100%),
+      linear-gradient(to bottom, var(--velo-arriba));
+    mask-image:
+      radial-gradient(ellipse 50% 50% at 50% 36%, #000 46%, transparent 100%),
+      linear-gradient(to bottom, var(--velo-arriba));
+    -webkit-mask-composite:source-in;
+            mask-composite:intersect;
   }
 
   /* ── la rueda de palabras ─────────────────────────────────
@@ -234,19 +259,25 @@
      llega al borde del lienzo, y `lx`/`rx` lo añaden a los costados cuando el
      brazo o la mesa se salían de la foto.
 
-     No todas van a la misma cabeza, y es a propósito. La 02, la 03 y la 04
-     son planos cerrados —cabeza, brazos y poco más— y a igual cabeza se
+     No todas van a la misma cabeza, y es a propósito. La 03 y la 04 son
+     planos cerrados —cabeza, brazos y poco más— y a igual cabeza se
      quedaban pequeñas dentro del disco, así que van a 140 px. La 05 y la 06
      enseñan cuerpo y con 117 ya lo llenan. Y la 01 se queda en 96: es el
      plano de presentación, Camilo de cuerpo entero y más lejos, con su
-     propio recorte a busto. Lo que sí comparten las seis es la línea de la
-     coronilla, que es lo que impide que la figura salte al pasar de etapa. */
+     propio recorte a busto. Todas ellas comparten la línea de la coronilla,
+     que es lo que impide que la figura salte al pasar de etapa.
+
+     La 02 es la excepción, y va aparte: es un plano tumbado —Camilo apoyado
+     sobre el portátil— que no tiene vertical de la que colgar, así que
+     alinearlo por la coronilla lo dejaba arrinconado arriba a la izquierda
+     con medio disco vacío debajo. Ese se centra en el trozo de disco que se
+     ve, no en el disco entero, y crece hasta donde el arco lo deja. */
   var ETAPAS = [
     { archivo:"El es camilo",      palabra:"“Él es Camilo”",
       x:"44.1%", y:"28.0%", h:"42.3%",
       busto:true, w:"44%", zoom:"172.9%", ix:"-12.3%", iy:"-7.8%" },
     { archivo:"Entrevista",        palabra:"Entrevista",
-      x:"39.3%", y:"21.1%", h:"50.5%", lx:"10%", rx:"8%" },
+      x:"48.3%", y:"17.0%", h:"61.3%", lx:"13%", rx:"8%" },
     { archivo:"Procedimientos",    palabra:"Procedimientos",
       x:"46.0%", y:"26.5%", h:"52.5%", lx:"8%", rx:"8%" },
     { archivo:"Diagnóstico",       palabra:"Diagnóstico",

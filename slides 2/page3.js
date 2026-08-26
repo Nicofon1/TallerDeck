@@ -80,6 +80,7 @@ class IndiceDeSecciones {
     this.total = this.secciones.length;
     this.currentHeroIndex = 0;
     this.isAnimating = false;
+    this.aterrizar = null;      // el aterrizaje del vuelo en curso, si lo hay
 
     this.thumbnailsTrack = document.getElementById('thumbnailsTrack');
     this.heroBannerCard = document.getElementById('heroBannerCard');
@@ -152,10 +153,7 @@ class IndiceDeSecciones {
       <div class="thumb-accent-bar"></div>
     `;
 
-    item.addEventListener('click', () => {
-      if (this.isAnimating) return;
-      this.goToIndex(secIdx);
-    });
+    item.addEventListener('click', () => this.goToIndex(secIdx));
 
     return item;
   }
@@ -234,7 +232,15 @@ class IndiceDeSecciones {
   }
 
   goToIndex(targetIdx) {
-    if (this.isAnimating || targetIdx === this.currentHeroIndex) return;
+    if (targetIdx === this.currentHeroIndex) return;
+
+    /* Antes, mientras la portada volaba, cualquier flecha se tiraba a la
+       basura: el recorrido iba al paso de la animación y no al de quien la
+       mira. Ahora la pulsación hace aterrizar el vuelo en curso en el acto
+       —con su portada y su tira ya en su sitio, que es de donde tiene que
+       salir el siguiente— y arranca el nuevo desde ahí. El índice se recorre
+       tan rápido como se pulse. */
+    if (this.isAnimating && this.aterrizar) this.aterrizar();
 
     const oldHeroIdx = this.currentHeroIndex;
     const isSingleStepForward = targetIdx === this.wrap(oldHeroIdx + 1);
@@ -258,6 +264,13 @@ class IndiceDeSecciones {
       : null;
 
     const firstRect = sourceBox ? sourceBox.getBoundingClientRect() : null;
+    /* Las dos clases del morfeo animan `transform`, así que medir con
+       cualquiera puesta devuelve una escala a medias. Se quitan y se fuerza
+       el cálculo antes de medir: la caja de destino es la de la portada
+       quieta, siempre. Con el candado puesto no se notaba —nunca había un
+       morfeo tan pegado al anterior—, sin él sí. */
+    this.heroBannerCard.classList.remove('morph-settle', 'morph-shrink-out');
+    void this.heroBannerCard.offsetWidth;
     const lastRect = this.heroBannerCard.getBoundingClientRect();
 
     if (isSingleStepForward) {
@@ -273,7 +286,6 @@ class IndiceDeSecciones {
       return;
     }
 
-    this.heroBannerCard.classList.remove('morph-settle');
     this.heroBannerCard.classList.add('morph-shrink-out');
 
     const ghost = this.flipGhostCard;
@@ -310,6 +322,7 @@ class IndiceDeSecciones {
     const land = () => {
       if (landed) return;
       landed = true;
+      this.aterrizar = null;
 
       if (this.heroImage) this.heroImage.src = s.heroImg;
       this.heroBannerCard.classList.remove('morph-shrink-out');
@@ -323,6 +336,7 @@ class IndiceDeSecciones {
     };
 
     flight.onfinish = land;
+    this.aterrizar = land;    // para poder hacerlo aterrizar desde fuera
     this.morphTimers.push(setTimeout(land, MORPH_MS + 400));
   }
 
@@ -334,6 +348,7 @@ class IndiceDeSecciones {
 
   finishMorph() {
     this.isAnimating = false;
+    this.aterrizar = null;
   }
 
   clearMorphTimers() {

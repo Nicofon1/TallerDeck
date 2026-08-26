@@ -15,6 +15,7 @@
   <!-- La paleta y las letras del taller, despues de la hoja propia -->
   <link rel="stylesheet" href="../taller.css">
   <script src="../enlace.js"></script>
+<script src="../gestos.js"></script>
   <script>try{if(window.parent!==window&&!/[?&]previa=1/.test(location.search))document.documentElement.className+=" con-telon";}catch(e){}</script>
 
   <style>
@@ -120,13 +121,13 @@
       padding:0 70px;color:var(--tinta);
       font-family:var(--texto);
     }
-    .hoja-fila{display:flex;align-items:baseline;justify-content:space-between;
-      font-size:.78rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase}
-    .hoja-id{color:var(--apagado);font-weight:600}
-    .hoja-regla{height:2px;background:var(--indigo);opacity:.85}
+    /* La regla no encabeza la hoja: la parte. Arriba lo que se dice —el
+       nombre del frente y su línea—, abajo lo que se enseña. Sin membrete:
+       en qué sección estamos ya lo dice el estante del que venimos. */
+    .hoja-regla{height:2px;background:var(--indigo);opacity:.85;margin:26px 0 0}
     .hoja-titulo{
       font-family:var(--titulo);
-      font-size:2.9rem;line-height:1.04;font-weight:500;margin:4px 0 0;
+      font-size:2.9rem;line-height:1.04;font-weight:500;margin:0;
     }
     /* Solo el nombre del frente y la línea que lo resume. Nada más: lo que
        se cuenta lo pone quien habla, la lámina es apoyo. */
@@ -135,6 +136,31 @@
       font-size:1.02rem;line-height:1.55;letter-spacing:.005em;
       color:var(--apagado);
     }
+
+    /* -- Las dos láminas de cada frente ----------------------------
+       Van debajo del texto y no al lado: el nombre del frente es lo que se
+       lee primero y las imágenes son la prueba, no el titular. Dos placas
+       del mismo alto, con su filete y su sombra corta, como las láminas
+       grapadas dentro de un expediente. Los cinco pares están montados a la
+       vez y solo cambia cuál se enseña: así no hay una carga a mitad de la
+       apertura, que es cuando más se notaría. */
+    .hoja-laminas{margin:0}
+    .hoja-laminas .par{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    /* `hidden` no puede con `display:grid`, hay que decírselo aparte */
+    .hoja-laminas .par[hidden]{display:none}
+    .hoja-laminas figure{
+      margin:0;height:250px;overflow:hidden;border-radius:3px;
+      background:var(--papel);
+      box-shadow:0 0 0 1px var(--linea),0 10px 26px hsla(250,45%,12%,.13);
+    }
+    .hoja-laminas img{
+      display:block;width:100%;height:100%;
+      object-fit:cover;object-position:var(--pos,50% 50%);
+    }
+    /* Los diagramas densos no se recortan: quitarles una fila los deja
+       ilegibles y con cara de error. Esos caben enteros sobre el papel. */
+    .hoja-laminas figure.entera{padding:10px}
+    .hoja-laminas figure.entera img{object-fit:contain}
 
     /* Salida lateral, hacia cualquier otra sección */
     html.saliendo #telon{opacity:1;transition-duration:.46s}
@@ -257,13 +283,11 @@
     <div class="exp-caja" id="expCaja">
       <div class="exp-hoja" id="expHoja">
         <div class="hoja-texto">
-          <div class="hoja-fila">
-            <span class="hoja-dep" id="hojaDep">&mdash;</span>
-            <span class="hoja-id" id="hojaId">&mdash;</span>
-          </div>
-          <div class="hoja-regla"></div>
           <h2 class="hoja-titulo" id="hojaTitulo">&mdash;</h2>
           <p class="hoja-cuerpo" id="hojaCuerpo">&mdash;</p>
+          <div class="hoja-regla"></div>
+          <!-- Los cinco pares de imágenes se montan aquí una sola vez -->
+          <div class="hoja-laminas" id="hojaLaminas"></div>
         </div>
       </div>
       <div class="exp-tapa" id="expTapa">

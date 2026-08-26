@@ -19,6 +19,15 @@ const FRENTES = [
        viudas feas en una caja tan estrecha. */
     portada: 'Voz<br>estudiantil',
     resumen: 'Encuestas amplias y entrevistas a profundidad.',
+    /* Dos imágenes del trabajo de campo. `pos` mueve el encuadre cuando el
+       recorte se comería lo que importa; `entera` es para los diagramas, que
+       no se recortan. */
+    laminas: [
+      { src: 'assets/frentes/voz-a.jpg',
+        alt: 'Estudiantes de medicina reunidos en una mesa del campus' },
+      { src: 'assets/frentes/voz-b.jpg',
+        alt: 'Dos estudiantes frente a la pantalla del simulador' }
+    ],
     spineBg: '#251D4E', textColor: '#C8DEFE', tabColor: '#82CACA',
     spineWidth: 44, coverWidth: 268, height: 318, tilt: -0.9
   },
@@ -27,6 +36,12 @@ const FRENTES = [
     titulo: 'Observación directa',
     portada: 'Observación<br>directa',
     resumen: 'Análisis y dinámicas en la clínica, vistas en observaciones de campo.',
+    laminas: [
+      { src: 'assets/frentes/observacion-a.jpg', pos: '50% 42%',
+        alt: 'La consola del docente tras el vidrio, durante una sesión' },
+      { src: 'assets/frentes/observacion-b.jpg', pos: '50% 46%',
+        alt: 'Sala de simulación con el simulador en la camilla' }
+    ],
     spineBg: '#426DC2', textColor: '#F9FAFB', tabColor: '#C8DEFE',
     spineWidth: 40, coverWidth: 262, height: 300, tilt: 0.6
   },
@@ -35,6 +50,12 @@ const FRENTES = [
     titulo: 'Referentes del mundo',
     portada: 'Referentes<br>del mundo',
     resumen: 'Los simuladores y tecnologías que hoy se usan alrededor del mundo.',
+    laminas: [
+      { src: 'assets/frentes/referentes-a.jpg',
+        alt: 'Un simulador clínico comercial, en escritorio, tableta y móvil' },
+      { src: 'assets/frentes/referentes-b.jpg', pos: '50% 44%',
+        alt: 'Pantalla de un simulador comercial con el panel de monitorización' }
+    ],
     spineBg: '#1A1A1A', textColor: '#82CACA', tabColor: '#82CACA',
     spineWidth: 50, coverWidth: 278, height: 332, tilt: 0
   },
@@ -43,6 +64,12 @@ const FRENTES = [
     titulo: 'Literatura científica',
     portada: 'Literatura<br>científica',
     resumen: 'Estudio de las academias nacionales y pares de medicina.',
+    laminas: [
+      { src: 'assets/frentes/literatura-a.png', entera: true,
+        alt: 'Diagrama del proceso diagnóstico, National Academies, 2015' },
+      { src: 'assets/frentes/literatura-b.png', entera: true,
+        alt: 'Diagrama del razonamiento clínico entre terapeuta y paciente' }
+    ],
     spineBg: '#82CACA', textColor: '#251D4E', tabColor: '#426DC2',
     spineWidth: 38, coverWidth: 258, height: 306, tilt: -1.1
   },
@@ -51,6 +78,12 @@ const FRENTES = [
     titulo: 'Marco normativo',
     portada: 'Marco<br>normativo',
     resumen: 'Estándares colombianos y globales de norma y clínica.',
+    laminas: [
+      { src: 'assets/frentes/normativo-a.png', pos: '50% 30%',
+        alt: 'Resolución 5596 de 2015 del Ministerio de Salud' },
+      { src: 'assets/frentes/normativo-b.png', pos: '50% 34%',
+        alt: 'Resolución 839 de 2017 del Ministerio de Salud' }
+    ],
     spineBg: '#C8DEFE', textColor: '#251D4E', tabColor: '#251D4E',
     spineWidth: 46, coverWidth: 270, height: 322, tilt: 0.8
   }
@@ -135,8 +168,39 @@ class EstanteInvestigacion {
 
   init() {
     this.renderShelf();
+    this.montarLaminas();
     this.bindEvents();
     this.startRenderLoop();
+  }
+
+  /* Los cinco pares de imágenes, montados de una vez al arrancar. Abrir un
+     frente solo cambia cuál de los cinco se enseña: si se crearan al vuelo,
+     la primera vez de cada uno el navegador tendría que ir a buscar la
+     imagen justo en mitad de la apertura, que es cuando peor sienta. */
+  montarLaminas() {
+    const caja = document.getElementById('hojaLaminas');
+    if (!caja) return;
+    this.laminas = this.books.map((frente) => {
+      const par = document.createElement('div');
+      par.className = 'par';
+      par.hidden = true;
+      (frente.laminas || []).forEach((lam) => {
+        const marco = document.createElement('figure');
+        if (lam.entera) marco.classList.add('entera');
+        const img = document.createElement('img');
+        img.src = lam.src;
+        img.alt = lam.alt || '';
+        /* Descodificar a mano y no esperar a que se enseñe: un `img` oculto
+           no se descodifica hasta que hace falta, y hacer falta le llega en
+           mitad de la apertura, con el primer cuadro en blanco. */
+        if (img.decode) img.decode().catch(function(){});
+        if (lam.pos) img.style.setProperty('--pos', lam.pos);
+        marco.appendChild(img);
+        par.appendChild(marco);
+      });
+      caja.appendChild(par);
+      return par;
+    });
   }
 
   /* ---------- el estante ---------- */
@@ -243,6 +307,17 @@ class EstanteInvestigacion {
       const delta = rawDelta * 0.0018;
       this.targetProgress = Math.max(0, Math.min(this.numBooks - 1, this.targetProgress + delta));
     }, { passive: false });
+
+    /* El estante se recorre arrastrando, así que sobre él el dedo es suyo:
+       deslizar mueve las carpetas, no pasa de frente. En cuanto una se abre
+       deja de arrastrar y el gesto vuelve a valer lo que vale en el resto de
+       la lámina —la flecha—, que es justo lo que se quiere con una carpeta
+       delante: seguir al frente siguiente. */
+    if (window.Gestos) {
+      window.Gestos.mio((e) =>
+        this.abierto === -1 && !this.ocupado && !this.enCierre &&
+        this.shelfViewport.contains(e.target));
+    }
 
     this.shelfViewport.addEventListener('pointerdown', (e) => {
       if (this.ocupado || this.enCierre || this.abierto !== -1) return;
@@ -484,10 +559,12 @@ class EstanteInvestigacion {
 
     /* Y la hoja de dentro es lo que se cuenta de ese frente. Nada mas: la
        lamina es apoyo, el resto lo pone quien habla. */
-    document.getElementById('hojaDep').textContent = 'La investigación';
-    document.getElementById('hojaId').textContent = 'Frente ' + frente.num + ' / 05';
     document.getElementById('hojaTitulo').textContent = frente.titulo;
     document.getElementById('hojaCuerpo').textContent = frente.resumen;
+    if (this.laminas) {
+      const cual = this.books.indexOf(frente);
+      this.laminas.forEach((par, i) => { par.hidden = (i !== cual); });
+    }
     this.expHoja.querySelector('.hoja-regla').style.background = frente.tabColor;
   }
 

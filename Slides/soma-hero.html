@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..900;1,300..900&family=League+Spartan:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../taller.css">
 <script src="../enlace.js"></script>
+<script src="../gestos.js"></script>
 <style>
   :root{
     --noche:var(--papel);
@@ -1254,6 +1255,11 @@ function seguirPuntero(e){
   puntero.x = x; puntero.y = y;
   puntero.dentro = true;
 }
+/* Aquí el lienzo es la lámina entera y se gira con el dedo, así que el
+   deslizamiento no puede significar además «entrar»: para eso está el botón,
+   que en una tableta es el gesto correcto de todos modos. */
+if (window.Gestos) window.Gestos.mio(() => true);
+
 cvs.addEventListener("pointerdown", e => {
   drag = { x:e.clientX, y:e.clientY };
   seguirPuntero(e);
