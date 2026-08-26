@@ -28,12 +28,12 @@ const seccionesData = [
   {
     id: 2,
     deck: 'investigacion',
-    src: '../presentacion/investigacion.html',
-    nombre: 'Entendiendo el problema desde varios frentes',
+    src: 'index.html',
+    nombre: 'Entendimos el problema desde cinco frentes',
     area: 'Investigación',
-    texto: 'Escuchamos a los estudiantes, observación directa, referentes del mundo, literatura científica y marco normativo.',
-    heroImg: 'assets/previews/investigacion.png',
-    thumbImg: 'assets/previews/investigacion.png'
+    texto: 'Voz estudiantil, observación directa, referentes del mundo, literatura científica y marco normativo. Cada frente es una carpeta que se abre.',
+    heroImg: 'assets/previews/biblioteca.png',
+    thumbImg: 'assets/previews/biblioteca.png'
   },
   {
     id: 3,
@@ -41,7 +41,7 @@ const seccionesData = [
     src: '../presentacion/journey.html',
     nombre: 'Cómo lo resolvemos',
     area: 'Journey',
-    texto: 'Recordemos que Camilo nunca intervino al paciente en Osler Hub, solo se enfocó en practicar su razonamiento diagnóstico.',
+    texto: 'El recorrido de Camilo, etapa por etapa: entrevista, procedimientos, diagnóstico, plan de manejo y retroalimentación.',
     heroImg: 'assets/previews/journey.png',
     thumbImg: 'assets/previews/journey.png'
   },
@@ -57,16 +57,6 @@ const seccionesData = [
   },
   {
     id: 5,
-    deck: 'burbujas',
-    src: '../Slides/corazon-burbujas.html',
-    nombre: 'Anatomía de burbujas',
-    area: 'Modelo interactivo',
-    texto: 'El corazón otra vez, pero en tus manos: densidad, tamaño, opacidad y paleta. Las esferas se apartan del puntero, empujan a las vecinas y vuelven a su sitio.',
-    heroImg: 'assets/previews/burbujas.png',
-    thumbImg: 'assets/previews/burbujas.png'
-  },
-  {
-    id: 6,
     deck: 'cinetica',
     src: 'page2.html',
     nombre: 'Tipografía cinética',
@@ -74,26 +64,6 @@ const seccionesData = [
     texto: 'Palabras en órbita sobre un eje tridimensional. Se arrastra para girarlas o se salta directo a cualquiera de ellas.',
     heroImg: 'assets/previews/cinetica.png',
     thumbImg: 'assets/previews/cinetica.png'
-  },
-  {
-    id: 7,
-    deck: 'biblioteca',
-    src: 'index.html',
-    nombre: 'Archivo de casos',
-    area: 'Estantería',
-    texto: 'La estantería de expedientes. Cada carpeta se centra al primer clic y abre su historia clínica al segundo.',
-    heroImg: 'assets/previews/biblioteca.png',
-    thumbImg: 'assets/previews/biblioteca.png'
-  },
-  {
-    id: 8,
-    deck: 'caso',
-    src: '../slide 3/index.html',
-    nombre: 'Historia clínica',
-    area: 'Caso PEDS-302',
-    texto: 'La ficha completa de urgencias: radiografía de tórax, electrocardiograma de doce derivaciones, constantes en vivo y el protocolo PALS aplicado.',
-    heroImg: 'assets/previews/caso.png',
-    thumbImg: 'assets/previews/caso.png'
   }
 ];
 

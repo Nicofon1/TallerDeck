@@ -5,7 +5,7 @@
 
 class KineticTypographyOrbit {
   constructor() {
-    this.words = ['Global', 'Fast', 'Local'];
+    this.words = ['Integridad académica', 'Eficiencia', 'Confianza'];
     this.numWords = this.words.length; // 3 palabras (120° de separación)
 
     // Elementos del DOM
@@ -14,9 +14,6 @@ class KineticTypographyOrbit {
     this.wordElements = Array.from(document.querySelectorAll('.orbit-word'));
 
     // Ángulos y cinemática (en radianes)
-    // angle = 0      -> palabra 0 (Global) al frente
-    // angle = -2PI/3 -> palabra 1 (Fast) al frente
-    // angle = -4PI/3 -> palabra 2 (Local) al frente
     this.currentIndex = 0;
     this.currentAngle = 0;
     this.targetAngle = 0;
@@ -39,7 +36,8 @@ class KineticTypographyOrbit {
     // Radios responsivos y planos orbitales
     this.radiusX = 360;
     this.radiusZ = 280;
-    this.tiltY = 160; // Elevación de las palabras traseras vs la delantera
+    this.bajo = 82; // Baja lo suficiente para quedar justo debajo de "Es"
+    this.alto = 150; // Cuánto suben las del fondo
 
     this.init();
   }
@@ -57,17 +55,20 @@ class KineticTypographyOrbit {
     const w = window.innerWidth;
     const h = window.innerHeight;
     if (w < 600) {
-      this.radiusX = 180;
-      this.radiusZ = 160;
-      this.tiltY = 120;
+      this.radiusX = 160;
+      this.radiusZ = 130;
+      this.bajo = 65;
+      this.alto = 110;
     } else if (w < 1000) {
-      this.radiusX = 290;
-      this.radiusZ = 220;
-      this.tiltY = 150;
+      this.radiusX = 260;
+      this.radiusZ = 180;
+      this.bajo = 75;
+      this.alto = 135;
     } else {
-      this.radiusX = Math.min(460, w * 0.33);
-      this.radiusZ = Math.min(320, h * 0.38);
-      this.tiltY = Math.min(200, h * 0.26);
+      this.radiusX = Math.min(440, w * 0.32);
+      this.radiusZ = Math.min(280, h * 0.32);
+      this.bajo = 82;
+      this.alto = 150;
     }
   }
 
@@ -216,10 +217,11 @@ class KineticTypographyOrbit {
       const x = sinT * this.radiusX;
       const z = cosT * this.radiusZ;
 
-      // Inclinación vertical (Y):
-      // Al frente (cosT = 1): y = +tiltY (abajo, en primer plano)
-      // Al fondo (cosT < 0):  y = -tiltY * 0.85 (arriba, detrás de Osler Hub)
-      const y = -cosT * this.tiltY + (this.tiltY * 0.2);
+      // Altura (Y). En reposo las tres solo visitan cosT = 1 (la delantera) y
+      // cosT = -0.5 (las dos del fondo), así que basta con estirar ese tramo
+      // entre las dos alturas: t = 1 abajo, t = 0 arriba.
+      const t = (cosT + 0.5) / 1.5;
+      const y = -this.alto + t * (this.bajo + this.alto);
 
       // Normalizado de profundidad (0 = fondo, 1 = frente)
       const normalizedDepth = (cosT + 1) / 2;
@@ -227,14 +229,19 @@ class KineticTypographyOrbit {
       // Escala: ~0.40 en el fondo hasta 1.0 al frente
       const scale = 0.38 + 0.62 * Math.pow(normalizedDepth, 1.4);
 
-      // Opacidad: 0.70 en el fondo hasta 1.0 al frente
-      const opacity = 0.68 + 0.32 * Math.pow(normalizedDepth, 1.2);
+      // Opacidad: se apaga con la distancia
+      const opacity = 0.58 + 0.42 * Math.pow(normalizedDepth, 1.2);
 
       // Z-Index: detrás del título Osler Hub (z: 20) si está atrás, al frente si está adelante (z: 35)
       const zIndex = cosT < -0.1 ? 10 : 35;
 
-      // Desenfoque por movimiento dinámico
-      const itemBlur = blurAmount * (0.2 + 0.8 * normalizedDepth);
+      // Desenfoque. Sin marco que las separe, la profundidad la tiene que
+      // decir el foco: la que manda está nítida y las del fondo, veladas.
+      // Encima va el barrido del movimiento, que solo pesa mientras gira.
+      // El filtro se aplica antes de la escala, así que lo que se ve en
+      // pantalla es blur*scale: hay que dividir para pedir píxeles reales.
+      const depthBlur = 5.4 * Math.pow(1 - normalizedDepth, 1.15) / scale;
+      const itemBlur = depthBlur + blurAmount * (0.2 + 0.8 * normalizedDepth);
 
       el.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, ${z.toFixed(1)}px) scale(${scale.toFixed(3)})`;
       el.style.opacity = opacity.toFixed(2);

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..900;1,300..900&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..900;1,300..900&family=League+Spartan:ital,wght@0,100..900;1,100..900&display=swap');
 
 /* ==========================================================================
    TALLER — la paleta y las dos letras, en un solo sitio
@@ -33,10 +33,9 @@
   --sobre-indigo: hsla(216, 96%, 89%, .72);    /* texto suave en oscuro     */
 
   /* ── Las dos letras ────────────────────────────────────────
-     Montserrat lo dice todo; Fraunces solo los títulos. Un texto
-     que dude entre las dos es que no es un título. */
+     Montserrat para texto general; League Spartan en Italic Bold (variante 14) para los títulos. */
   --texto:  'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --titulo: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --titulo: 'League Spartan', 'Montserrat', system-ui, sans-serif;
 
   /* ══════════════════════════════════════════════════════════
      El puente: lo que cada página llamaba lo suyo, reasignado.
@@ -44,8 +43,6 @@
 
   /* — Índice de secciones (page3.css) — */
   --font-main:        var(--texto);
-  /* "display" era el nombre que estas paginas le daban a su letra de titular:
-     ahi es donde entra Fraunces. */
   --font-display:     var(--titulo);
   --accent-yellow:    var(--azul);
   --accent-yellow-hover: var(--indigo);
@@ -68,8 +65,10 @@
   --font-sans:        var(--texto);
 }
 
-/* Fraunces es variable: sin esto sale con la anchura y el corte de un texto
-   corrido, que a 4rem se ve blando. Los títulos piden el ojo grande. */
-h1, h2, h3, .titular, .hoja-titulo, .releases-title, .folder-main-title{
-  font-variation-settings: 'opsz' 120, 'SOFT' 0, 'WONK' 0;
+/* Variante 14: League Spartan Italic Bold (700) para todos los títulos grandes de la web */
+h1, h2, h3, .titular, .hoja-titulo, .releases-title, .folder-main-title, .punch, .main-title, .osler-hero-title, .osler-hero-sub, .reviewer-name, .vertical-title, .quote-title, .hero-title, .word-text {
+  font-family: var(--titulo) !important;
+  font-weight: 700 !important;
+  font-style: italic !important;
 }
+

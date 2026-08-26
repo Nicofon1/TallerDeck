@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ARTSPACE — Chapter 4: Upcoming Releases</title>
-  <meta name="description" content="ARTSPACE Chapter 4 Upcoming Releases editorial bookshelf.">
+  <title>La investigación — Osler Hub</title>
+  <meta name="description" content="Los cinco frentes desde los que entendimos el problema.">
   
   <!-- Google Fonts for authentic editorial typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..900;1,300..900&family=League+Spartan:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="styles.css">
   <!-- La paleta y las letras del taller, despues de la hoja propia -->
@@ -35,21 +35,33 @@
     @keyframes asomarEstante{from{opacity:0;transform:translateY(46px) scale(.97)}to{opacity:1;transform:none}}
 
     /* Salida hacia el caso: el estante se retira y en su sitio queda el
-       expediente abriéndose. Sin telón: la carpeta abierta se funde
-       directamente con el caso, que ya viene por debajo. */
+       expediente abriéndose, y en su sitio queda la carpeta.
+
+       Los tiempos van atados a los del motor —340 ms para recoger— para que
+       el estante acabe de volver justo cuando la carpeta aterriza. Si vuelve
+       antes, parpadea; si vuelve después, la apertura siguiente lo pilla a
+       medio camino. */
     html.abriendo .editorial-header,
     html.abriendo .editorial-footer,
     html.abriendo .shelf-ground-line{
       opacity:0;transform:translateY(18px);
-      transition:opacity .34s ease,transform .44s ease;
+      transition:opacity .3s ease,transform .34s ease;
     }
-    html.abriendo .book-slot{
+    /* El estante se apaga entero, y se apaga AQUÍ y no libro a libro.
+       `.book-slot` es `transform-style:preserve-3d`, y una opacidad menor que
+       uno sobre un elemento preserve-3d aplana su subárbol: la portada pierde
+       de golpe el `translateZ` que la saca hacia el espectador y todos los
+       libros encogen un 3,45% en un solo cuadro, justo al empezar la apertura.
+       Ese era el tirón. `.carousel-stage` no es preserve-3d —solo sostiene la
+       perspectiva—, así que apagarla no aplana nada. */
+    html.abriendo .carousel-stage{
       opacity:0;
-      transition:opacity .38s ease;
+      transition:opacity .3s ease;
     }
     /* El que se abre desaparece en el acto: el expediente ya esta montado
-       justo encima y si se desvaneciera se verian los dos a la vez. */
-    html.abriendo .book-slot.se-abre{transition:none}
+       justo encima y si se desvaneciera se verian los dos a la vez. Con
+       visibility y no con opacity, por lo mismo de arriba. */
+    html.abriendo .book-slot.se-abre{visibility:hidden}
 
     /* -- El expediente que se abre --------------------------------
        Una carpeta a tamaño real montada encima del estante, justo sobre
@@ -60,6 +72,14 @@
       pointer-events:none;opacity:0;perspective:1900px;
     }
     .expediente.abierto{opacity:1}
+    /* Al cierre la carpeta abierta no vuelve al estante: se va por abajo con
+       la lámina entera, en el mismo gesto, y queda la frase. La transición va
+       en el estado de destino a propósito: entrar al cierre se anima, salir
+       de él se resuelve en seco. */
+    html.cierre .expediente.abierto{
+      opacity:0;transform:translateY(46px) scale(.972);
+      transition:opacity .46s ease,transform .62s cubic-bezier(.55,0,.85,.45);
+    }
 
     .exp-caja{
       position:absolute;left:0;top:0;
@@ -89,14 +109,15 @@
     }
     .tapa-texto .cover-folder{width:100%;height:100%;padding:34px 26px 26px}
 
-    /* El texto arriba y no centrado: asi la hoja se lee como la primera
-       pagina del expediente, que es justo lo que aparece despues. Centrado
-       parecia un cartel, y el corte contra el caso se notaba. */
+    /* Antes el texto iba arriba porque detras venia el caso clinico y el
+       corte se notaba. Ya no hay nada detras: la hoja ES el destino, y con
+       solo un nombre y una linea, arriba se leia como una pagina a medias.
+       Centrado se lee como lo que es. */
     .hoja-texto{
       position:absolute;left:50%;top:50%;
       width:900px;height:560px;transform-origin:center center;
-      display:flex;flex-direction:column;justify-content:flex-start;gap:14px;
-      padding:52px 70px 0;color:var(--tinta);
+      display:flex;flex-direction:column;justify-content:center;gap:14px;
+      padding:0 70px;color:var(--tinta);
       font-family:var(--texto);
     }
     .hoja-fila{display:flex;align-items:baseline;justify-content:space-between;
@@ -107,17 +128,12 @@
       font-family:var(--titulo);
       font-size:2.9rem;line-height:1.04;font-weight:500;margin:4px 0 0;
     }
-    .hoja-sub{font-size:.92rem;color:var(--apagado);letter-spacing:.02em}
-    .hoja-reglas{display:flex;flex-direction:column;gap:11px;margin-top:14px}
-    .hoja-reglas span{height:7px;background:var(--niebla);border-radius:2px}
-    .hoja-reglas span:nth-child(2){width:88%}
-    .hoja-reglas span:nth-child(3){width:94%}
-    .hoja-reglas span:nth-child(4){width:72%}
-    .hoja-reglas span:nth-child(5){width:90%}
-    .hoja-reglas span:nth-child(6){width:56%}
-    .hoja-pie{
-      margin-top:18px;font-size:.7rem;font-weight:700;
-      letter-spacing:.22em;text-transform:uppercase;color:var(--apagado);
+    /* Solo el nombre del frente y la línea que lo resume. Nada más: lo que
+       se cuenta lo pone quien habla, la lámina es apoyo. */
+    .hoja-cuerpo{
+      margin:16px 0 0;max-width:34ch;
+      font-size:1.02rem;line-height:1.55;letter-spacing:.005em;
+      color:var(--apagado);
     }
 
     /* Salida lateral, hacia cualquier otra sección */
@@ -129,6 +145,35 @@
 
     /* Cualquier expediente se ofrece a abrirse */
     .book-slot{cursor:pointer}
+
+    /* -- El cierre --------------------------------------------------
+       Recorridos los cinco frentes, el estante se va por abajo y la frase
+       se queda sola con la lámina entera. Es la conclusión, y en la
+       conclusión no hay nada más que mirar. */
+    html.cierre .editorial-stage{
+      opacity:0;transform:translateY(52px) scale(.955);
+      pointer-events:none;
+      transition:opacity .5s ease,transform .78s cubic-bezier(.55,0,.85,.45);
+    }
+    .cierre-frase{
+      position:fixed;inset:0;z-index:940;
+      display:grid;place-items:center;
+      padding:clamp(28px,6vw,96px);
+      pointer-events:none;opacity:0;
+      transition:opacity .55s ease .28s;
+    }
+    html.cierre .cierre-frase{opacity:1}
+    .cierre-frase p{
+      margin:0;max-width:24ch;text-align:center;
+      font-family:var(--titulo);
+      font-size:clamp(23px,3.05vw,45px);
+      line-height:1.16;letter-spacing:-.012em;
+      color:var(--tinta);
+      transform:translateY(20px);
+      transition:transform .85s cubic-bezier(.16,1,.3,1) .24s;
+    }
+    html.cierre .cierre-frase p{transform:none}
+    .cierre-frase em{color:var(--indigo)}
 
     @media (prefers-reduced-motion:reduce){
       html.entrando .editorial-header,html.entrando .editorial-footer,
@@ -146,27 +191,26 @@
     <!-- Top Header matching the authentic screenshot -->
     <header class="editorial-header">
       <div class="header-col col-left" style="display:flex;align-items:center;gap:8px;">
-        <span class="brand-tag">ARCHIVO</span>
+        <span class="brand-tag">OSLER HUB</span>
         <a href="page3.html" data-seccion="indice" aria-label="Volver al índice" style="width:32px;height:32px;border-radius:50%;background:hsla(220,51%,51%,.10);border:1px solid hsla(220,51%,51%,.24);display:inline-grid;place-items:center;color:#426DC2;text-decoration:none;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
         </a>
       </div>
       
       <div class="header-col col-center">
-        <span class="chapter-label">CHAPTER<sup>4</sup></span>
+        <span class="chapter-label">CINCO FRENTES</span>
         <h1 class="releases-title">
-          <span>UPCOMING</span>
-          <span>RELEASES</span>
+          <span>INVESTIGACIÓN</span>
         </h1>
       </div>
       
       <div class="header-col col-right">
         <div class="chapter-nav">
-          <span class="page-num" data-idx="0">1</span>
-          <span class="page-num" data-idx="2">2</span>
-          <span class="page-num" data-idx="4">3</span>
-          <span class="page-num active" data-idx="7">4</span>
-          <span class="page-num" data-idx="10">5</span>
+          <span class="page-num active" data-idx="0">1</span>
+          <span class="page-num" data-idx="1">2</span>
+          <span class="page-num" data-idx="2">3</span>
+          <span class="page-num" data-idx="3">4</span>
+          <span class="page-num" data-idx="4">5</span>
         </div>
       </div>
     </header>
@@ -202,7 +246,7 @@
       </div>
 
       <div class="interaction-hint">
-        <span>Arrastra o usa la rueda para recorrer el estante · haz clic en cualquier expediente para abrirlo</span>
+        <span>Arrastra o usa la rueda para recorrer el estante · las flechas abren los cinco frentes en orden</span>
       </div>
     </footer>
 
@@ -218,18 +262,23 @@
             <span class="hoja-id" id="hojaId">&mdash;</span>
           </div>
           <div class="hoja-regla"></div>
-          <h2 class="hoja-titulo">Historia clínica</h2>
-          <div class="hoja-sub" id="hojaSub">&mdash;</div>
-          <div class="hoja-reglas">
-            <span></span><span></span><span></span><span></span><span></span><span></span>
-          </div>
-          <div class="hoja-pie">Abriendo expediente</div>
+          <h2 class="hoja-titulo" id="hojaTitulo">&mdash;</h2>
+          <p class="hoja-cuerpo" id="hojaCuerpo">&mdash;</p>
         </div>
       </div>
       <div class="exp-tapa" id="expTapa">
         <div class="tapa-texto"></div>
       </div>
     </div>
+  </div>
+
+  <!-- Pasados los cinco frentes, el estante se retira y queda esto -->
+  <div class="cierre-frase" id="cierreFrase" aria-hidden="true">
+    <p>
+      El problema no es que a los estudiantes les falte conocimiento. Es que el
+      proceso por el cual llegan a una respuesta es <em>invisible y automático</em>,
+      y por lo tanto no se puede corregir.
+    </p>
   </div>
 
   <script src="script.js"></script>
@@ -250,22 +299,19 @@
     if (!window.Taller) return;
 
     Taller.alEntrar(function(){
-      raiz.classList.remove("saliendo", "abriendo");
-      // el estante vuelve a estar entero al regresar de un caso
+      raiz.classList.remove("saliendo", "abriendo", "cierre");
+      // el estante vuelve a estar entero al volver de otra sección
       if (window.estante) window.estante.cerrarExpediente();
       raiz.classList.add("entrando");
+      /* El recorrido va con las flechas, y dentro del deck el teclado escribe
+         donde está el foco: si no se lo lleva la lámina, no llega nada. */
+      try { window.focus(); } catch (err) {}
       Taller.trasPintar(function(){ raiz.classList.remove("con-telon"); });
       setTimeout(function(){ raiz.classList.remove("entrando"); }, 1300);
     });
 
-    Taller.alSalir(function(hacia){
+    Taller.alSalir(function(){
       raiz.classList.remove("entrando");
-      /* Hacia el caso no hay salida que coreografiar: la apertura ya viene
-         corriendo desde el clic. El deck solo espera a que termine. */
-      if (hacia === "caso" && window.estante && window.estante.aperturaLista) {
-        raiz.classList.add("abriendo");
-        return window.estante.aperturaLista;
-      }
       raiz.classList.add("saliendo", "con-telon");
       return new Promise(function(listo){ setTimeout(listo, 480); });
     });

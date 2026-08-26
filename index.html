@@ -12,7 +12,7 @@
 
    No hay barra, ni flechas, ni contador. La navegación vive
    DENTRO de las láminas: el corazón invita a entrar, el índice
-   lleva a las secciones, cada libro abre su caso. Lo único que
+   lleva a las secciones, cada libro abre su frente. Lo único que
    hace este archivo es sostener las láminas y coserlas: le pide
    a una que se vaya, espera a que termine su propia salida, y
    descubre la siguiente por debajo. Si el corte no se nota,
@@ -92,16 +92,16 @@ const MAPA = {
   // presentar; el indice queda siempre a un paso.
   contexto:     { src:"presentacion/contexto.html",     cerca:["problema"] },
   problema:     { src:"presentacion/problema.html",     cerca:["investigacion"] },
-  investigacion:{ src:"presentacion/investigacion.html",cerca:["journey"] },
+  // La investigación se cuenta en el estante: cada frente es una carpeta que
+  // se abre. La lámina plana de antes queda en presentacion/investigacion.html,
+  // fuera del recorrido.
+  investigacion:{ src:"slides 2/index.html",            cerca:["journey"] },
   journey:      { src:"presentacion/journey.html",      cerca:["timeline"] },
   timeline:     { src:"presentacion/timeline.html",     cerca:["indice"] },
   // El índice ya carga sus secciones para previsualizarlas: precargarlas
   // otra vez aquí sería arrancar cada motor por duplicado.
   indice:     { src:"slides 2/page3.html",           cerca:[] },
-  cinetica:   { src:"slides 2/page2.html",           cerca:["indice"] },
-  biblioteca: { src:"slides 2/index.html",           cerca:["caso"] },
-  caso:       { src:"slide 3/index.html",            cerca:["biblioteca"] },
-  burbujas:   { src:"Slides/corazon-burbujas.html",  cerca:["indice"] }
+  cinetica:   { src:"slides 2/page2.html",           cerca:["indice"] }
 };
 const INICIO = "soma";
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Journey — Osler Hub</title>
+<title>Cómo lo resolvemos — Osler Hub</title>
 <script>document.documentElement.setAttribute("data-theme","light");</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,143 +13,189 @@
 <script>try{if(window.parent!==window&&!/[?&]previa=1/.test(location.search))document.documentElement.className+=" con-telon";}catch(e){}</script>
 
 <style>
-  /* ── la órbita ────────────────────────────────────────────
-     Un núcleo en el centro y cinco satélites girando alrededor. El
-     anillo entero gira despacio; cada satélite gira al revés a la misma
-     velocidad, así los rótulos nunca se ponen de cabeza. */
-  .orbita{
+  /* ═══════════════════════════════════════════════════════════
+     El journey de Camilo.
+
+     Un disco enorme anclado al borde izquierdo, cortado por la
+     pantalla, y una rueda de seis palabras montada sobre su mismo
+     centro. La palabra que manda siempre está en el medio, a la
+     derecha del disco. Al pasar de etapa la rueda entera gira 60°:
+     la que estaba se va bajando por el borde del círculo hasta
+     salirse por abajo, y la siguiente entra desde arriba y se planta
+     en el medio. Las otras cuatro están al otro lado del disco, fuera
+     de cuadro.
+
+     Nada de tarjetas: lo que se cuenta lo pone quien habla.
+     ═══════════════════════════════════════════════════════════ */
+
+  .lamina.entera{
     position:relative;
-    height:min(100%,540px);
-    aspect-ratio:1;
+    display:block;
+    padding:0;
+    overflow:hidden;      /* el disco se sale por la izquierda a propósito */
   }
-  .anillo{
-    position:absolute;inset:0;
-    animation:girar 72s linear infinite;
-  }
-  .orbita.quieta .anillo,
-  .orbita.quieta .satelite,
-  .orbita.quieta .nube{animation-play-state:paused}
-  @keyframes girar{to{rotate:360deg}}
-  @keyframes girar-inv{to{rotate:-360deg}}
 
-  .radios{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+  /* ── el eje ────────────────────────────────────────────────
+     Un punto sin tamaño pegado al borde izquierdo. Todo —el disco y
+     la rueda— cuelga de aquí, así que los dos comparten centro por
+     construcción y no por cuadrar números a mano. */
+  .ruedo{
+    --R:  min(58vh, 30vw);                        /* radio del disco */
+    --Rw: calc(var(--R) + clamp(48px, 9vw, 150px));  /* radio de la rueda */
+    position:absolute;
+    left:4%; top:50%;
+    width:0; height:0;
+  }
+
+  /* ── el disco ─────────────────────────────────────────────
+     Cinco de las seis fotos son recortes sin fondo, así que el color
+     lo pone el disco. Las seis viven apiladas y solo cambia cuál se
+     ve: pasar de etapa es un fundido, no una carga. */
+  .disco{
+    position:absolute; left:0; top:0;
+    width:calc(var(--R) * 2); height:calc(var(--R) * 2);
+    margin:calc(var(--R) * -1) 0 0 calc(var(--R) * -1);
+    border-radius:50%;
+    overflow:hidden;
+    background:linear-gradient(158deg,
+      hsl(216,96%,94%) 0%,
+      var(--cielo) 46%,
+      hsl(180,40%,80%) 100%);
+  }
+
+  /* El encuadre va foto a foto y no con una regla común, porque las seis
+     están tomadas a distancias distintas: en una Camilo sale de cuerpo
+     entero y en otra es un primer plano. Medí en cada archivo el ancho de
+     la cabeza y dónde empieza, y de ahí salen `--h` (altura a la que se
+     dibuja) y `--x` / `--y` (dónde cae). Con esos números las seis cabezas
+     miden lo mismo en pantalla y todas arrancan a la misma altura: la
+     figura no da saltos de tamaño al pasar de etapa.
+     Todo en % del disco, así aguanta cualquier tamaño de ventana. */
+  .foto{position:absolute; inset:0}
+  .capa{
+    position:absolute;
+    left:var(--x); top:var(--y); height:var(--h);
+    overflow:hidden;
+    opacity:0;
+    transform:translateY(14px);
+    transition:opacity .6s ease, transform .9s cubic-bezier(.16,1,.3,1);
+  }
+  .capa.activa{opacity:1;transform:none}
+  .capa img{display:block; height:100%; width:auto}
+
+  /* Los recortes están cortados por el lienzo allí donde el brazo, la mesa o
+     el portátil se salían de la foto, y ese canto recto sobre el disco se lee
+     como una losa flotando. Dos máscaras cruzadas —una horizontal y otra
+     vertical— disuelven cada borde en el color; solo sobrevive lo que las dos
+     dejan pasar. Los lados van a cero por defecto: la mayoría solo necesita
+     el de abajo, y a los que además tocan un costado se les da `--lx`/`--rx`. */
+  .capa img{
+    -webkit-mask-image:
+      linear-gradient(to right, transparent 0, #000 var(--lx,0%),
+                                #000 calc(100% - var(--rx,0%)), transparent 100%),
+      linear-gradient(to bottom, #000 var(--m0,82%), transparent var(--m1,100%));
+    mask-image:
+      linear-gradient(to right, transparent 0, #000 var(--lx,0%),
+                                #000 calc(100% - var(--rx,0%)), transparent 100%),
+      linear-gradient(to bottom, #000 var(--m0,82%), transparent var(--m1,100%));
+    -webkit-mask-composite:source-in;
+            mask-composite:intersect;
+  }
+
+  /* La primera es la única con fondo de verdad —un jardín— y de cuerpo
+     entero. Se recorta a busto para que su cabeza mida lo que las otras, y
+     en vez de enmarcarla se le pasa un velo elíptico: el jardín se disuelve
+     en el color del disco y deja de leerse como una foto pegada encima. */
+  .capa.busto{width:var(--w); overflow:visible}
+  .capa.busto img{
+    position:absolute;
+    height:var(--zoom); left:var(--ix); top:var(--iy);
+    -webkit-mask-image:radial-gradient(ellipse 50% 48% at 50% 40%, #000 46%, transparent 100%);
+            mask-image:radial-gradient(ellipse 50% 48% at 50% 40%, #000 46%, transparent 100%);
+    -webkit-mask-composite:source-over;
+            mask-composite:add;
+  }
+
+  /* ── la rueda de palabras ─────────────────────────────────
+     `--rho` es cuánto ha girado la rueda; `--a` es el sitio fijo de
+     cada palabra en ella. La punta deshace las dos —gira
+     `-(rho + a)`— para que el texto viaje por el arco sin ladearse.
+     Las dos transiciones comparten curva y duración o se desfasan. */
+  .rueda{
+    position:absolute; left:0; top:0; width:0; height:0;
+    transform:rotate(var(--rho, 0deg));
+    transition:transform .9s cubic-bezier(.16,1,.3,1);
+  }
   .radio{
-    stroke:var(--linea);stroke-width:1;fill:none;
-    vector-effect:non-scaling-stroke;
-    transition:stroke .4s ease,opacity .4s ease;
+    position:absolute; left:0; top:0; width:0; height:0;
+    transform:rotate(var(--a));
+    visibility:hidden;
   }
-  .radio.vivo{
-    stroke:var(--azul);
-    stroke-dasharray:2.5 4;
-    animation:pulsar 1.25s linear infinite;
+  /* Solo la que manda y sus dos vecinas: son las únicas que se cruzan por
+     el cuadro durante el giro. Las otras cuatro caen al otro lado del disco
+     y, como la palabra cuelga por su borde izquierdo, a las largas les
+     asomaba la cola por el margen. */
+  .radio.cerca{visibility:visible}
+  .punta{
+    position:absolute; left:var(--Rw); top:0; width:0; height:0;
+    transform:rotate(calc(-1 * (var(--rho, 0deg) + var(--a))));
+    transition:transform .9s cubic-bezier(.16,1,.3,1);
   }
-  @keyframes pulsar{to{stroke-dashoffset:-13}}
-
-  /* ── el núcleo ────────────────────────────────────────────
-     Las mismas esferas de la portada, reducidas a su idea: puntos en dos
-     anillos que giran en sentidos contrarios. */
-  .nucleo{
-    position:absolute;left:50%;top:50%;
-    width:31%;height:31%;margin:-15.5% 0 0 -15.5%;
-    border-radius:50%;
-    display:grid;place-items:center;
-    border:1px solid var(--linea);
-    background:radial-gradient(circle at 50% 42%, hsla(216,96%,89%,.55), hsla(210,17%,98%,.95) 70%);
-    transition:box-shadow .5s ease,border-color .5s ease;
-  }
-  .nucleo.encendido{
-    border-color:transparent;
-    box-shadow:0 0 0 1px var(--tono,var(--azul)) inset,
-               0 18px 50px hsla(220,51%,51%,.22);
-  }
-  .nucleo b{
-    font-family:var(--titulo);font-weight:400;
-    font-size:clamp(15px,1.5vw,21px);letter-spacing:-.01em;
-    color:var(--tinta);z-index:2;
-  }
-  .nube{position:absolute;inset:0;animation:girar 26s linear infinite}
-  .nube.lejos{animation:girar-inv 38s linear infinite}
-  .nube i{
-    position:absolute;
-    width:8px;height:8px;margin:-4px 0 0 -4px;
-    border-radius:50%;
-    background:linear-gradient(150deg,var(--aqua),var(--azul));
-    opacity:.62;
-  }
-  .nube.lejos i{opacity:.38;width:6px;height:6px;margin:-3px 0 0 -3px}
-
-  /* ── los satélites ────────────────────────────────────── */
-  .satelite{
-    position:absolute;
-    width:96px;height:96px;margin:-48px 0 0 -48px;
-    border-radius:50%;
-    display:grid;place-items:center;
-    border:1px solid var(--linea);
-    background:var(--papel);
-    color:var(--apagado);
-    font:inherit;cursor:pointer;padding:0;
-    animation:girar-inv 72s linear infinite;
-    transition:width .5s cubic-bezier(.16,1,.3,1),
-               height .5s cubic-bezier(.16,1,.3,1),
-               margin .5s cubic-bezier(.16,1,.3,1),
-               background .38s ease,color .38s ease,
-               border-color .38s ease,box-shadow .38s ease;
-  }
-  .satelite b{font-family:var(--titulo);font-weight:400;font-size:20px;line-height:1}
-  .satelite .nombre{
-    position:absolute;left:50%;top:100%;transform:translate(-50%,10px);
-    font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;
-    white-space:nowrap;color:var(--apagado);
-    transition:color .3s ease;
-  }
-  .satelite:hover{border-color:var(--azul);color:var(--tinta)}
-  .satelite.activo{
-    width:118px;height:118px;margin:-59px 0 0 -59px;
-    border-color:transparent;
-    background:linear-gradient(150deg,var(--tono-claro,var(--aqua)),var(--tono,var(--azul)));
-    color:var(--papel);
-    box-shadow:0 18px 44px hsla(220,51%,51%,.28);
-  }
-  .satelite.activo .nombre{color:var(--tinta);font-weight:600}
-
-  /* ── la ficha del paso ────────────────────────────────── */
-  .paso{
-    border:1px solid var(--linea);
-    border-left:2px solid var(--azul);
-    background:var(--papel);
-    border-radius:3px;
-    padding:22px 24px;
-    display:flex;flex-direction:column;gap:12px;
-    min-height:250px;
-    transition:opacity .32s ease,transform .32s cubic-bezier(.16,1,.3,1);
-  }
-  .paso.cambiando{opacity:0;transform:translateY(10px)}
-  .paso .momento{
-    font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--azul);
-  }
-  .paso h2{
-    margin:0;
-    font-family:var(--titulo);font-weight:400;
-    font-size:clamp(21px,2vw,29px);line-height:1.08;letter-spacing:-.012em;
+  .palabra{
+    position:absolute; left:0; top:0;
+    transform:translateY(-50%);
+    white-space:nowrap;
+    font-family:var(--titulo);
+    font-weight:700;
+    font-style:italic;
+    font-size:clamp(28px,4.7vw,72px);
+    line-height:1;
+    letter-spacing:-.016em;
     color:var(--tinta);
   }
-  .paso .extra{
-    margin:0;padding-top:11px;border-top:1px solid var(--linea);
-    font-size:12.5px;line-height:1.56;color:var(--apagado);
-  }
-  .paso .extra b{color:var(--tinta);font-weight:600}
 
-  .pasos-mini{display:flex;gap:6px;flex-wrap:wrap}
-  .pasos-mini button{
-    appearance:none;cursor:pointer;font:inherit;
-    border:1px solid var(--linea);background:transparent;color:var(--apagado);
-    border-radius:999px;padding:7px 12px;
-    font-size:10px;letter-spacing:.12em;text-transform:uppercase;
-    transition:all .24s ease;
+  /* ── lo poco que queda de interfaz ────────────────────────── */
+  .rotulo-flotante{
+    position:absolute; top:26px; left:50%;
+    transform:translateX(-50%);
+    margin:0;
+    font-size:10px; letter-spacing:.34em; text-transform:uppercase;
+    color:var(--apagado);
   }
-  .pasos-mini button:hover{color:var(--tinta);border-color:var(--azul)}
-  .pasos-mini button[aria-pressed="true"]{
-    background:var(--tinta);border-color:var(--tinta);color:var(--papel);
+  .cuenta{
+    position:absolute; bottom:30px; right:clamp(28px,4vw,64px);
+    margin:0;
+    font-size:11px; letter-spacing:.22em;
+    color:var(--apagado);
+    font-variant-numeric:tabular-nums;
+  }
+  .cuenta b{color:var(--tinta);font-weight:600}
+
+  /* ── llegada y salida ─────────────────────────────────────── */
+  html.entrando .ruedo{animation:asomarRuedo 1.05s cubic-bezier(.16,1,.3,1) .04s both}
+  html.entrando .rotulo-flotante,
+  html.entrando .cuenta{animation:asomarTexto .8s cubic-bezier(.16,1,.3,1) .26s both}
+  @keyframes asomarRuedo{from{opacity:0;transform:translateX(-42px)}to{opacity:1;transform:none}}
+
+  html.saliendo .ruedo{
+    opacity:0;transform:translateX(-32px);
+    transition:opacity .4s ease,transform .5s cubic-bezier(.6,0,.9,.4);
+  }
+  html.saliendo .rotulo-flotante,
+  html.saliendo .cuenta{opacity:0;transition:opacity .34s ease}
+
+  @media (prefers-reduced-motion:reduce){
+    html.entrando .ruedo,
+    html.entrando .rotulo-flotante,
+    html.entrando .cuenta{animation:none}
+    .rueda,.punta,.capa{transition:none}
+  }
+
+  /* En ventana estrecha —las miniaturas del índice— el disco encoge
+     para que a la palabra le quede sitio. */
+  @media (max-width:900px){
+    .ruedo{--R:min(46vh,34vw)}
+    .palabra{font-size:clamp(18px,4.6vw,30px)}
   }
 </style>
 </head>
@@ -161,30 +207,17 @@
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
 </a>
 
-<main class="lamina">
-  <div class="columna">
-    <p class="rotulo">Cómo lo resolvemos</p>
-    <h1 class="punch">Camilo, octavo semestre, un martes por la noche.</h1>
+<main class="lamina entera">
+  <p class="rotulo-flotante">Cómo lo resolvemos</p>
 
-    <div class="pasos-mini" id="mini" role="group" aria-label="Los cinco pasos"></div>
-
-    <div class="paso" id="ficha">
-      <span class="momento" id="momento"></span>
-      <h2 id="titulo"></h2>
-      <p class="parrafo" id="texto"></p>
-      <p class="extra" id="extra"></p>
+  <div class="ruedo" id="ruedo">
+    <div class="disco">
+      <div class="foto" id="foto"></div>
     </div>
+    <div class="rueda" id="rueda"></div>
   </div>
 
-  <div class="escena">
-    <p class="nota-escena">La simulación, paso a paso</p>
-    <div class="orbita" id="orbita">
-      <div class="nucleo" id="nucleo"><b>Osler</b></div>
-      <div class="anillo" id="anillo">
-        <svg class="radios" viewBox="0 0 100 100" aria-hidden="true"></svg>
-      </div>
-    </div>
-  </div>
+  <p class="cuenta"><b id="cN">01</b> / 06</p>
 </main>
 
 <script src="costura.js"></script>
@@ -192,163 +225,131 @@
 (function(){
   "use strict";
 
-  var PASOS = [
-    {
-      n:"1", corto:"Inicio", titulo:"Inicio y modo",
-      momento:"Martes, 9:00 p.m.",
-      tono:"var(--azul)", tonoClaro:"var(--cielo)",
-      texto:"Camilo necesita estudiar para endocrinología, así que abre la web de " +
-            "Osler Hub desde su computador. Filtra los casos clínicos por especialidad " +
-            "médica y por su semestre, elige uno e inicia la simulación.",
-      extra:"<b>Elige cómo practicarlo:</b> práctica libre, sin presión de tiempo, o " +
-            "examen cronometrado de ocho minutos."
-    },
-    {
-      n:"2", corto:"Anamnesis", titulo:"Anamnesis libre",
-      momento:"La entrevista",
-      tono:"var(--aqua)", tonoClaro:"var(--cielo)",
-      texto:"Hace las preguntas de la entrevista por voz o por texto, en lenguaje " +
-            "natural, y el paciente responde en lenguaje cotidiano. Cuando está listo " +
-            "para terminar, cierra la entrevista y pasa a la siguiente etapa.",
-      extra:"<b>Sin menús delatores:</b> no hay opciones prediseñadas que le soplen la " +
-            "pregunta que faltaba."
-    },
-    {
-      n:"3", corto:"Procedimientos", titulo:"Procedimientos y ayudas",
-      momento:"Las pruebas",
-      tono:"var(--indigo)", tonoClaro:"var(--aqua)",
-      texto:"Decide qué exámenes diagnósticos quiere realizarle al paciente y los " +
-            "escribe en un campo de texto, sin una lista de opciones predeterminadas " +
-            "que lo obligue a reconocer en vez de recordar.",
-      extra:"<b>Antes de los resultados:</b> la interfaz le exige redactar la " +
-            "argumentación clínica de qué busca confirmar."
-    },
-    {
-      n:"4", corto:"Diagnóstico", titulo:"Diagnóstico y justificación",
-      momento:"El corazón de la app",
-      tono:"var(--indigo)", tonoClaro:"var(--azul)",
-      texto:"Registra su sospecha principal, la justifica y lista sus diagnósticos " +
-            "diferenciales. Si no acierta el principal pero razonó bien el camino y la " +
-            "respuesta correcta está entre sus diferenciales, eso se le reconoce en la " +
-            "retroalimentación.",
-      extra:"<b>Plan de manejo:</b> registra qué formularía a nivel general, sin dosis " +
-            "ni nombres específicos. El sistema revisa que el plan sea coherente con la " +
-            "causa que él mismo planteó."
-    },
-    {
-      n:"5", corto:"Feedback", titulo:"Feedback guardado",
-      momento:"El cierre",
-      tono:"var(--azul)", tonoClaro:"var(--aqua)",
-      texto:"El sistema le retroalimenta qué preguntas clave le faltaron, qué pidió que " +
-            "no necesitaba, qué hizo tarde y qué fue incoherente. Al cierre se adjuntan " +
-            "las guías académicas del caso, para que estudie justo aquello donde falló.",
-      extra:"<b>Queda registrado:</b> la semana siguiente Camilo puede volver a leerlo, " +
-            "compararlo y repetir el caso las veces que quiera."
-    }
+  /* Cada etapa: el archivo tal cual está en la carpeta, la palabra tal cual
+     se lee, y su encuadre dentro del disco —todo en % del disco—.
+
+     `h` es la altura a la que se dibuja; sale de igualar el ancho de la
+     cabeza. `x` e `y` colocan la cara sobre el mismo eje y la coronilla a la
+     misma altura. `m0`/`m1` mueven el fundido de abajo cuando el recorte no
+     llega al borde del lienzo, y `lx`/`rx` lo añaden a los costados cuando el
+     brazo o la mesa se salían de la foto.
+
+     No todas van a la misma cabeza, y es a propósito. La 02, la 03 y la 04
+     son planos cerrados —cabeza, brazos y poco más— y a igual cabeza se
+     quedaban pequeñas dentro del disco, así que van a 140 px. La 05 y la 06
+     enseñan cuerpo y con 117 ya lo llenan. Y la 01 se queda en 96: es el
+     plano de presentación, Camilo de cuerpo entero y más lejos, con su
+     propio recorte a busto. Lo que sí comparten las seis es la línea de la
+     coronilla, que es lo que impide que la figura salte al pasar de etapa. */
+  var ETAPAS = [
+    { archivo:"El es camilo",      palabra:"“Él es Camilo”",
+      x:"44.1%", y:"28.0%", h:"42.3%",
+      busto:true, w:"44%", zoom:"172.9%", ix:"-12.3%", iy:"-7.8%" },
+    { archivo:"Entrevista",        palabra:"Entrevista",
+      x:"39.3%", y:"21.1%", h:"50.5%", lx:"10%", rx:"8%" },
+    { archivo:"Procedimientos",    palabra:"Procedimientos",
+      x:"46.0%", y:"26.5%", h:"52.5%", lx:"8%", rx:"8%" },
+    { archivo:"Diagnóstico",       palabra:"Diagnóstico",
+      x:"39.4%", y:"24.9%", h:"61.7%", m0:"70%", m1:"80.5%" },
+    { archivo:"Plan de manejo",    palabra:"Plan de manejo",
+      x:"45.0%", y:"29.9%", h:"50.0%", lx:"12%", rx:"11%" },
+    { archivo:"Retroalimentación", palabra:"Retroalimentación",
+      x:"42.2%", y:"29.4%", h:"61.8%" }
   ];
 
-  var RADIO = 37;          // en % del lado de la órbita
-  var ARRANQUE = -Math.PI/2;
+  var N = ETAPAS.length;
+  /* Seis palabras repartidas por la rueda entera. A 60° la vecina de arriba
+     y la de abajo quedan justo fuera de cuadro cuando la rueda está quieta,
+     y solo se las ve cruzar mientras gira. Las otras cuatro caen al otro
+     lado del disco, fuera de la pantalla por la izquierda. */
+  var PASO = 360 / N;
 
-  var orbita = document.getElementById("orbita");
-  var anillo = document.getElementById("anillo");
-  var nucleo = document.getElementById("nucleo");
-  var svg    = anillo.querySelector(".radios");
-  var mini   = document.getElementById("mini");
-  var ficha  = document.getElementById("ficha");
-  var elMom  = document.getElementById("momento");
-  var elTit  = document.getElementById("titulo");
-  var elTxt  = document.getElementById("texto");
-  var elExt  = document.getElementById("extra");
+  var foto  = document.getElementById("foto");
+  var rueda = document.getElementById("rueda");
+  var cN    = document.getElementById("cN");
 
-  var lunas = [], radios = [], chips = [], elegido = -1, reloj = null;
+  /* Las seis fotos, apiladas y precargadas: cambiar de etapa es cambiar cuál
+     lleva la clase, y el navegador funde una con otra sin esperas. */
+  var fotos = ETAPAS.map(function(e){
+    var capa = document.createElement("span");
+    capa.className = "capa" + (e.busto ? " busto" : "");
+    var est = "--x:" + e.x + ";--y:" + e.y + ";--h:" + e.h;
+    if (e.w)  est += ";--w:" + e.w + ";--zoom:" + e.zoom + ";--ix:" + e.ix + ";--iy:" + e.iy;
+    if (e.m0) est += ";--m0:" + e.m0 + ";--m1:" + e.m1;
+    if (e.lx) est += ";--lx:" + e.lx + ";--rx:" + e.rx;
+    capa.setAttribute("style", est);
 
-  /* El núcleo: dos anillos de puntos girando en sentidos contrarios. Es la
-     misma idea de la portada —materia hecha de esferas— en pequeño. */
-  [[9, 29, false], [7, 42, true]].forEach(function(capa){
-    var cuantos = capa[0], r = capa[1], lejos = capa[2];
-    var nube = document.createElement("div");
-    nube.className = "nube" + (lejos ? " lejos" : "");
-    for (var k = 0; k < cuantos; k++){
-      var punto = document.createElement("i");
-      var a = (k / cuantos) * Math.PI * 2 + (lejos ? 0.31 : 0);
-      // En % del núcleo, igual que los satélites en % de la órbita.
-      punto.style.left = (50 + Math.cos(a) * r).toFixed(2) + "%";
-      punto.style.top  = (50 + Math.sin(a) * r).toFixed(2) + "%";
-      nube.appendChild(punto);
+    var img = document.createElement("img");
+    img.src = "../ImagenesJourney/" + encodeURIComponent(e.archivo) + ".png";
+    img.alt = e.palabra.replace(/[“”]/g, "");
+    img.decoding = "async";
+    capa.appendChild(img);
+    foto.appendChild(capa);
+    return capa;
+  });
+
+  /* La palabra i vive en la rueda a -i·60°. Con la rueda girada +i·60°, la i
+     cae en las tres en punto —el medio de la pantalla— y las demás quedan
+     donde les toca sin que haya que moverlas nunca. */
+  var radios = ETAPAS.map(function(e, i){
+    var radio = document.createElement("span");
+    radio.className = "radio";
+    radio.style.setProperty("--a", (-i * PASO).toFixed(2) + "deg");
+    radio.innerHTML = '<span class="punta"><span class="palabra"></span></span>';
+    radio.querySelector(".palabra").textContent = e.palabra;
+    rueda.appendChild(radio);
+    return radio;
+  });
+
+  var actual = -1;
+
+  function ir(i, deGolpe){
+    if (i < 0 || i >= N || i === actual) return;
+    actual = i;
+
+    /* Girar en positivo baja la que estaba y trae la siguiente desde arriba.
+       Al revés subiría, que es justo lo contrario de lo que se cuenta. */
+    var giro = (i * PASO).toFixed(2) + "deg";
+    if (deGolpe){
+      rueda.style.transition = "none";
+      rueda.style.setProperty("--rho", giro);
+      rueda.getBoundingClientRect();          // fuerza el reflow antes de devolverle la transición
+      rueda.style.transition = "";
+    } else {
+      rueda.style.setProperty("--rho", giro);
     }
-    nucleo.appendChild(nube);
-  });
 
-  PASOS.forEach(function(d, i){
-    var a = ARRANQUE + (i / PASOS.length) * Math.PI * 2;
-    var x = 50 + Math.cos(a) * RADIO;
-    var y = 50 + Math.sin(a) * RADIO;
-
-    var linea = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    linea.setAttribute("class", "radio");
-    linea.setAttribute("x1", "50"); linea.setAttribute("y1", "50");
-    linea.setAttribute("x2", x.toFixed(2)); linea.setAttribute("y2", y.toFixed(2));
-    svg.appendChild(linea);
-    radios.push(linea);
-
-    var b = document.createElement("button");
-    b.type = "button";
-    b.className = "satelite";
-    b.style.left = x.toFixed(2) + "%";
-    b.style.top  = y.toFixed(2) + "%";
-    b.style.setProperty("--tono", d.tono);
-    b.style.setProperty("--tono-claro", d.tonoClaro);
-    b.innerHTML = '<b>' + d.n + '</b><span class="nombre">' + d.corto + '</span>';
-    b.setAttribute("aria-label", "Paso " + d.n + ": " + d.titulo);
-    b.addEventListener("click", function(){ elegir(i); });
-    anillo.appendChild(b);
-    lunas.push(b);
-
-    var c = document.createElement("button");
-    c.type = "button";
-    c.textContent = d.n + " · " + d.corto;
-    c.addEventListener("click", function(){ elegir(i); });
-    mini.appendChild(c);
-    chips.push(c);
-  });
-
-  function elegir(i){
-    if (i === elegido) return;
-    var primero = elegido === -1;
-    elegido = i;
-    var d = PASOS[i];
-
-    lunas.forEach(function(b, j){ b.classList.toggle("activo", j === i); });
-    chips.forEach(function(b, j){ b.setAttribute("aria-pressed", String(j === i)); });
-    radios.forEach(function(l, j){ l.classList.toggle("vivo", j === i); });
-
-    /* El núcleo toma el color del paso: el wireframe pedía que la estructura
-       central respondiera a cada satélite. */
-    nucleo.classList.add("encendido");
-    nucleo.style.setProperty("--tono", d.tono);
-    ficha.style.borderLeftColor = d.tono;
-
-    var pintar = function(){
-      elMom.textContent = d.momento;
-      elTit.textContent = d.titulo;
-      elTxt.textContent = d.texto;
-      elExt.innerHTML   = d.extra;
-      ficha.classList.remove("cambiando");
-    };
-
-    if (primero){ pintar(); return; }
-    ficha.classList.add("cambiando");
-    clearTimeout(reloj);
-    reloj = setTimeout(pintar, 200);
+    fotos.forEach(function(f, j){ f.classList.toggle("activa", j === i); });
+    radios.forEach(function(rd, j){ rd.classList.toggle("cerca", Math.abs(j - i) <= 1); });
+    cN.textContent = ("0" + (i + 1)).slice(-2);
   }
 
-  /* Mientras alguien está mirando de cerca, la órbita se detiene: perseguir un
-     botón que se mueve no es una gracia, es un estorbo. */
-  orbita.addEventListener("pointerenter", function(){ orbita.classList.add("quieta"); });
-  orbita.addEventListener("pointerleave", function(){ orbita.classList.remove("quieta"); });
+  function avanzar(){
+    if (actual < N - 1){ ir(actual + 1); return; }
+    if (window.Taller && Taller.dentroDelDeck) Taller.ir("indice");
+    else location.href = "../slides 2/page3.html";
+  }
+  function retroceder(){ ir(actual - 1); }
 
-  elegir(0);
+  addEventListener("keydown", function(e){
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var k = e.key;
+    if (k === "ArrowRight" || k === "ArrowDown" || k === " " || k === "PageDown"){
+      avanzar(); e.preventDefault();
+    } else if (k === "ArrowLeft" || k === "ArrowUp" || k === "PageUp"){
+      retroceder(); e.preventDefault();
+    }
+  });
+
+  /* Dentro del deck el teclado escribe donde está el foco: si la lámina no
+     se lo lleva al llegar, las flechas no llegan hasta aquí. */
+  window.alLlegarLamina = function(){
+    try { window.focus(); } catch (err) {}
+    actual = -1;
+    ir(0, true);
+  };
+
+  ir(0, true);
 })();
 </script>
 </body>

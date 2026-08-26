@@ -1,134 +1,58 @@
 /* ==========================================================================
-   MEDICAL CASE FILES — Interactive 3D Folder Shelf
-   Symmetric 90° Swing & Flush Cover Engine
+   LA INVESTIGACIÓN — el estante de los cinco frentes
+
+   Cada frente es una carpeta. En el estante se lee por el lomo; al llegar al
+   centro gira y enseña la portada; al abrirse, la tapa rota sobre el lomo y
+   deja ver la hoja de dentro, que es donde vive lo que se cuenta.
+
+   Dos maneras de recorrerlo, a propósito:
+     · rueda, arrastre y los botones → mirar el estante libremente
+     · las flechas                   → abrir los cinco frentes en orden
+   Pasado el quinto, la lámina se retira y queda la frase que lo resume.
    ========================================================================== */
 
-const booksData = [
+const FRENTES = [
   {
-    id: 'folder-cardiology',
-    title: 'CARDIOLOGY',
-    subtitle: 'Dept. A-12',
-    spineBg: '#251D4E', textColor: '#C8DEFE',
-    tabColor: '#426DC2',
-    spineWidth: 36, height: 295, tilt: -0.9,
-    isFeatured: false
+    id: 'voz', num: '01',
+    titulo: 'Voz estudiantil',
+    /* El titular de la portada se parte a mano: dejar que caiga solo abría
+       viudas feas en una caja tan estrecha. */
+    portada: 'Voz<br>estudiantil',
+    resumen: 'Encuestas amplias y entrevistas a profundidad.',
+    spineBg: '#251D4E', textColor: '#C8DEFE', tabColor: '#82CACA',
+    spineWidth: 44, coverWidth: 268, height: 318, tilt: -0.9
   },
   {
-    id: 'folder-neurology',
-    title: 'NEUROLOGY — Case Files Vol. III',
-    subtitle: 'Dr. R. Castillo',
-    spineBg: '#426DC2', textColor: '#F9FAFB',
-    tabColor: '#82CACA',
-    spineWidth: 30, height: 305, tilt: 0.5,
-    isSlimSerif: true, isFeatured: false
+    id: 'observacion', num: '02',
+    titulo: 'Observación directa',
+    portada: 'Observación<br>directa',
+    resumen: 'Análisis y dinámicas en la clínica, vistas en observaciones de campo.',
+    spineBg: '#426DC2', textColor: '#F9FAFB', tabColor: '#C8DEFE',
+    spineWidth: 40, coverWidth: 262, height: 300, tilt: 0.6
   },
   {
-    id: 'folder-oncology',
-    title: 'ONCOLOGY PROTOCOLS',
-    author: 'Dr. Helena Voss',
-    spineBg: '#1A1A1A', textColor: '#82CACA',
-    tabColor: '#82CACA',
-    spineWidth: 46, coverWidth: 280, height: 310, tilt: 0,
-    isFeatured: true, coverType: 'oncology'
+    id: 'referentes', num: '03',
+    titulo: 'Referentes del mundo',
+    portada: 'Referentes<br>del mundo',
+    resumen: 'Los simuladores y tecnologías que hoy se usan alrededor del mundo.',
+    spineBg: '#1A1A1A', textColor: '#82CACA', tabColor: '#82CACA',
+    spineWidth: 50, coverWidth: 278, height: 332, tilt: 0
   },
   {
-    id: 'folder-trauma',
-    title: 'TRAUMA REGISTRY — ACTIVE',
-    subtitle: 'ER Division',
-    spineBg: '#251D4E', textColor: '#C8DEFE',
-    tabColor: '#82CACA',
-    spineWidth: 28, height: 340, tilt: -1.1,
-    isFeatured: false
+    id: 'literatura', num: '04',
+    titulo: 'Literatura científica',
+    portada: 'Literatura<br>científica',
+    resumen: 'Estudio de las academias nacionales y pares de medicina.',
+    spineBg: '#82CACA', textColor: '#251D4E', tabColor: '#426DC2',
+    spineWidth: 38, coverWidth: 258, height: 306, tilt: -1.1
   },
   {
-    id: 'folder-labs',
-    title: 'LAB RESULTS — PENDING',
-    subtitle: '',
-    spineBg: '#EBEBEB', textColor: '#251D4E',
-    tabColor: '#426DC2',
-    spineWidth: 40, height: 315, tilt: 0.7,
-    isGrid: true, isFeatured: false
-  },
-  {
-    id: 'folder-radiology',
-    title: 'RADIOLOGY',
-    author: 'Dr. S. Nomura',
-    spineBg: '#C8DEFE', textColor: '#251D4E',
-    tabColor: '#426DC2',
-    spineWidth: 44, coverWidth: 270, height: 310, tilt: 0,
-    isFeatured: true, coverType: 'generic'
-  },
-  {
-    id: 'folder-pathology',
-    title: 'PATHOLOGY: BIOPSY REPORTS — Q3',
-    subtitle: 'Dr. L. Fontaine',
-    spineBg: '#4C8FAE', textColor: '#F9FAFB',
-    tabColor: '#C8DEFE',
-    spineWidth: 38, height: 318, tilt: -0.4,
-    isFeatured: false
-  },
-  {
-    id: 'folder-patient-records',
-    title: 'PATIENT RECORDS',
-    author: 'Central Registry',
-    spineBg: '#251D4E', textColor: '#C8DEFE',
-    tabColor: '#426DC2',
-    spineWidth: 48, coverWidth: 280, height: 285, tilt: 0,
-    isFeatured: true, coverType: 'patient-records'
-  },
-  {
-    id: 'folder-internal-med',
-    title: 'INTERNAL MEDICINE — Referrals',
-    subtitle: 'Building C, Floor 4',
-    spineBg: '#1A1A1A', textColor: '#C8DEFE',
-    tabColor: '#82CACA',
-    spineWidth: 42, height: 322, tilt: 1.0,
-    isFeatured: false
-  },
-  {
-    id: 'folder-pediatrics',
-    title: 'PEDIATRICS',
-    subtitle: 'Ward 7-B',
-    spineBg: '#82CACA', textColor: '#251D4E',
-    tabColor: '#426DC2',
-    spineWidth: 34, height: 300, tilt: -0.6,
-    isFeatured: false
-  },
-  {
-    id: 'folder-surgery',
-    title: 'SURGICAL REPORTS',
-    author: 'Dr. K. Andersen',
-    spineBg: '#426DC2', textColor: '#F9FAFB',
-    tabColor: '#82CACA',
-    spineWidth: 40, coverWidth: 270, height: 305, tilt: 0,
-    isFeatured: true, coverType: 'surgery'
-  },
-  {
-    id: 'folder-pharmacy',
-    title: 'PHARMACY — Rx Log',
-    subtitle: '',
-    spineBg: '#EBEBEB', textColor: '#251D4E',
-    tabColor: '#426DC2',
-    spineWidth: 26, height: 308, tilt: 1.1,
-    isFeatured: false
-  },
-  {
-    id: 'folder-diagnostics',
-    title: 'DIAGNOSTICS',
-    author: 'Clinical Lab',
-    spineBg: '#426DC2', textColor: '#F9FAFB',
-    tabColor: '#C8DEFE',
-    spineWidth: 48, coverWidth: 280, height: 330, tilt: 0,
-    isBold: true, isFeatured: true, coverType: 'diagnostics'
-  },
-  {
-    id: 'folder-discharge',
-    title: 'DISCHARGE SUMMARIES',
-    subtitle: '',
-    spineBg: '#6B6880', textColor: '#F9FAFB',
-    tabColor: '#C8DEFE',
-    spineWidth: 36, height: 312, tilt: -0.8,
-    isFeatured: false
+    id: 'normativo', num: '05',
+    titulo: 'Marco normativo',
+    portada: 'Marco<br>normativo',
+    resumen: 'Estándares colombianos y globales de norma y clínica.',
+    spineBg: '#C8DEFE', textColor: '#251D4E', tabColor: '#251D4E',
+    spineWidth: 46, coverWidth: 270, height: 322, tilt: 0.8
   }
 ];
 
@@ -139,12 +63,21 @@ const booksData = [
    se abriria antes de que a nadie le diera tiempo a verla. Esta arranca
    despacio, coge cuerpo en medio y frena al final, que es como se abre una
    carpeta de verdad. */
-const APERTURA_MS = 1050;
+const APERTURA_MS = 880;
 const APERTURA_EASE = 'cubic-bezier(0.42, 0.02, 0.2, 1)';
+/* Cerrar es mas corto: nadie mira como se guarda una carpeta, y con cinco
+   frentes seguidos cada milisegundo de mas se nota. */
+const CIERRE_MS = 340;
+const CIERRE_EASE = 'cubic-bezier(0.5, 0, 0.75, 0.95)';
+/* El tramo del medio: el estante caminando de un frente al siguiente. Va con
+   reloj propio y no con el acercamiento del bucle, porque el bucle nunca
+   termina de llegar —siempre le falta un pelo— y esa cola es justo lo que
+   hacia que la apertura empezara con un salto. */
+const VIAJE_MS = 420;
 const TAPA_W = 300, TAPA_H = 420;
 const HOJA_W = 900, HOJA_H = 560;
 
-class BookshelfManager {
+class EstanteInvestigacion {
   constructor() {
     this.shelfTrack = document.getElementById('shelfTrack');
     this.shelfViewport = document.getElementById('shelfViewport');
@@ -156,11 +89,11 @@ class BookshelfManager {
     this.expTapa = document.getElementById('expTapa');
     this.expHoja = document.getElementById('expHoja');
 
-    this.books = booksData;
+    this.books = FRENTES;
     this.numBooks = this.books.length;
 
-    this.currentProgress = 7;
-    this.targetProgress = 7;
+    this.currentProgress = 0;
+    this.targetProgress = 0;
 
     this.isDragging = false;
     this.startX = 0;
@@ -169,22 +102,24 @@ class BookshelfManager {
     this.lastX = 0;
     this.lastTime = 0;
 
-    /* Nada se mueve solo: el estante espera. */
-    this.abriendo = false;
-    this.aperturaLista = null;
+    /* El recorrido. `abierto` es el frente desplegado ahora mismo, o -1 si
+       solo se esta mirando el estante; `ocupado` tapa las flechas mientras
+       una carpeta se abre o se cierra, que si no se pisan las animaciones. */
+    this.abierto = -1;
+    this.hueco = null;
+    this.ocupado = false;
+    this.enCierre = false;
     this.relojes = [];
     this.arrastro = 0;     // cuanto se movio el puntero: un clic no arrastra
-    /* El estante se acerca un poco al abrirse un expediente. Va aquí y no en
-       CSS porque el bucle de render reescribe el transform de la pista en
-       cada cuadro: una regla de hoja de estilo no sobreviviría al siguiente. */
-    this.zoom = 1;
-    this.zoomObjetivo = 1;
+    /* Mientras el estante viaja con reloj propio, el bucle no le toca la
+       posicion: si no, se estarian disputando el mismo numero. */
+    this.viajando = false;
 
     this.domSlots = [];
 
     // Pre-compute random organic quirks per slot (stable across frames)
     // Subtle: extraGap 0-4px, vertShift 0-3px — enough to break linearity without overlapping
-    this.quirks = booksData.map((b, i) => {
+    this.quirks = this.books.map((b, i) => {
       const s = Math.sin(i * 9.1 + 3.7) * 10000;
       const r = s - Math.floor(s);
       const s2 = Math.sin(i * 13.3 + 7.1) * 10000;
@@ -204,6 +139,18 @@ class BookshelfManager {
     this.startRenderLoop();
   }
 
+  /* ---------- el estante ---------- */
+
+  portadaDe(frente) {
+    return '' +
+      '<div class="cover-folder" style="background:#F9FAFB;color:#251D4E;">' +
+        '<div class="folder-tab" style="background:' + frente.tabColor + ';"></div>' +
+        '<div class="folder-dept">Frente ' + frente.num + ' / 05</div>' +
+        '<div class="folder-main-title">' + frente.portada + '</div>' +
+        '<div class="folder-meta">' + frente.resumen + '</div>' +
+      '</div>';
+  }
+
   renderShelf() {
     this.shelfTrack.innerHTML = '';
     this.domSlots = [];
@@ -212,94 +159,21 @@ class BookshelfManager {
       const slotEl = document.createElement('div');
       slotEl.className = 'book-slot';
       slotEl.dataset.index = index;
-      slotEl.style.height = `${book.height}px`;
+      slotEl.style.height = book.height + 'px';
 
-      let innerMarkup = '';
-
-      if (book.isFeatured) {
-        // Cover content (medical folder open face)
-        let coverMarkup = '';
-        if (book.coverType === 'oncology') {
-          coverMarkup = `
-            <div class="cover-folder" style="background:#F9FAFB;color:#251D4E;">
-              <div class="folder-tab" style="background:${book.tabColor};"></div>
-              <div class="folder-dept">DEPARTMENT OF ONCOLOGY</div>
-              <div class="folder-main-title">PROTOCOLS<br>&amp; TREATMENT<br>GUIDELINES</div>
-              <div class="folder-meta">Dr. Helena Voss — Attending<br>Case Series 2024–2026</div>
-              <div class="folder-stamp">CONFIDENTIAL</div>
-            </div>`;
-        } else if (book.coverType === 'patient-records') {
-          coverMarkup = `
-            <div class="cover-folder" style="background:#F9FAFB;color:#251D4E;">
-              <div class="folder-tab" style="background:${book.tabColor};"></div>
-              <div class="folder-dept">CENTRAL REGISTRY</div>
-              <div class="folder-main-title">PATIENT<br>RECORDS</div>
-              <div class="folder-meta">Active Cases — All Departments<br>Updated: Aug 2026</div>
-              <div class="folder-id">ID: CR-4401-B</div>
-            </div>`;
-        } else if (book.coverType === 'surgery') {
-          coverMarkup = `
-            <div class="cover-folder" style="background:#F9FAFB;color:#251D4E;">
-              <div class="folder-tab" style="background:${book.tabColor};"></div>
-              <div class="folder-dept">SURGICAL DIVISION</div>
-              <div class="folder-main-title">OPERATIVE<br>REPORTS</div>
-              <div class="folder-meta">Dr. K. Andersen — Chief Surgeon<br>Post-Op Follow-Up</div>
-              <div class="folder-stamp">REVIEW PENDING</div>
-            </div>`;
-        } else if (book.coverType === 'diagnostics') {
-          coverMarkup = `
-            <div class="cover-folder" style="background:#F9FAFB;color:#251D4E;">
-              <div class="folder-tab" style="background:${book.tabColor};"></div>
-              <div class="folder-dept">CLINICAL LABORATORY</div>
-              <div class="folder-main-title">DIAGNOSTIC<br>ANALYSIS</div>
-              <div class="folder-meta">Full Panel Results<br>Hematology / Biochemistry / Serology</div>
-              <div class="folder-id">REF: DX-7783</div>
-            </div>`;
-        } else {
-          coverMarkup = `
-            <div class="cover-folder" style="background:#F9FAFB;color:#251D4E;">
-              <div class="folder-tab" style="background:${book.tabColor};"></div>
-              <div class="folder-main-title">${book.title}</div>
-              <div class="folder-meta">${book.author || ''}</div>
-            </div>`;
-        }
-
-        const spineClass = book.isBold ? 'bold-block' : book.isSlimSerif ? 'slim-serif' : '';
-
-        innerMarkup = `
-          <div class="book-3d-mesh" data-spine-depth="${book.spineWidth}" style="width:${book.coverWidth}px;">
-            <div class="mesh-face-front" style="transform:translateZ(${book.spineWidth}px);">
-              ${coverMarkup}
-              <div class="mesh-shading-layer"></div>
-            </div>
-            <div class="mesh-face-spine" style="width:${book.spineWidth}px; background:${book.spineBg}; color:${book.textColor};">
-              <div class="spine-text-rot ${spineClass}">${book.title}</div>
-            </div>
-            <div class="mesh-face-pages" style="width:${book.spineWidth}px; transform:translateX(${book.coverWidth}px) rotateY(90deg);"></div>
-          </div>`;
-      } else {
-        // Static spine-only folder
-        let spineInner = '';
-        if (book.isGrid) {
-          spineInner = `
-            <div style="display:flex;flex-direction:column;align-items:center;justify-content:space-between;height:100%;width:100%;">
-              <div style="width:100%;height:4px;background:${book.tabColor};border-radius:0 0 2px 2px;"></div>
-              <div class="spine-text-rot" style="flex:1;">${book.title}</div>
-            </div>`;
-        } else {
-          const spineClass = book.isBold ? 'bold-block' : book.isSlimSerif ? 'slim-serif' : '';
-          spineInner = `
-            <div style="width:100%;height:4px;background:${book.tabColor};border-radius:0 0 2px 2px;position:absolute;top:0;left:0;"></div>
-            <div class="spine-text-rot ${spineClass}">${book.title}</div>`;
-        }
-
-        innerMarkup = `
-          <div class="spine-static-book" style="background:${book.spineBg};color:${book.textColor};transform:rotate(${book.tilt}deg);">
-            ${spineInner}
-          </div>`;
-      }
-
-      slotEl.innerHTML = innerMarkup;
+      /* Los cinco son carpetas de verdad: lomo, portada y canto. Ninguno es
+         solo un lomo pintado, porque los cinco se abren. */
+      slotEl.innerHTML =
+        '<div class="book-3d-mesh" style="width:' + book.coverWidth + 'px;">' +
+          '<div class="mesh-face-front" style="transform:translateZ(' + book.spineWidth + 'px);">' +
+            this.portadaDe(book) +
+            '<div class="mesh-shading-layer"></div>' +
+          '</div>' +
+          '<div class="mesh-face-spine" style="width:' + book.spineWidth + 'px; background:' + book.spineBg + '; color:' + book.textColor + ';">' +
+            '<div class="spine-text-rot">' + book.titulo + '</div>' +
+          '</div>' +
+          '<div class="mesh-face-pages" style="width:' + book.spineWidth + 'px; transform:translateX(' + book.coverWidth + 'px) rotateY(90deg);"></div>' +
+        '</div>';
 
       this.shelfTrack.appendChild(slotEl);
 
@@ -307,8 +181,7 @@ class BookshelfManager {
         slotEl,
         meshEl: slotEl.querySelector('.book-3d-mesh'),
         shadingEl: slotEl.querySelector('.mesh-shading-layer'),
-        book,
-        isFeatured: book.isFeatured
+        book
       });
     });
   }
@@ -323,33 +196,48 @@ class BookshelfManager {
        Asi que el libro no lo decide el DOM: lo decide donde se hizo clic. */
     this.shelfViewport.addEventListener('click', (ev) => {
       if (this.arrastro > 6) return;      // eso fue arrastrar, no señalar
+      if (this.ocupado || this.enCierre) return;
+      if (this.abierto !== -1) { this.cerrar(); return; }
       const i = this.libroEn(ev.clientX, ev.clientY);
       if (i !== -1) this.abrir(i);
     });
 
     this.prevBtn.addEventListener('click', () => {
+      if (!this.libre()) return;
       this.targetProgress = Math.max(0, this.targetProgress - 1);
     });
     this.nextBtn.addEventListener('click', () => {
+      if (!this.libre()) return;
       this.targetProgress = Math.min(this.numBooks - 1, this.targetProgress + 1);
     });
 
-    this.pageNums.forEach(btn => {
+    this.pageNums.forEach((btn) => {
       btn.addEventListener('click', () => {
-        this.targetProgress = parseInt(btn.dataset.idx, 10);
+        if (this.ocupado || this.enCierre) return;
+        const i = parseInt(btn.dataset.idx, 10);
+        if (this.abierto !== -1) this.enOrden(i);
+        else this.targetProgress = i;
       });
     });
 
+    /* Las flechas son el recorrido: abren los cinco frentes en orden y al
+       final entregan la frase. Lo demas —rueda, arrastre, botones— sigue
+       siendo mirar el estante a mano. */
     window.addEventListener('keydown', (e) => {
-      if (this.abriendo) return;
-      if (e.key === 'ArrowLeft') this.targetProgress = Math.max(0, this.targetProgress - 1);
-      if (e.key === 'ArrowRight') this.targetProgress = Math.min(this.numBooks - 1, this.targetProgress + 1);
-      if (e.key === 'Enter') this.abrir(Math.round(this.currentProgress));
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const k = e.key;
+      if (k === 'ArrowRight' || k === 'ArrowDown' || k === ' ' || k === 'PageDown' || k === 'Enter') {
+        this.avanzar(); e.preventDefault();
+      } else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp') {
+        this.retroceder(); e.preventDefault();
+      }
     });
 
     this.shelfViewport.addEventListener('wheel', (e) => {
       e.preventDefault();
-      if (this.abriendo) return;
+      if (this.ocupado || this.enCierre) return;
+      /* Girar la rueda con una carpeta abierta es pedir volver al estante. */
+      if (this.abierto !== -1) { this.cerrar(); return; }
       // Smooth calibrated wheel delta (no more instant jumping)
       const rawDelta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
       const delta = rawDelta * 0.0018;
@@ -357,7 +245,7 @@ class BookshelfManager {
     }, { passive: false });
 
     this.shelfViewport.addEventListener('pointerdown', (e) => {
-      if (this.abriendo) return;
+      if (this.ocupado || this.enCierre || this.abierto !== -1) return;
       this.arrastro = 0;
       this.isDragging = true;
       this.shelfViewport.classList.add('is-dragging');
@@ -392,6 +280,8 @@ class BookshelfManager {
     window.addEventListener('pointercancel', endDrag);
   }
 
+  libre() { return !this.ocupado && !this.enCierre && this.abierto === -1; }
+
   /* Que libro hay en este punto de la pantalla.
 
      Se mide lo que se pinta, no las ranuras —que llegan a medir cero de
@@ -420,22 +310,139 @@ class BookshelfManager {
     return elegido;
   }
 
-  /* ---------- abrir un expediente ----------
-     Un clic basta. Si el expediente no estaba de frente primero viaja al
-     centro: abrirlo de perfil no se entendería. */
-  abrir(index) {
-    if (this.abriendo) return;
-    const ficha = this.domSlots[index];
-    if (!ficha) return;
+  /* ---------- el recorrido con las flechas ---------- */
 
-    this.targetProgress = index;
-    const viaje = Math.min(620, Math.abs(index - this.currentProgress) * 170);
-    this.abriendo = true;
-    this.relojes.push(setTimeout(() => this.desplegar(ficha), viaje));
+  avanzar() {
+    if (this.ocupado) return;
+    if (this.enCierre) { this.alIndice(); return; }
+    if (this.abierto === this.numBooks - 1) { this.alCierre(); return; }
+    /* Sin nada abierto, la primera flecha abre el que este centrado: si se
+       ha estado hurgando el estante a mano, sigue por donde se dejo. */
+    const siguiente = this.abierto === -1
+      ? Math.max(0, Math.min(this.numBooks - 1, Math.round(this.currentProgress)))
+      : this.abierto + 1;
+    this.enOrden(siguiente);
   }
 
-  /* La caja que ocupa el expediente en pantalla ahora mismo. Se mide la cara
-     de la carpeta si la tiene; si es un lomo suelto, el hueco entero. */
+  retroceder() {
+    if (this.ocupado) return;
+    if (this.enCierre) { this.salirDelCierre(); return; }
+    if (this.abierto > 0) { this.enOrden(this.abierto - 1); return; }
+    if (this.abierto === 0) { this.cerrar(); return; }
+    this.targetProgress = Math.max(0, this.targetProgress - 1);
+  }
+
+  /* Un paso entre frentes es UN movimiento, no un cierre y una apertura
+     sueltas que se pisan. Tres tramos que no se solapan nunca:
+
+       recoger   la carpeta vuelve a su libro y el estante reaparece
+       viajar    el estante camina hasta el frente siguiente
+       desplegar la carpeta nueva se abre
+
+     Lo que sí se solapa —a propósito— es cada tramo con el desvanecido del
+     estante, porque van en el mismo sentido: la carpeta encoge mientras el
+     estante aparece, y crece mientras el estante se va. */
+  enOrden(i) {
+    if (this.ocupado || i === this.abierto) return Promise.resolve();
+    if (i < 0 || i >= this.numBooks) return Promise.resolve();
+    this.ocupado = true;
+    return this.recoger()
+      .then(() => this.viajar(i))
+      .then(() => this.desplegar(i))
+      .then(() => this.espera(APERTURA_MS + 40))
+      .then(() => { this.ocupado = false; });
+  }
+
+  /* Al cierre no se devuelve nada al estante: la carpeta y la lámina entera
+     se van juntas y en su sitio queda la frase. Traer el estante de vuelta
+     medio segundo para volver a echarlo era justo el parpadeo que sobraba. */
+  alCierre() {
+    if (this.ocupado) return;
+    this.ocupado = true;
+    this.enCierre = true;
+    document.documentElement.classList.add('cierre');
+    this.espera(620).then(() => {
+      this.pararAnimaciones();
+      this.expediente.classList.remove('abierto');
+      this.domSlots.forEach((f) => f.slotEl.classList.remove('se-abre'));
+      document.documentElement.classList.remove('abriendo');
+      this.abierto = -1;
+      this.hueco = null;
+      this.ocupado = false;
+    });
+  }
+
+  salirDelCierre() {
+    if (this.ocupado) return;
+    this.ocupado = true;
+    this.enCierre = false;
+    document.documentElement.classList.remove('cierre');
+    this.viajar(this.numBooks - 1)
+      .then(() => this.desplegar(this.numBooks - 1))
+      .then(() => this.espera(APERTURA_MS + 40))
+      .then(() => { this.ocupado = false; });
+  }
+
+  alIndice() {
+    if (window.Taller && window.Taller.dentroDelDeck) window.Taller.ir('indice');
+    else window.location.href = 'page3.html';
+  }
+
+  /* ---------- abrir y cerrar un expediente ---------- */
+
+  espera(ms) {
+    return new Promise((listo) => { this.relojes.push(setTimeout(listo, ms)); });
+  }
+
+  /* Un clic basta. Si el expediente no estaba de frente primero viaja al
+     centro: abrirlo de perfil no se entendería. */
+  abrir(index) {
+    return this.enOrden(index);
+  }
+
+  cerrar() {
+    if (this.ocupado || this.abierto === -1) return Promise.resolve();
+    this.ocupado = true;
+    return this.recoger().then(() => { this.ocupado = false; });
+  }
+
+  /* El estante camina hasta un frente con reloj propio y aterriza clavado.
+     El acercamiento del bucle nunca acaba de llegar, y ese resto era lo que
+     obligaba a cuadrar el número de golpe justo antes de abrir: un salto de
+     un tercio de libro en el peor cuadro posible. */
+  viajar(i) {
+    const desde = this.currentProgress;
+    this.targetProgress = i;
+    if (Math.abs(i - desde) < 0.002) return Promise.resolve();
+
+    const t0 = performance.now();
+    this.viajando = true;
+
+    return new Promise((listo) => {
+      const acabar = () => {
+        if (!this.viajando) return;
+        this.viajando = false;
+        this.currentProgress = i;
+        this.update3DLayout();
+        listo();
+      };
+      /* Si el navegador congela los cuadros —una pestaña de fondo lo hace—
+         el viaje se cierra igual por reloj y el recorrido no se queda colgado. */
+      this.relojes.push(setTimeout(acabar, VIAJE_MS + 400));
+
+      const paso = () => {
+        if (!this.viajando) return;
+        const k = Math.min(1, (performance.now() - t0) / VIAJE_MS);
+        // easeInOutCubic: sale y entra sin tirón, que es como se recorre un estante
+        const e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+        this.currentProgress = desde + (i - desde) * e;
+        if (k < 1) requestAnimationFrame(paso); else acabar();
+      };
+      requestAnimationFrame(paso);
+    });
+  }
+
+  /* La caja que ocupa el expediente en pantalla ahora mismo. */
   cajaDe(ficha) {
     const cara = ficha.slotEl.querySelector('.mesh-face-front') || ficha.slotEl;
     const r = cara.getBoundingClientRect();
@@ -464,50 +471,43 @@ class BookshelfManager {
   }
 
   pintarExpediente(ficha) {
-    const libro = ficha.book;
+    const frente = ficha.book;
+
+    /* La tapa es la portada que ya estaba en el estante, tal cual. */
     const bloque = this.expTapa.querySelector('.tapa-texto');
     const original = ficha.slotEl.querySelector('.cover-folder');
     bloque.innerHTML = '';
+    const clon = original.cloneNode(true);
+    this.expTapa.style.background = '#F9FAFB';
+    clon.style.backgroundColor = 'transparent';
+    bloque.appendChild(clon);
 
-    if (original) {
-      /* La tapa es la portada que ya estaba en el estante, tal cual. */
-      const clon = original.cloneNode(true);
-      this.expTapa.style.background = original.style.backgroundColor || '#e8e4db';
-      clon.style.backgroundColor = 'transparent';
-      bloque.appendChild(clon);
-    } else {
-      /* Los lomos sueltos no tienen portada: se les arma una con lo suyo. */
-      const d = document.createElement('div');
-      d.className = 'cover-folder';
-      d.style.color = '#1a2530';
-      d.innerHTML =
-        '<div class="folder-tab" style="background:' + libro.tabColor + ';"></div>' +
-        '<div class="folder-dept">Expediente</div>' +
-        '<div class="folder-main-title">' + libro.title + '</div>' +
-        '<div class="folder-meta">' + (libro.subtitle || libro.author || '') + '</div>';
-      this.expTapa.style.background = '#e8e4db';
-      bloque.appendChild(d);
-    }
-
-    document.getElementById('hojaDep').textContent = libro.title;
-    document.getElementById('hojaId').textContent = libro.id.replace('folder-', 'REF · ').toUpperCase();
-    document.getElementById('hojaSub').textContent = libro.subtitle || libro.author || '';
-    this.expHoja.querySelector('.hoja-regla').style.background = libro.tabColor || '#1b1b19';
+    /* Y la hoja de dentro es lo que se cuenta de ese frente. Nada mas: la
+       lamina es apoyo, el resto lo pone quien habla. */
+    document.getElementById('hojaDep').textContent = 'La investigación';
+    document.getElementById('hojaId').textContent = 'Frente ' + frente.num + ' / 05';
+    document.getElementById('hojaTitulo').textContent = frente.titulo;
+    document.getElementById('hojaCuerpo').textContent = frente.resumen;
+    this.expHoja.querySelector('.hoja-regla').style.background = frente.tabColor;
   }
 
-  desplegar(ficha) {
+  desplegar(index) {
+    const ficha = this.domSlots[index];
+    if (!ficha) return;
     const desde = this.cajaDe(ficha);
     const hasta = this.cajaFinal();
 
     this.pintarExpediente(ficha);
-    this.expCaja.style.transform = this.pose(desde).transform;
-    this.expCaja.style.width = this.pose(desde).width;
-    this.expCaja.style.height = this.pose(desde).height;
+    const p0 = this.pose(desde);
+    this.expCaja.style.transform = p0.transform;
+    this.expCaja.style.width = p0.width;
+    this.expCaja.style.height = p0.height;
     this.expediente.classList.add('abierto');
 
     ficha.slotEl.classList.add('se-abre');
     document.documentElement.classList.add('abriendo');
-    this.zoomObjetivo = 1.14;
+    this.abierto = index;
+    this.hueco = desde;   // adonde tendrá que volver, medido una sola vez
 
     const t = { duration: APERTURA_MS, easing: APERTURA_EASE, fill: 'both' };
 
@@ -531,54 +531,80 @@ class BookshelfManager {
       { transform: this.contener(desde, HOJA_W, HOJA_H), opacity: 0, offset: 0.28 },
       { transform: this.contener(hasta, HOJA_W, HOJA_H), opacity: 1 }
     ], t);
-
-    const libro = ficha.book;
-    this.aperturaLista = new Promise((listo) => {
-      this.relojes.push(setTimeout(listo, APERTURA_MS + 90));
-    });
-
-    const extra = {
-      expediente: libro.id,
-      titulo: libro.title,
-      area: libro.subtitle || libro.author || '',
-      color: libro.spineBg
-    };
-
-    if (window.Taller && window.Taller.dentroDelDeck) {
-      window.Taller.ir('caso', extra);
-    } else {
-      // Suelta, sin deck alrededor: la carpeta se abre y luego navega
-      this.aperturaLista.then(() => { window.location.href = '../slide 3/index.html'; });
-    }
   }
 
-  /* Al volver del caso el estante tiene que estar entero otra vez. */
+  /* El camino de vuelta: la tapa se cierra y la carpeta se encoge hasta su
+     sitio en el estante, que ya esta reapareciendo por debajo. Mide primero
+     y toca el estante despues: el hueco al que vuelve tiene que ser el mismo
+     durante todo el trayecto. */
+  recoger() {
+    if (this.abierto === -1) return Promise.resolve();
+    const ficha = this.domSlots[this.abierto];
+    const hasta = this.hueco || this.cajaDe(ficha);   // su hueco en el estante
+    const desde = this.cajaFinal();                   // donde esta abierta ahora
+
+    document.documentElement.classList.remove('abriendo');
+
+    const t = { duration: CIERRE_MS, easing: CIERRE_EASE, fill: 'both' };
+
+    this.expCaja.animate([this.pose(desde), this.pose(hasta)], t);
+    this.expTapa.animate([
+      { transform: 'rotateY(-162deg)' },
+      { transform: 'rotateY(0deg)' }
+    ], t);
+    this.expTapa.querySelector('.tapa-texto').animate([
+      { transform: this.contener(desde, TAPA_W, TAPA_H) },
+      { transform: this.contener(hasta, TAPA_W, TAPA_H) }
+    ], t);
+    this.expHoja.querySelector('.hoja-texto').animate([
+      { transform: this.contener(desde, HOJA_W, HOJA_H), opacity: 1 },
+      { transform: this.contener(hasta, HOJA_W, HOJA_H), opacity: 0 }
+    ], t);
+
+    return this.espera(CIERRE_MS).then(() => {
+      this.expediente.classList.remove('abierto');
+      ficha.slotEl.classList.remove('se-abre');
+      this.pararAnimaciones();
+      this.abierto = -1;
+      this.hueco = null;
+    });
+  }
+
+  pararAnimaciones() {
+    [this.expCaja, this.expTapa, this.expHoja,
+     this.expTapa.querySelector('.tapa-texto'),
+     this.expHoja.querySelector('.hoja-texto')].forEach((el) => {
+      if (el) el.getAnimations().forEach((a) => a.cancel());
+    });
+  }
+
+  /* Al volver de otra sección la lámina tiene que estar entera otra vez. */
   cerrarExpediente() {
     this.relojes.forEach(clearTimeout);
     this.relojes = [];
-    this.abriendo = false;
-    this.aperturaLista = null;
-    this.zoomObjetivo = 1;
-    this.zoom = 1;
+    this.ocupado = false;
+    this.abierto = -1;
+    this.hueco = null;
+    this.enCierre = false;
+    this.viajando = false;
+    this.targetProgress = 0;
+    this.currentProgress = 0;
 
     if (this.expediente) {
       this.expediente.classList.remove('abierto');
-      [this.expCaja, this.expTapa, this.expHoja,
-       this.expTapa.querySelector('.tapa-texto'),
-       this.expHoja.querySelector('.hoja-texto')].forEach((el) => {
-        if (el) el.getAnimations().forEach((a) => a.cancel());
-      });
+      this.pararAnimaciones();
     }
-    document.documentElement.classList.remove('abriendo');
+    document.documentElement.classList.remove('abriendo', 'cierre');
     this.domSlots.forEach((f) => f.slotEl.classList.remove('se-abre'));
   }
 
+  /* ---------- el bucle ---------- */
+
   startRenderLoop() {
     const render = () => {
-      if (!this.isDragging) {
+      if (!this.isDragging && !this.viajando) {
         this.currentProgress += (this.targetProgress - this.currentProgress) * 0.085;
       }
-      this.zoom += (this.zoomObjetivo - this.zoom) * 0.055;
       this.update3DLayout();
       requestAnimationFrame(render);
     };
@@ -595,27 +621,23 @@ class BookshelfManager {
       const absDist = Math.abs(idx - this.currentProgress);
       const quirk = this.quirks[idx];
 
-      if (slot.isFeatured) {
-        const openness = Math.max(0, Math.min(1, 1 - absDist));
-        const rotY = 90 * (1 - openness);
+      const openness = Math.max(0, Math.min(1, 1 - absDist));
+      const rotY = 90 * (1 - openness);
 
-        const rad = (rotY * Math.PI) / 180;
-        const projW = book.coverWidth * Math.cos(rad) + book.spineWidth * Math.sin(rad);
+      const rad = (rotY * Math.PI) / 180;
+      const projW = book.coverWidth * Math.cos(rad) + book.spineWidth * Math.sin(rad);
 
-        computed.push({ width: Math.max(book.spineWidth, projW), rotY, openness, isFeatured: true, quirk });
-      } else {
-        computed.push({ width: book.spineWidth, rotY: 0, openness: 0, isFeatured: false, quirk });
-      }
+      computed.push({ width: Math.max(book.spineWidth, projW), rotY, openness, quirk });
     });
 
     const centers = [];
-    computed.forEach((pos, idx) => {
+    computed.forEach((pos) => {
       centers.push(accX + pos.width / 2);
       // Use base gap + per-book extra random gap for organic spacing
       accX += pos.width + baseGap + pos.quirk.extraGap;
     });
 
-    const fi = Math.floor(this.currentProgress);
+    const fi = Math.max(0, Math.floor(this.currentProgress));
     const ci = Math.min(this.numBooks - 1, fi + 1);
     const frac = this.currentProgress - fi;
     const focalX = centers[fi] + ((centers[ci] || centers[fi]) - centers[fi]) * frac;
@@ -625,52 +647,55 @@ class BookshelfManager {
     this.domSlots.forEach((slot, idx) => {
       const pos = computed[idx];
       const quirk = pos.quirk;
-      slot.slotEl.style.width = `${pos.width}px`;
+      slot.slotEl.style.width = pos.width + 'px';
       // El expediente centrado es el único que se puede abrir: que se note
       slot.slotEl.classList.toggle('es-actual', idx === centrado);
 
       // Apply organic vertical offset and tilt to the slot itself
-      const baseTilt = slot.book.tilt || 0;
-      // When the folder is opening (featured & close to center), reduce disorder
-      const disorderFade = pos.isFeatured ? (1 - pos.openness) : 1;
-      const tiltDeg = baseTilt * disorderFade;
+      // When the folder is opening (close to center), reduce disorder
+      const disorderFade = 1 - pos.openness;
+      const tiltDeg = (slot.book.tilt || 0) * disorderFade;
       const vShift = quirk.vertShift * disorderFade;
 
       // Calculate how much the top of the book displaces horizontally due to tilt
       // displacement = height * sin(tilt). Add margin on the side the book leans toward.
       const tiltRad = (Math.abs(tiltDeg) * Math.PI) / 180;
       const topDisplacement = slot.book.height * Math.sin(tiltRad);
-      
+
       // Positive tilt = leans right → need margin-right
       // Negative tilt = leans left → need margin-left
       const mLeft = tiltDeg < 0 ? topDisplacement : 0;
       const mRight = tiltDeg > 0 ? topDisplacement : quirk.extraGap;
 
-      slot.slotEl.style.transform = `translateY(${-vShift}px) rotate(${tiltDeg}deg)`;
-      slot.slotEl.style.marginLeft = `${mLeft}px`;
-      slot.slotEl.style.marginRight = `${mRight + quirk.extraGap}px`;
+      slot.slotEl.style.transform = 'translateY(' + (-vShift) + 'px) rotate(' + tiltDeg + 'deg)';
+      slot.slotEl.style.marginLeft = mLeft + 'px';
+      slot.slotEl.style.marginRight = (mRight + quirk.extraGap) + 'px';
 
-      if (slot.isFeatured && slot.meshEl) {
+      if (slot.meshEl) {
         const liftY = -pos.openness * 6;
         const liftZ = pos.openness * 10;
-        slot.meshEl.style.transform = `translateY(${liftY}px) translateZ(${liftZ}px) rotateY(${pos.rotY}deg)`;
+        slot.meshEl.style.transform =
+          'translateY(' + liftY + 'px) translateZ(' + liftZ + 'px) rotateY(' + pos.rotY + 'deg)';
 
         if (slot.shadingEl) {
-          slot.shadingEl.style.opacity = `${(pos.rotY / 90) * 0.35}`;
+          slot.shadingEl.style.opacity = String((pos.rotY / 90) * 0.35);
         }
       }
     });
 
     const ri = Math.round(this.currentProgress);
-    this.pageNums.forEach(btn => {
+    this.pageNums.forEach((btn) => {
       const t = parseInt(btn.dataset.idx, 10);
-      btn.classList.toggle('active', Math.abs(t - ri) <= 1);
+      btn.classList.toggle('active', t === ri);
+      /* Los frentes ya recorridos se quedan marcados: con cinco carpetas y
+         una charla encima, saber por dónde se va vale más que la simetría. */
+      btn.classList.toggle('visto', this.abierto !== -1 && t < this.abierto);
     });
 
-    this.shelfTrack.style.transform = `translateX(${-focalX}px) scale(${this.zoom.toFixed(4)})`;
+    this.shelfTrack.style.transform = 'translateX(' + (-focalX) + 'px)';
   }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  window.estante = new BookshelfManager();
+  window.estante = new EstanteInvestigacion();
 });

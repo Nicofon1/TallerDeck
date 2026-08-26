@@ -67,8 +67,8 @@ html.saliendo #telon{opacity:1;transition-duration:.46s}
 .punch{
   margin:0;
   font-family:var(--titulo);
-  font-weight:400;
-  font-variation-settings:'opsz' 120,'SOFT' 0,'WONK' 0;
+  font-weight:700;
+  font-style:italic;
   font-size:clamp(30px,3.5vw,54px);
   line-height:1.04;
   letter-spacing:-.014em;

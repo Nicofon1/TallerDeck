@@ -11,13 +11,11 @@ if (!fs.existsSync(outDir)) {
 const paginas = [
   { id: 'contexto', url: 'http://localhost:8000/presentacion/contexto.html' },
   { id: 'problema', url: 'http://localhost:8000/presentacion/problema.html' },
-  { id: 'investigacion', url: 'http://localhost:8000/presentacion/investigacion.html' },
   { id: 'journey', url: 'http://localhost:8000/presentacion/journey.html' },
   { id: 'timeline', url: 'http://localhost:8000/presentacion/timeline.html' },
-  { id: 'burbujas', url: 'http://localhost:8000/Slides/corazon-burbujas.html' },
   { id: 'cinetica', url: 'http://localhost:8000/slides 2/page2.html' },
-  { id: 'biblioteca', url: 'http://localhost:8000/slides 2/index.html' },
-  { id: 'caso', url: 'http://localhost:8000/slide 3/index.html' }
+  // La investigación vive en el estante: su miniatura sale de ahí.
+  { id: 'biblioteca', url: 'http://localhost:8000/slides 2/index.html' }
 ];
 
 for (const p of paginas) {

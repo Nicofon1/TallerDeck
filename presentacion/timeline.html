@@ -13,103 +13,271 @@
 <script>try{if(window.parent!==window&&!/[?&]previa=1/.test(location.search))document.documentElement.className+=" con-telon";}catch(e){}</script>
 
 <style>
-  .lamina.entera{
-    grid-template-rows:auto 1fr auto;
-    align-content:center;
-    gap:clamp(20px,2.6vw,38px);
-    padding-bottom:34px;
+  /* ── Timeline Main Container ────────────────────────────────────── */
+  .lamina.timeline-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 32px clamp(24px, 4vw, 54px) 24px;
+    background: var(--papel, #F9FAFB);
+    box-sizing: border-box;
+    overflow: hidden;
+    color: var(--tinta, #1A1A1A);
+    justify-content: space-between;
   }
 
-  /* ── el riel ──────────────────────────────────────────────
-     Las columnas no son iguales: cada hito ocupa a lo ancho lo que dura.
-     El prototipo son cinco semanas y la entrega es un día, y así se ve. */
-  .riel{
-    display:grid;
-    grid-template-columns:1.55fr 1fr .62fr .62fr;
-    gap:0;
-    align-items:stretch;
+  /* ── Header ─────────────────────────────────────────────────────── */
+  .timeline-header-wrap {
+    margin-bottom: 16px;
+    flex-shrink: 0;
   }
 
-  .hito{
-    position:relative;
-    display:flex;flex-direction:column;gap:14px;
-    padding:0 clamp(14px,1.6vw,26px) 0 0;
-  }
-  .hito .fecha{
-    font-size:10px;letter-spacing:.2em;text-transform:uppercase;
-    color:var(--azul);font-weight:600;
-  }
-
-  /* La barra: un tramo lleno para lo que dura semanas, un punto para lo
-     que ocurre en un día. */
-  .barra-hito{
-    position:relative;height:3px;border-radius:2px;
-    background:var(--niebla);
-    margin-right:10px;
-  }
-  .barra-hito::before{
-    content:"";position:absolute;inset:0;border-radius:2px;
-    background:linear-gradient(90deg,var(--aqua),var(--azul));
-    transform-origin:left center;
-    transform:scaleX(var(--llena,1));
-    transition:transform .9s cubic-bezier(.16,1,.3,1);
-  }
-  .hito .punto{
-    position:absolute;left:0;top:50%;transform:translate(-1px,-50%);
-    width:11px;height:11px;border-radius:50%;
-    background:var(--papel);border:2px solid var(--azul);
-    z-index:2;
-  }
-  .hito.puntual .punto{background:var(--azul)}
-  .hito.puntual .barra-hito{background:transparent}
-  .hito.puntual .barra-hito::before{display:none}
-
-  .hito h2{
-    margin:0;
-    font-family:var(--titulo);font-weight:400;
-    font-size:clamp(17px,1.62vw,24px);line-height:1.1;letter-spacing:-.012em;
-    color:var(--tinta);
-  }
-  .hito p{
-    margin:0;font-size:12.5px;line-height:1.58;color:var(--apagado);
-    max-width:32ch;
-  }
-  .hito .duracion{
-    margin-top:auto;
-    font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;
-    color:var(--apagado);
+  /* ── Gantt Container ───────────────────────────────────────────── */
+  .gantt-chart-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 0;
+    margin: 6px 0;
   }
 
-  /* Al mirar uno, los demás se apartan un poco de la atención. */
-  .riel:hover .hito{opacity:.5}
-  .riel .hito:hover{opacity:1}
-  .hito{transition:opacity .3s ease}
+  /* Grid Dotted Background Lines */
+  .grid-bg-lines {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    pointer-events: none;
+    z-index: 1;
+  }
 
-  /* ── el cierre ────────────────────────────────────────────
-     La última frase del guion vive aquí, al pie de la línea de tiempo:
-     es lo que queda dicho cuando ya se vio todo el plan. */
-  .cierre{
-    border-top:1px solid var(--linea);
-    padding-top:clamp(14px,1.8vw,22px);
-    display:flex;align-items:flex-end;gap:clamp(20px,3vw,48px);
-    flex-wrap:wrap;
+  .grid-bg-col {
+    border-left: 1.5px dashed var(--linea, rgba(0, 0, 0, 0.15));
+    height: 100%;
   }
-  .cierre .marca-paso{
-    font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;
-    color:var(--apagado);white-space:nowrap;padding-bottom:6px;
+  .grid-bg-col:last-child {
+    border-right: 1.5px dashed var(--linea, rgba(0, 0, 0, 0.15));
   }
-  .cierre p{
-    margin:0;flex:1 1 420px;
-    font-family:var(--titulo);font-weight:400;
-    font-variation-settings:'opsz' 120,'SOFT' 0,'WONK' 0;
-    font-size:clamp(19px,2.05vw,30px);
-    line-height:1.16;letter-spacing:-.012em;
-    color:var(--tinta);
-  }
-  .cierre em{font-style:italic;color:var(--indigo)}
 
-  @media (max-width:900px){
-    .riel{grid-template-columns:1fr 1fr;gap:26px 0}
+  /* Waterfall Area (Cascading Palette Pills) */
+  .waterfall-container {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 1.2vh, 14px);
+    padding-top: 6px;
+  }
+
+  .waterfall-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    width: 100%;
+    align-items: center;
+  }
+
+  .pill-bar {
+    font-family: var(--texto), sans-serif;
+    font-size: clamp(13.5px, 1.05vw, 15.5px);
+    font-weight: 600;
+    padding: clamp(10px, 1.2vh, 14px) clamp(18px, 1.6vw, 26px);
+    border-radius: 9999px;
+    box-shadow: 0 4px 14px var(--sombra, rgba(0, 0, 0, 0.1));
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .pill-bar .duracion-tag {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-left: 12px;
+  }
+
+  .pill-bar:hover {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 8px 24px rgba(37, 29, 78, 0.22);
+  }
+
+  /* Palette Styling for Pill Bars */
+  .pill-row-1 .pill-bar,
+  .pill-row-2 .pill-bar,
+  .pill-row-3 .pill-bar,
+  .pill-row-4 .pill-bar {
+    background: var(--indigo);
+    color: var(--papel);
+  }
+  
+  .pill-row-1 .duracion-tag,
+  .pill-row-2 .duracion-tag,
+  .pill-row-3 .duracion-tag,
+  .pill-row-4 .duracion-tag {
+    color: var(--cielo);
+    opacity: 0.85;
+  }
+
+  .pill-row-1 .pill-bar { grid-column: 1 / 2; width: 94%; }
+  .pill-row-2 .pill-bar { grid-column: 2 / 3; width: 94%; }
+  .pill-row-3 .pill-bar { grid-column: 3 / 4; width: 94%; }
+  .pill-row-4 .pill-bar { grid-column: 4 / 5; width: 94%; }
+
+  /* Dates Row */
+  .dates-grid {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    width: 100%;
+    margin: 14px 0 10px 0;
+  }
+
+  .date-pair {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 6px;
+  }
+
+  .date-label {
+    font-size: clamp(10px, 0.85vw, 11.5px);
+    font-weight: 600;
+    color: var(--azul);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* Deliverables Lists Row */
+  .deliverables-grid {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    width: 100%;
+    gap: 16px;
+  }
+
+  .deliverable-col {
+    padding: 0 8px;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .deliverable-col h3 {
+    margin: 0 0 6px 0;
+    font-family: var(--titulo);
+    font-size: clamp(14px, 1.1vw, 16px);
+    font-weight: 700;
+    font-style: italic;
+    color: var(--indigo);
+    letter-spacing: -0.01em;
+  }
+
+  .deliverable-col p.desc {
+    margin: 0 0 8px 0;
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--apagado);
+  }
+
+  .deliverable-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .deliverable-col li {
+    font-size: clamp(11px, 0.9vw, 12.5px);
+    font-weight: 500;
+    color: var(--tinta);
+    line-height: 1.35;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .deliverable-col li::before { content: "•"; font-size: 14px; color: var(--azul); font-weight: bold; }
+
+  /* ── Cierre Footer Section ──────────────────────────────────────── */
+  .cierre {
+    border-top: 1px solid var(--linea);
+    padding-top: clamp(10px, 1.4vh, 16px);
+    display: flex;
+    align-items: center;
+    gap: clamp(16px, 2.5vw, 36px);
+    flex-shrink: 0;
+    margin-top: 10px;
+  }
+
+  .cierre .marca-paso {
+    font-size: 9.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--apagado);
+    white-space: nowrap;
+    font-weight: 600;
+  }
+
+  .cierre p {
+    margin: 0;
+    flex: 1;
+    font-family: var(--titulo);
+    font-weight: 700;
+    font-style: italic;
+    font-size: clamp(15px, 1.35vw, 20px);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--tinta);
+  }
+
+  .cierre em {
+    font-style: italic;
+    color: var(--indigo);
+  }
+
+  /* Entry Animations */
+  html.entrando .pill-bar {
+    animation: slidePill 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .pill-row-1 .pill-bar { animation-delay: 0.08s; }
+  .pill-row-2 .pill-bar { animation-delay: 0.16s; }
+  .pill-row-3 .pill-bar { animation-delay: 0.24s; }
+  .pill-row-4 .pill-bar { animation-delay: 0.32s; }
+
+  html.entrando .deliverable-col {
+    animation: fadeInList 0.6s ease both;
+  }
+  .deliverable-col:nth-child(1) { animation-delay: 0.20s; }
+  .deliverable-col:nth-child(2) { animation-delay: 0.28s; }
+  .deliverable-col:nth-child(3) { animation-delay: 0.36s; }
+  .deliverable-col:nth-child(4) { animation-delay: 0.44s; }
+
+  @keyframes slidePill {
+    from { opacity: 0; transform: translateY(16px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @keyframes fadeInList {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 900px) {
+    .lamina.timeline-page {
+      overflow-y: auto;
+      height: auto;
+      min-height: 100vh;
+    }
   }
 </style>
 </head>
@@ -121,21 +289,117 @@
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
 </a>
 
-<main class="lamina entera">
-  <div class="cabeza columna" style="max-width:62ch">
-    <p class="rotulo">Timeline</p>
-    <h1 class="punch">De aquí a la entrega, en cuatro tramos.</h1>
+<main class="lamina timeline-page">
+  <!-- Header -->
+  <div class="cabeza columna timeline-header-wrap">
+    <h1 class="punch">Timeline</h1>
   </div>
 
-  <div class="riel" id="riel"></div>
+  <!-- Main Gantt Area -->
+  <div class="gantt-chart-wrapper">
+    <!-- Grid Background Vertical Dotted Lines -->
+    <div class="grid-bg-lines">
+      <div class="grid-bg-col"></div>
+      <div class="grid-bg-col"></div>
+      <div class="grid-bg-col"></div>
+      <div class="grid-bg-col"></div>
+    </div>
 
-  <div class="cierre">
-    <span class="marca-paso">El cierre</span>
-    <p>
-      Osler Hub no reemplaza la Clínica de Simulación: la <em>complementa</em>.
-      La clínica enseña a intervenir; Osler Hub acompaña el paso previo, que es
-      aprender a pensar antes de hacer.
-    </p>
+    <!-- Waterfall Pills Area (Harmonious Palette Colors) -->
+    <div class="waterfall-container">
+      <div class="waterfall-row pill-row-1">
+        <div class="pill-bar" data-col="1">
+          <span>Prototipo MVP</span>
+          <span class="duracion-tag">5 semanas</span>
+        </div>
+      </div>
+      <div class="waterfall-row pill-row-2">
+        <div class="pill-bar" data-col="2">
+          <span>Pruebas de usuario</span>
+          <span class="duracion-tag">3 semanas</span>
+        </div>
+      </div>
+      <div class="waterfall-row pill-row-3">
+        <div class="pill-bar" data-col="3">
+          <span>Pre entrega</span>
+          <span class="duracion-tag">1 día</span>
+        </div>
+      </div>
+      <div class="waterfall-row pill-row-4">
+        <div class="pill-bar" data-col="4">
+          <span>Entrega final</span>
+          <span class="duracion-tag">1 día</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Date Markers Row -->
+    <div class="dates-grid">
+      <div class="date-pair">
+        <span class="date-label">26 Ago</span>
+        <span class="date-label">30 Sep</span>
+      </div>
+      <div class="date-pair">
+        <span class="date-label">1 Oct</span>
+        <span class="date-label">20 Oct</span>
+      </div>
+      <div class="date-pair">
+        <span class="date-label">21 Oct</span>
+        <span class="date-label">31 Oct</span>
+      </div>
+      <div class="date-pair">
+        <span class="date-label">1 Nov</span>
+        <span class="date-label">11 Nov</span>
+      </div>
+    </div>
+
+    <!-- Deliverables & Content Bullet Lists Row -->
+    <div class="deliverables-grid">
+      <!-- Col 1: Prototipo -->
+      <div class="deliverable-col" data-col="1">
+        <h3>Prueba de usuario</h3>
+        <p class="desc">Enfoque en el producto mínimo funcional para validar el core de la aplicación.</p>
+        <ul>
+          <li>Desarrollo de MVP</li>
+          <li>Prueba de simulación</li>
+          <li>Interfaz interactiva</li>
+          <li>Casos clínicos base</li>
+        </ul>
+      </div>
+
+      <!-- Col 2: Testeos -->
+      <div class="deliverable-col" data-col="2">
+        <h3>Pruebas de usuario</h3>
+        <p class="desc">Recolectas de testeos con estudiantes de diferentes semestres.</p>
+        <ul>
+          <li>Múltiples testeos</li>
+          <li>Diferentes semestres</li>
+          <li>Historias de usuario</li>
+          <li>Validación clínica</li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Pre entrega -->
+      <div class="deliverable-col" data-col="3">
+        <h3>Pre entrega</h3>
+        <p class="desc">Entrega preliminar del producto con ajustes hallados en testeos.</p>
+        <ul>
+          <li>Revisión preliminar</li>
+          <li>Correcciones de testeos</li>
+          <li>Ajustes de UX y lógica</li>
+        </ul>
+      </div>
+
+      <!-- Col 4: Entrega final -->
+      <div class="deliverable-col" data-col="4">
+        <h3>Entrega final</h3>
+        <p class="desc">Entrega formal del producto funcional multi-plataforma.</p>
+        <ul>
+          <li>Producto funcional 100%</li>
+          <li>Acceso versión Web</li>
+          <li>Descargable APK Android</li>
+        </ul>
+    </div>
   </div>
 </main>
 
@@ -143,59 +407,30 @@
 <script>
 (function(){
   "use strict";
+  // Interactivity: Highlight matching deliverable list on pill hover
+  const pills = document.querySelectorAll('.pill-bar');
+  const cols = document.querySelectorAll('.deliverable-col');
 
-  var HITOS = [
-    {
-      fecha:"26 ago — 30 sep", duracion:"Cinco semanas",
-      titulo:"Prototipo para prueba de usuario",
-      texto:"El equipo de desarrollo y diseño se enfoca en un producto mínimo " +
-            "funcional, suficiente para que un usuario pueda testear el core de la " +
-            "aplicación."
-    },
-    {
-      fecha:"1 — 20 oct", duracion:"Tres semanas",
-      titulo:"Pruebas de usuario",
-      texto:"Se recolectan múltiples testeos con usuarios de diferentes semestres " +
-            "para validar las historias de usuario principales."
-    },
-    {
-      fecha:"21 oct", duracion:"Un día", puntual:true,
-      titulo:"Pre entrega",
-      texto:"Entrega preliminar del producto, implementando las correcciones " +
-            "halladas durante los testeos."
-    },
-    {
-      fecha:"11 nov", duracion:"Un día", puntual:true,
-      titulo:"Entrega",
-      texto:"Entrega formal del producto funcional, en formato de link para web y " +
-            "el descargable APK para Android."
-    }
-  ];
-
-  var riel = document.getElementById("riel");
-
-  HITOS.forEach(function(h){
-    var d = document.createElement("article");
-    d.className = "hito" + (h.puntual ? " puntual" : "");
-    d.innerHTML =
-      '<span class="fecha">' + h.fecha + '</span>' +
-      '<div class="barra-hito"><span class="punto"></span></div>' +
-      '<h2>' + h.titulo + '</h2>' +
-      '<p>' + h.texto + '</p>' +
-      '<span class="duracion">' + h.duracion + '</span>';
-    riel.appendChild(d);
-  });
-
-  /* Las barras se llenan al llegar. Va por reloj y no por `animationend`
-     porque en una pestaña de fondo las animaciones no corren. */
-  function llenar(){
-    riel.querySelectorAll(".barra-hito").forEach(function(b, i){
-      b.style.setProperty("--llena", "0");
-      setTimeout(function(){ b.style.setProperty("--llena", "1"); }, 180 + i*130);
+  pills.forEach(pill => {
+    const colId = pill.getAttribute('data-col');
+    pill.addEventListener('mouseenter', () => {
+      cols.forEach(col => {
+        if (col.getAttribute('data-col') === colId) {
+          col.style.transform = 'translateY(-2px)';
+          col.style.transition = 'transform 0.2s ease';
+        } else {
+          col.style.opacity = '0.35';
+          col.style.transition = 'opacity 0.2s ease';
+        }
+      });
     });
-  }
-  window.alLlegarLamina = llenar;   // el gancho que ofrece costura.js
-  llenar();
+    pill.addEventListener('mouseleave', () => {
+      cols.forEach(col => {
+        col.style.transform = 'none';
+        col.style.opacity = '1';
+      });
+    });
+  });
 })();
 </script>
 </body>

@@ -312,7 +312,7 @@
     out[2] = y*st + z*ct - DIST;
   }
 
-  var elegido = 0, giro = 0, ultimo = 0, quieto = false, destino = null;
+  var elegido = 0, giro = Math.PI, ultimo = 0, quieto = false, destino = null;
   /* El recorrido de la sección: los tres problemas y, al final, el cierre.
      `cierreT` es lo avanzada que está esa mudanza, de 0 a 1. */
   var raiz = document.documentElement;
