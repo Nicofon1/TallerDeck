@@ -655,9 +655,39 @@
   /* Dentro del deck la lámina vive en un iframe: sin foco no le llegan las
      teclas. Se lo pide al llegar y también en cuanto alguien la toca. */
   function tomarFoco(){ try { window.focus(); } catch(err){} }
-  window.alLlegarLamina = tomarFoco;
   addEventListener("pointerdown", tomarFoco);
   tomarFoco();
+
+  /* Cada llegada empieza por el principio. Que la lámina se acuerde de por
+     dónde iba está bien mientras se la recorre, pero el deck no la destruye
+     al salir: volver a entrar después de haberla terminado te dejaba metido
+     en las frases del cierre en vez de delante de los tres problemas, que es
+     donde empieza lo que se cuenta. */
+  function alPrincipio(){
+    enCierre = false;
+    raiz.classList.remove("cierre");
+    pasoCierre = 0;
+    metaCierre = 0;
+    /* También el giro acumulado: es lo que la elipse persigue, y si se queda
+       con la vuelta de la visita anterior, la próxima vez que se llegue al
+       cierre entraría desenroscándose desde donde se dejó. */
+    giroCierre = 0;
+    /* Y la frase del cierre se queda escrita de la visita anterior. No se ve
+       —la tapa la clase que acabamos de quitar— pero es estado viejo, y con
+       un fundido a medias podría tener un reloj suyo todavía en marcha. */
+    clearTimeout(relojFrase);
+    frase.classList.remove("cambiando");
+    frase.textContent = "";
+    clearTimeout(reloj);
+    /* Como en el arranque: `primero` pinta la ficha en seco, sin el fundido
+       de cambiar de nodo, y `elegido` en -1 obliga a repintarla aunque el
+       nodo donde se quedó ya fuera el primero. */
+    primero = true;
+    elegido = -1;
+    elegir(0);
+  }
+
+  window.alLlegarLamina = function(){ tomarFoco(); alPrincipio(); };
 
   /* El clic se resuelve por geometría: se proyecta el centro de cada cúmulo y
      gana el más cercano al puntero dentro de su radio. Con tres bolas que se

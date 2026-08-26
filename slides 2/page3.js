@@ -12,8 +12,8 @@ const seccionesData = [
     nombre: 'La clínica de simulación',
     area: 'Contexto',
     texto: 'Uno de los lugares más importantes en la formación de los estudiantes, porque es donde se pueden equivocar con los simuladores de alta fidelidad sin afectar una vida humana.',
-    heroImg: 'assets/previews/contexto.png',
-    thumbImg: 'assets/previews/contexto.png'
+    heroImg: 'assets/cards/torax.jpg',
+    thumbImg: 'assets/cards/torax.jpg'
   },
   {
     id: 1,
@@ -22,8 +22,8 @@ const seccionesData = [
     nombre: 'Los tres problemas que se refuerzan uno al otro.',
     area: 'Problema',
     texto: 'Inseguridad y la ansiedad.\n\nEl método clínico no se internaliza bien.\n\nfeedback docente ineficiente.',
-    heroImg: 'assets/previews/problema.png',
-    thumbImg: 'assets/previews/problema.png'
+    heroImg: 'assets/cards/corazon.jpg',
+    thumbImg: 'assets/cards/corazon.jpg'
   },
   {
     id: 2,
@@ -32,8 +32,8 @@ const seccionesData = [
     nombre: 'Entendimos el problema desde cinco frentes',
     area: 'Investigación',
     texto: 'Voz estudiantil, observación directa, referentes del mundo, literatura científica y marco normativo. Cada frente es una carpeta que se abre.',
-    heroImg: 'assets/previews/biblioteca.png',
-    thumbImg: 'assets/previews/biblioteca.png'
+    heroImg: 'assets/cards/mano.jpg',
+    thumbImg: 'assets/cards/mano.jpg'
   },
   {
     id: 3,
@@ -42,8 +42,8 @@ const seccionesData = [
     nombre: 'Cómo lo resolvemos',
     area: 'Journey',
     texto: 'El recorrido de Camilo, etapa por etapa: entrevista, procedimientos, diagnóstico, plan de manejo y retroalimentación.',
-    heroImg: 'assets/previews/journey.png',
-    thumbImg: 'assets/previews/journey.png'
+    heroImg: 'assets/cards/esqueleto.jpg',
+    thumbImg: 'assets/cards/esqueleto.jpg'
   },
   {
     id: 4,
@@ -52,8 +52,8 @@ const seccionesData = [
     nombre: '11 de Noviembre',
     area: 'Timeline',
     texto: 'Osler Hub no reemplaza la Clínica de Simulación: la complementa. La clínica enseña a intervenir; Osler Hub acompaña el paso previo, que es aprender a pensar antes de hacer.',
-    heroImg: 'assets/previews/timeline.png',
-    thumbImg: 'assets/previews/timeline.png'
+    heroImg: 'assets/cards/espina.jpg',
+    thumbImg: 'assets/cards/espina.jpg'
   },
   {
     id: 5,
@@ -62,8 +62,8 @@ const seccionesData = [
     nombre: 'Tipografía cinética',
     area: 'Concepto',
     texto: 'Palabras en órbita sobre un eje tridimensional. Se arrastra para girarlas o se salta directo a cualquiera de ellas.',
-    heroImg: 'assets/previews/cinetica.png',
-    thumbImg: 'assets/previews/cinetica.png'
+    heroImg: 'assets/cards/cerebro.jpg',
+    thumbImg: 'assets/cards/cerebro.jpg'
   }
 ];
 
@@ -382,7 +382,17 @@ class IndiceDeSecciones {
     if (this.reviewerName) this.reviewerName.textContent = s.nombre;
     if (this.reviewerCompany) this.reviewerCompany.textContent = s.area;
     if (this.reviewerQuote) this.reviewerQuote.textContent = s.texto;
-    if (this.heroImage) this.heroImage.alt = s.nombre;
+    if (this.heroImage) {
+      this.heroImage.alt = s.nombre;
+      this.heroImage.src = s.heroImg;
+      this.heroImage.setAttribute('data-deck', s.deck);
+    }
+    if (this.heroBannerCard) {
+      this.heroBannerCard.setAttribute('data-deck', s.deck);
+    }
+    if (this.flipGhostImg) {
+      this.flipGhostImg.setAttribute('data-deck', s.deck);
+    }
     if (this.entrarMarcoTexto) this.entrarMarcoTexto.textContent = 'Ingresar a ' + s.nombre;
   }
 

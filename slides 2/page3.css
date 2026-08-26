@@ -258,7 +258,13 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: top left;
+  /* Centrado y no anclado a la esquina. Las portadas son radiografías: cada
+     una viene con su tamaño, y sujetas por arriba a la izquierda la figura
+     caía en un sitio distinto en cada card. Las imágenes ya vienen compuestas
+     a la proporción de la card, así que centrando no se recorta casi nada; lo
+     poco que el ancho de ventana mueva, se reparte por igual a los dos lados
+     en vez de comerse un costado entero. */
+  object-position: center;
   display: block;
   transition: transform 0.4s ease;
 }
@@ -360,8 +366,19 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: top left;
+  object-position: center;
   display: block;
+}
+
+/* Centrado vertical perfecto para la imagen de la caja torácica (contexto) */
+.hero-image[data-deck="contexto"],
+.hero-banner-card[data-deck="contexto"] .hero-image,
+.thumb-img-box img[data-deck="contexto"],
+.flip-ghost-card img[data-deck="contexto"],
+img[src*="contexto"] {
+  object-position: center 96% !important;
+  transform: scale(1.85) translateY(-14%);
+  transform-origin: center center;
 }
 
 /* 1. Hero Morph Transitions (FLIP / shared layout) */
@@ -415,7 +432,13 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: top left;
+  /* Centrado y no anclado a la esquina. Las portadas son radiografías: cada
+     una viene con su tamaño, y sujetas por arriba a la izquierda la figura
+     caía en un sitio distinto en cada card. Las imágenes ya vienen compuestas
+     a la proporción de la card, así que centrando no se recorta casi nada; lo
+     poco que el ancho de ventana mueva, se reparte por igual a los dos lados
+     en vez de comerse un costado entero. */
+  object-position: center;
   display: block;
 }
 
